@@ -9,7 +9,7 @@ OCLOSURE := YES
 
 ###
 
-all: local byte opt graffiti.p${PORT}.conf
+all: local byte opt
 
 LIBDIR := local/var/www/lib
 JSDIR  := local/var/www/static
@@ -28,14 +28,14 @@ DIRS = local/var/lib/ocsidbm local/var/run local/var/log \
 
 local: ${DIRS} local/var/www/static/css css/closure
 
-local/var/www/static/css:
+local/var/www/static/css: local
 	ln -fs $(shell pwd)/css local/var/www/static/css
 css/closure:
 	ln -fs $(shell ocamlfind query oclosure)/closure/goog/css/ css/closure
 ${DIRS}:
 	mkdir -p $@
 
-local/etc/graffiti.p${PORT}.conf: graffiti.conf.in
+local/etc/graffiti.p${PORT}.conf: local graffiti.conf.in
 	sed -e "s|%%SRC%%|$(shell pwd)|" \
 	    -e "s|%%LIBDIR%%|${LIBDIR}|" \
 	    -e "s|%%JSDIR%%|${JSDIR}|" \
