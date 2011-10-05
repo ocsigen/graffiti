@@ -79,21 +79,25 @@ let create_account_service =
   Eliom_services.post_coservice ~fallback:main_service ~post_params:(let open Eliom_parameters in (string "name" ** string "password")) ()
 
 let username = Eliom_references.eref ~scope:Eliom_common.session None
-let users = ref ["titi","tata";"test","test";"a","a"]
-let check_pwd name pwd = try List.assoc name !users = pwd with Not_found -> false
+
+let user_table = Ocsipersist.open_table "user_table"
+let check_pwd name pwd =
+  try_lwt
+    lwt saved_password = Ocsipersist.find user_table name in
+    Lwt.return ( pwd = saved_password )
+  with
+    Not_found -> Lwt.return false
 
 let () = Eliom_output.Action.register
   ~service:create_account_service
-  (fun () (name, pwd) ->
-    users := (name, pwd)::!users;
-    Lwt.return ())
+  (fun () (name, pwd) -> Ocsipersist.add user_table name pwd)
 
 let () = Eliom_output.Action.register
   ~service:connection_service
   (fun () (name, password) ->
-    if check_pwd name password
-    then Eliom_references.set username (Some name)
-    else Lwt.return ())
+    match_lwt check_pwd name password with
+      | true -> Eliom_references.set username (Some name)
+      | false -> Lwt.return ())
 
 let () =
   Eliom_output.Action.register
