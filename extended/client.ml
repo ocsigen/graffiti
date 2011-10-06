@@ -31,8 +31,10 @@ let launch_client_canvas bus imageservice canvas_elt =
   (* The initial image: *)
   let img = Dom_html.createImg Dom_html.document in
   img##alt <- Js.string "canvas";
-  img##src <- Js.string (Eliom_output.Html5.make_string_uri ~service:imageservice ());
-  img##onload <- Dom_html.handler (fun ev -> ctx##drawImage(img, 0., 0.); Js._false);
+  img##src <- Js.string
+    (Eliom_output.Html5.make_string_uri ~service:imageservice ());
+  img##onload <- Dom_html.handler
+    (fun ev -> ctx##drawImage(img, 0., 0.); Js._false);
 
   (* Size of the brush *)
   let slider = jsnew Goog.Ui.slider(Js.null) in
@@ -69,7 +71,8 @@ let launch_client_canvas bus imageservice canvas_elt =
   let drawing_arrow =
     run (mousedowns canvas
            (arr (fun ev -> set_coord ev; line ev)
-			   >>> first [mousemoves Dom_html.document (arr line);
-				      mouseup Dom_html.document >>> (arr line)])) () in
+                   >>> first [mousemoves Dom_html.document (arr line);
+                              mouseup Dom_html.document >>>
+				(arr line)])) () in
   { drawing_thread = t;
     drawing_arrow = drawing_arrow }

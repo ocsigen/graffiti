@@ -30,7 +30,6 @@ let start_drawing name canvas =
 
 let () = Connected.register ~service:multigraffiti_service
   !% ( fun name () username ->
-    (* the page element in wich we will include the canvas *)
     let canvas = unique (canvas ~a:[ a_width width; a_height height ]
 			   [pcdata "your browser doesn't support canvas"]) in
     start_drawing name canvas;
