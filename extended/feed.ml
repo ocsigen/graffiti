@@ -2,7 +2,16 @@ open Eliom_pervasives
 open HTML5.M
 open Server
 
-let static_dir = "local/var/www/static/"
+let static_dir =
+  match Eliom_config.get_config () with
+    | [Simplexmlparser.Element ("staticdir", [], [Simplexmlparser.PCData dir])] ->
+        dir
+    | [] ->
+      raise (Ocsigen_extensions.Error_in_config_file
+               ("staticdir must be configured"))
+    | _ ->
+      raise (Ocsigen_extensions.Error_in_config_file
+               ("Unexpected content inside graffiti config"))
 
 let image_dir name =
   let dir = static_dir ^ "/graffiti_saved/" ^ (Url.encode name) in

@@ -25,7 +25,9 @@
     <host hostfilter="*">
       <followsymlinks value="always" />
       <static dir="%%SRC%%/%%JSDIR%%" />
-      <eliom module="%%SRC%%/%%LIBDIR%%/graffiti.cma" />
+      <eliom module="%%SRC%%/%%LIBDIR%%/graffiti.cma">
+	<staticdir>%%SRC%%/%%JSDIR%%</staticdir>
+      </eliom>
     </host>
 
   </server>
