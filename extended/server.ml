@@ -9,14 +9,17 @@ module My_appl =
   end)
 
 let rgb_from_string color = (* color is in format "#rrggbb" *)
-  let get_color i = (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255. in
+  let get_color i =
+    (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255.
+  in
   try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
 
 let launch_server_canvas () =
   let bus = Eliom_bus.create Json.t<messages> in
 
   let draw_server, image_string =
-    let surface = Cairo.image_surface_create Cairo.FORMAT_ARGB32 ~width ~height in
+    let surface = Cairo.image_surface_create
+      Cairo.FORMAT_ARGB32 ~width ~height in
     let ctx = Cairo.create surface in
     ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
 
