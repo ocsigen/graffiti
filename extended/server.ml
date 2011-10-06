@@ -123,9 +123,8 @@ let login_name_form service button_text =
 
 let oclosure_script =
     HTML5.M.unique
-      (HTML5.M.script
-         ~a:[HTML5.M.a_src (HTML5.M.uri_of_string "./graffiti_oclosure.js")]
-         (HTML5.M.pcdata ""))
+      (Eliom_output.Html5_forms.js_script
+         ~uri:(HTML5.M.uri_of_string "./graffiti_oclosure.js") ())
 
 let make_page body =
   Lwt.return
