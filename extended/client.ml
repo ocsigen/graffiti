@@ -23,18 +23,17 @@ let stop_drawing { drawing_thread; drawing_arrow } =
   (* cancelling this thread also close the bus *)
   Event_arrows.cancel drawing_arrow
 
-let launch_client_canvas bus imageservice canvas_elt =
+let launch_client_canvas bus image_elt canvas_elt =
   let canvas = Eliom_client.Html5.of_canvas canvas_elt in
   let ctx = canvas##getContext (Dom_html._2d_) in
   ctx##lineCap <- Js.string "round";
 
-  (* The initial image: *)
-  let img = Dom_html.createImg Dom_html.document in
-  img##alt <- Js.string "canvas";
-  img##src <- Js.string
-    (Eliom_output.Html5.make_string_uri ~service:imageservice ());
-  img##onload <- Dom_html.handler
-    (fun ev -> ctx##drawImage(img, 0., 0.); Js._false);
+  let img = Eliom_client.Html5.of_img image_elt in
+  let copy_image () = ctx##drawImage(img, 0., 0.) in
+  if Js.to_bool (img##complete)
+  then copy_image ()
+  else img##onload <- Dom_html.handler
+    (fun ev -> copy_image (); Js._false);
 
   (* Size of the brush *)
   let slider = jsnew Goog.Ui.slider(Js.null) in

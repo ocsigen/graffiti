@@ -49,15 +49,30 @@ let launch_server_canvas () =
 
 let graffiti_info = Hashtbl.create 0
 
-let get_bus_image (name:string) =
+let imageservice =
+  Eliom_output.Text.register_service
+    ~path:["image"]
+    ~headers:Http_headers.dyn_headers
+    ~get_params:(let open Eliom_parameters in string "name" ** int "q")
+    (* we add another parameter for the browser not to cache: at least
+       for chrome, there is no way to force the browser to reload the
+       image without leaving the application *)
+    (fun (name,_) () ->
+      try_lwt
+        let _ ,image_string = Hashtbl.find graffiti_info name in
+	Lwt.return (image_string (), "image/png")
+      with
+	| Not_found -> raise_lwt Eliom_common.Eliom_404)
+
+let get_bus (name:string) =
   (* create a new bus and image_string function only if it did not exists *)
   try
-    Hashtbl.find graffiti_info name
+    fst (Hashtbl.find graffiti_info name)
   with
     | Not_found ->
       let bus,image_string = launch_server_canvas () in
       Hashtbl.add graffiti_info name (bus,image_string);
-      (bus,image_string)
+      bus
 
 let main_service = Eliom_services.service ~path:[""]
   ~get_params:(Eliom_parameters.unit) ()
@@ -135,19 +150,15 @@ let make_page body =
        (HTML5.M.head
 	  (HTML5.M.title (HTML5.M.pcdata "Graffiti"))
  	  [
-            HTML5.M.link ~rel:[ `Stylesheet ]
-              ~href:(HTML5.M.uri_of_string"./css/closure/common.css")
-              ();
-            HTML5.M.link ~rel:[ `Stylesheet ]
-              ~href:(HTML5.M.uri_of_string"./css/closure/hsvpalette.css")
-              ();
-            HTML5.M.link ~rel:[ `Stylesheet ]
-              ~href:(HTML5.M.uri_of_string"./css/slider.css")
-              ();
+	    Eliom_output.Html5_forms.css_link
+	      ~uri:(HTML5.M.uri_of_string"./css/closure/common.css") ();
+	    Eliom_output.Html5_forms.css_link
+	      ~uri:(HTML5.M.uri_of_string"./css/closure/hsvpalette.css") ();
+	    Eliom_output.Html5_forms.css_link
+	      ~uri:(HTML5.M.uri_of_string"./css/slider.css") ();
             oclosure_script;
-	    HTML5.M.link ~rel:[ `Stylesheet ]
-	      ~href:(HTML5.M.uri_of_string"./css/graffiti.css")
-              ();
+	    Eliom_output.Html5_forms.css_link
+	      ~uri:(HTML5.M.uri_of_string"./css/graffiti.css") ();
           ])
        (HTML5.M.body body))
 

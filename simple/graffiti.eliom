@@ -45,7 +45,7 @@ let rgb_from_string color = (* color is in format "#rrggbb" *)
   let get_color i = (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255. in
   try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
 
-let draw_server, image_string = 
+let draw_server, image_string =
   let surface = Cairo.image_surface_create Cairo.FORMAT_ARGB32 ~width ~height in
   let ctx = Cairo.create surface in
   ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
@@ -60,7 +60,7 @@ let draw_server, image_string =
     Cairo.move_to ctx (float x1) (float y1) ;
     Cairo.line_to ctx (float x2) (float y2) ;
     Cairo.close_path ctx ;
-    
+
     (* Apply the ink *)
     Cairo.stroke ctx ;
    ),
@@ -88,29 +88,34 @@ let imageservice =
 let main_service =
   My_appl.register_service ~path:[""] ~get_params:Eliom_parameters.unit
     (fun () () ->
+      let image_elt = unique (img ~alt:"canvas" ~src:(Eliom_output.Html5.make_string_uri
+						~service:imageservice ()) ()) in
+      let canvas_elt = unique (canvas ~a:[ a_width width; a_height height ]
+				 [pcdata "your browser doesn't support canvas"; br ();
+				  image_elt]) in
+      let canvas2_elt = unique (canvas ~a:[ a_width width; a_height height ] []) in
        Eliom_services.onload
          {{
-           let canvas = Dom_html.createCanvas Dom_html.document in
-           canvas##width <- width; canvas##height <- height;
+	   let canvas = Eliom_client.Html5.of_canvas %canvas_elt in
            let st = canvas##style in
            st##position <- Js.string "absolute";
            st##zIndex <- Js.string "-1";
-           Dom.appendChild Dom_html.document##body canvas;
            let ctx = canvas##getContext (Dom_html._2d_) in
            ctx##lineCap <- Js.string "round";
 
            (* Another canvas, for second layer *)
-           let canvas2 = Dom_html.createCanvas Dom_html.document in
+	   let canvas2 = Eliom_client.Html5.of_canvas %canvas2_elt in
            canvas2##width <- width; canvas2##height <- height;
-           Dom.appendChild Dom_html.document##body canvas2;
            let ctx2 = canvas2##getContext (Dom_html._2d_) in
            ctx2##lineCap <- Js.string "round";
 
            (* The initial image: *)
-           let img = Dom_html.createImg Dom_html.document in
-           img##alt <- Js.string "canvas";
-           img##src <- Js.string (Eliom_output.Html5.make_string_uri ~service:%imageservice ());
-           img##onload <- Dom_html.handler (fun ev -> ctx##drawImage(img, 0., 0.); Js._false);
+	   let img = Eliom_client.Html5.of_img %image_elt in
+	   let copy_image () = ctx##drawImage(img, 0., 0.) in
+	   if Js.to_bool (img##complete)
+	   then copy_image ()
+	   else img##onload <- Dom_html.handler
+	     (fun ev -> copy_image (); Js._false);
 
            (* Size of the brush *)
            let slider = jsnew Goog.Ui.slider(Js.null) in
@@ -120,12 +125,12 @@ let main_service =
            slider##setValue(10.);
            slider##setMoveToPointEnabled(Js._true);
            slider##render(Js.some Dom_html.document##body);
-          
+
            (* The color palette: *)
-           let pSmall = 
+           let pSmall =
 (*VVV Problems with HSVA:
  - the widget gives #rrggbbaa and the canvas expects rgba(rrr, ggg, bbb, a)
- - the point between two lines is diaplayed twice (=> darker)
+ - the point between two lines is displayed twice (=> darker)
 *)
              jsnew Goog.Ui.hsvPalette(Js.null, Js.null,
                                       Js.some (Js.string "goog-hsv-palette-sm"))
@@ -151,7 +156,7 @@ let main_service =
            in
            ignore (Lwt_js.sleep 0.1 >>= fun () -> (* avoid chromium looping cursor *)
                    Lwt.catch
-                     (fun () -> 
+                     (fun () ->
                        Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus))
                      (function e (* Eliom_comet.Channel_full *) ->
                        Firebug.console##log (e);
@@ -201,5 +206,5 @@ let main_service =
                 ();
               oclosure_script;
             ])
-	  (HTML5.M.body []))
+	  (HTML5.M.body [canvas_elt; canvas2_elt]))
    )
