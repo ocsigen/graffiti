@@ -35,7 +35,7 @@ css/closure:
 ${DIRS}:
 	mkdir -p $@
 
-local/etc/graffiti.p${PORT}.conf: local graffiti.conf.in
+local/etc/graffiti.p${PORT}.conf: graffiti.conf.in
 	sed -e "s|%%SRC%%|$(shell pwd)|" \
 	    -e "s|%%LIBDIR%%|${LIBDIR}|" \
 	    -e "s|%%JSDIR%%|${JSDIR}|" \

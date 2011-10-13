@@ -9,30 +9,25 @@
 open Server
 open Feed
 
-let start_drawing name canvas =
-
-  let bus,image_string = get_bus_image name in
-
-  let imageservice =
-    Eliom_output.Text.register_coservice'
-      ~timeout:10.
-      (* the service is available fo 10 seconds only, but it is long
-	 enouth for the browser to do its request. *)
-      ~get_params:Eliom_parameters.unit
-      (fun () () -> Lwt.return (image_string (), "image/png"))
-  in
-
+let start_drawing name image canvas =
+  let bus = get_bus name in
   Eliom_services.onload
     {{
-      let canceller = launch_client_canvas %bus %imageservice %canvas in
+      let canceller = launch_client_canvas %bus %image %canvas in
       Eliom_client.on_unload (fun () -> stop_drawing canceller)
     }}
 
+let counter = ref 0
+
 let () = Connected.register ~service:multigraffiti_service
   !% ( fun name () username ->
+    (* Some browsers won't reload the image, so we force them by changing the url each time. *)
+    incr counter;
+    let image = unique (img ~alt:name ~src:(Eliom_output.Html5.make_string_uri
+					      ~service:imageservice (name,!counter)) ()) in
     let canvas = unique (canvas ~a:[ a_width width; a_height height ]
-			   [pcdata "your browser doesn't support canvas"]) in
-    start_drawing name canvas;
+			   [pcdata "your browser doesn't support canvas"; br (); image]) in
+    start_drawing name image canvas;
     make_page
       [h1 [pcdata name];
        disconnect_box ();
