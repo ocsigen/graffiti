@@ -73,12 +73,6 @@ let draw_server, image_string =
 
 let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
-let oclosure_script =
-    HTML5.M.unique
-      (HTML5.M.script
-         ~a:[HTML5.M.a_src (HTML5.M.uri_of_string "./graffiti_oclosure.js")]
-         (HTML5.M.pcdata ""))
-
 let imageservice =
   Eliom_output.Text.register_service
     ~path:["image"]
@@ -192,19 +186,16 @@ let main_service =
         (HTML5.M.html
 	  (HTML5.M.head
 	    (HTML5.M.title (HTML5.M.pcdata "Graffiti"))
- 	    [ HTML5.M.link ~rel:[ `Stylesheet ]
-                ~href:(HTML5.M.uri_of_string"./css/graffiti.css")
-                ();
-              HTML5.M.link ~rel:[ `Stylesheet ]
-                ~href:(HTML5.M.uri_of_string"./css/closure/common.css")
-                ();
-              HTML5.M.link ~rel:[ `Stylesheet ]
-                ~href:(HTML5.M.uri_of_string"./css/closure/hsvpalette.css")
-                ();
-              HTML5.M.link ~rel:[ `Stylesheet ]
-                ~href:(HTML5.M.uri_of_string"./css/slider.css")
-                ();
-              oclosure_script;
+ 	    [ Eliom_output.Html5_forms.css_link
+		~uri:(HTML5.M.uri_of_string"./css/closure/common.css") ();
+	      Eliom_output.Html5_forms.css_link
+		~uri:(HTML5.M.uri_of_string"./css/closure/hsvpalette.css") ();
+	      Eliom_output.Html5_forms.css_link
+		~uri:(HTML5.M.uri_of_string"./css/slider.css") ();
+	      Eliom_output.Html5_forms.css_link
+		~uri:(HTML5.M.uri_of_string"./css/graffiti.css") ();
+	      Eliom_output.Html5_forms.js_script
+		~uri:(HTML5.M.uri_of_string "./graffiti_oclosure.js") ();
             ])
 	  (HTML5.M.body [canvas_elt; canvas2_elt]))
    )
