@@ -21,7 +21,8 @@ let counter = ref 0
 
 let () = Connected.register ~service:multigraffiti_service
   !% ( fun name () username ->
-    (* Some browsers won't reload the image, so we force them by changing the url each time. *)
+    (* Some browsers won't reload the image, so we force
+       them by changing the url each time. *)
     incr counter;
     let image = unique (img ~alt:name ~src:(Eliom_output.Html5.make_string_uri
 					      ~service:imageservice (name,!counter)) ()) in
