@@ -28,14 +28,16 @@ let () = Connected.register ~service:multigraffiti_service
 					      ~service:imageservice (name,!counter)) ()) in
     let canvas = unique (canvas ~a:[ a_width width; a_height height ]
 			   [pcdata "your browser doesn't support canvas"; br (); image]) in
+    lwt save_box = if name = username
+      then save_image_box name
+      else Lwt.return (pcdata "no saving")
+    in
     start_drawing name image canvas;
     make_page
       [h1 [pcdata name];
        disconnect_box ();
        choose_drawing_form ();
        Eliom_output.Html5.a feed_service [pcdata "atom feed"] name;
-       div ( if name = username
-	 then [save_image_box name]
-	 else [pcdata "no saving"] );
+       div [save_box];
        canvas;])
 
