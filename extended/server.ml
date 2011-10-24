@@ -96,8 +96,6 @@ let disconnection_service = Eliom_services.post_coservice' ~post_params:Eliom_pa
 let create_account_service =
   Eliom_services.post_coservice ~fallback:main_service ~post_params:(let open Eliom_parameters in (string "name" ** string "password")) ()
 
-let username = Eliom_references.eref ~scope:Eliom_common.session None
-
 let user_table = Ocsipersist.open_table "user_table"
 let check_pwd name pwd =
   try_lwt
@@ -114,7 +112,9 @@ let () = Eliom_output.Action.register
   ~service:connection_service
   (fun () (name, password) ->
     match_lwt check_pwd name password with
-      | true -> Eliom_references.set username (Some name)
+      | true -> Eliom_state.set_volatile_data_session_group
+	~scope:Eliom_common.session name;
+	Lwt.return ()
       | false -> Lwt.return ())
 
 let () =
@@ -175,8 +175,8 @@ module Connected_translate =
 struct
   type page = string -> My_appl.page Lwt.t
   let translate page =
-    Eliom_references.get username >>=
-      function
+    match Eliom_state.get_volatile_data_session_group
+      ~scope:Eliom_common.session () with
 	| None -> default_content ()
 	| Some username -> page username
 end

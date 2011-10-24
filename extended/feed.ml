@@ -41,16 +41,26 @@ let save_image username =
   let (_,image_string) = Hashtbl.find graffiti_info username in
   save (image_string ()) username number
 
-let save_image_box name =
-  let save_image_service =
-    Eliom_output.Action.register_post_coservice'
-      ~post_params:Eliom_parameters.unit
-      (fun () () -> save_image name)
+let save_image_box =
+  let save_service_reference =
+    Eliom_references.eref ~scope:Eliom_common.session_group None in
+  fun name ->
+  lwt save_image_service =
+    match_lwt Eliom_references.get save_service_reference with
+      | None ->
+	let service = Eliom_output.Action.register_post_coservice'
+	  ~scope:Eliom_common.session_group
+	  ~post_params:Eliom_parameters.unit
+	  (fun () () -> save_image name) in
+	lwt () = Eliom_references.set save_service_reference (Some service) in
+	Lwt.return service
+      | Some service -> Lwt.return service
   in
-  Eliom_output.Html5.post_form save_image_service
-    (fun _ ->
-      [p [Eliom_output.Html5.string_input
-             ~input_type:`Submit ~value:"save" ()]]) ()
+  Lwt.return (
+    Eliom_output.Html5.post_form save_image_service
+      (fun _ ->
+	[p [Eliom_output.Html5.string_input
+               ~input_type:`Submit ~value:"save" ()]]) ())
 
 let feed_service = Eliom_services.service ~path:["feed"]
   ~get_params:(Eliom_parameters.string "name") ()
