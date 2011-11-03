@@ -24,7 +24,7 @@ let () = Connected.register ~service:multigraffiti_service
     (* Some browsers won't reload the image, so we force
        them by changing the url each time. *)
     incr counter;
-    let image = unique (img ~alt:name ~src:(Eliom_output.Html5.make_string_uri
+    let image = unique (img ~alt:name ~src:(Eliom_output.Html5.make_uri
 					      ~service:imageservice (name,!counter)) ()) in
     let canvas = unique (canvas ~a:[ a_width width; a_height height ]
 			   [pcdata "your browser doesn't support canvas"; br (); image]) in
