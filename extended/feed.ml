@@ -77,7 +77,7 @@ let rec entries name list = function
 	let title = Atom_feed.plain
 	  ("graffiti " ^ name ^ " " ^ (string_of_int n)) in
 	let uri =
-	  Eliom_uri.make_string_uri ~absolute:true
+	  Eliom_output.Html5.make_uri ~absolute:true
 	    ~service:(Eliom_services.static_dir ())
 	    (local_filename name n)
 	in
@@ -87,7 +87,7 @@ let rec entries name list = function
 	entry::(entries name q (len - 1))
 
 let feed name () =
-  let id = Eliom_uri.make_string_uri ~absolute:true
+  let id = Eliom_output.Html5.make_uri ~absolute:true
     ~service:feed_service name in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   try_lwt
@@ -101,7 +101,7 @@ let feed name () =
     | e -> Lwt.fail e
 
 let feed name () =
-  let id = Eliom_uri.make_string_uri ~absolute:true ~service:feed_service name in
+  let id = Eliom_output.Html5.make_uri ~absolute:true ~service:feed_service name in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   Lwt.catch
     (fun () -> Ocsipersist.find image_info_table name >|=
