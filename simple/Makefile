@@ -28,7 +28,7 @@ DIRS = local/var/lib/ocsidbm local/var/run local/var/log \
 
 local: ${DIRS} local/var/www/static/css css/closure
 
-local/var/www/static/css: local
+local/var/www/static/css: local/var/www/static
 	ln -fs $(shell pwd)/css local/var/www/static/css
 css/closure:
 	ln -fs $(shell ocamlfind query oclosure)/closure/goog/css/ css/closure
