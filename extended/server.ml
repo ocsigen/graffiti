@@ -182,7 +182,7 @@ struct
 end
 
 module Connected =
-  Eliom_output.Customize ( My_appl ) ( My_appl ) ( Connected_translate )
+  Eliom_output.Customize ( My_appl ) ( Connected_translate )
 
 let ( !% ) f = fun a b -> return (fun c -> f a b c)
 
