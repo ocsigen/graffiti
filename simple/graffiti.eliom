@@ -6,7 +6,6 @@
 
 {shared{
   open Eliom_pervasives
-  open HTML5.M
   let width = 700
   let height = 300
 }}
@@ -81,20 +80,21 @@ let imageservice =
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
 let image_elt =
-  unique (img ~alt:"canvas"
-              ~src:(Eliom_output.Html5.make_uri ~service:imageservice ())
-	      ())
+  HTML5.img ~alt:"canvas"
+    ~src:(Eliom_output.Html5.make_uri ~service:imageservice ())
+    ()
 let canvas_elt =
-  unique (canvas ~a:[ a_width width; a_height height ]
-	    [pcdata "your browser doesn't support canvas"; br ();
-	     image_elt])
+  HTML5.canvas ~a:[ HTML5.a_width width; HTML5.a_height height ]
+           [HTML5.pcdata "your browser doesn't support canvas";
+            HTML5.br ();
+            image_elt]
 let canvas2_elt =
-  unique (canvas ~a:[ a_width width; a_height height ] [])
+  HTML5.canvas ~a:[ HTML5.a_width width; HTML5.a_height height ] []
 
 let page =
-  HTML5.M.html
-    (HTML5.M.head
-       (HTML5.M.title (HTML5.M.pcdata "Graffiti"))
+  HTML5.html
+    (HTML5.head
+       (HTML5.title (HTML5.pcdata "Graffiti"))
        [ Eliom_output.Html5_forms.css_link
 	   ~uri:(Eliom_output.Html5.make_uri
 		   (Eliom_services.static_dir ()) ["css";"closure";"common.css"]) ();
@@ -111,7 +111,7 @@ let page =
 	   ~uri:(Eliom_output.Html5.make_uri
 		   (Eliom_services.static_dir ()) ["graffiti_oclosure.js"]) ();
        ])
-    (HTML5.M.body [canvas_elt; canvas2_elt])
+    (HTML5.body [canvas_elt; canvas2_elt])
 
 let onload_handler = {{
 
