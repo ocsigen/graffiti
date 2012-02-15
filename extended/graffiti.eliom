@@ -1,6 +1,5 @@
 {shared{
   open Eliom_pervasives
-  open HTML5.M
   open Common
 }}
 {client{
@@ -24,20 +23,23 @@ let () = Connected.register ~service:multigraffiti_service
     (* Some browsers won't reload the image, so we force
        them by changing the url each time. *)
     incr counter;
-    let image = unique (img ~alt:name ~src:(Eliom_output.Html5.make_uri
-					      ~service:imageservice (name,!counter)) ()) in
-    let canvas = unique (canvas ~a:[ a_width width; a_height height ]
-			   [pcdata "your browser doesn't support canvas"; br (); image]) in
+    let image =
+      HTML5.img ~alt:name ~src:(Eliom_output.Html5.make_uri
+				  ~service:imageservice (name,!counter)) () in
+    let canvas =
+      HTML5.canvas
+        ~a:[HTML5.a_width width; HTML5.a_height height ]
+        [ HTML5.pcdata "your browser doesn't support canvas";  HTML5.br (); image] in
     lwt save_box = if name = username
       then save_image_box name
-      else Lwt.return (pcdata "no saving")
+      else Lwt.return (HTML5.pcdata "no saving")
     in
     start_drawing name image canvas;
     make_page
-      [h1 [pcdata name];
-       disconnect_box ();
-       choose_drawing_form ();
-       Eliom_output.Html5.a feed_service [pcdata "atom feed"] name;
-       div [save_box];
-       canvas;])
+      [ HTML5.h1 [ HTML5.pcdata name];
+        disconnect_box ();
+        choose_drawing_form ();
+        Eliom_output.Html5.a feed_service [HTML5.pcdata "atom feed"] name;
+        HTML5.div [save_box];
+        canvas;])
 
