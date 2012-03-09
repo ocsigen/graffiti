@@ -39,7 +39,7 @@ module My_appl =
   type messages = (string * int * (int * int) * (int * int)) deriving (Json)
 }}
 
-let bus = Eliom_bus.create ~scope:`Global ~name:"grib" ~size:500 Json.t<messages>
+let bus = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 Json.t<messages>
 
 let rgb_from_string color = (* color is in format "#rrggbb" *)
   let get_color i = (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255. in
