@@ -1,14 +1,11 @@
-{server{
-
-   let _ = Eliom_state.set_global_volatile_data_state_timeout ~scope:Eliom_common.comet_client_process (Some 20.)
-
- }}
 
 {shared{
-  open Eliom_pervasives
+  open Eliom_content
   let width = 700
   let height = 300
 }}
+
+let _ = Eliom_state.set_global_volatile_data_state_timeout ~scope:Eliom_common.comet_client_process (Some 20.)
 
 module My_appl =
   Eliom_output.Eliom_appl (struct
@@ -76,46 +73,46 @@ let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 let imageservice =
   Eliom_output.Text.register_service
     ~path:["image"]
-    ~get_params:Eliom_parameters.unit
+    ~get_params:Eliom_parameter.unit
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
 let image_elt =
-  HTML5.img ~alt:"canvas"
-    ~src:(Eliom_output.Html5.make_uri ~service:imageservice ())
+  Html5.D.img ~alt:"canvas"
+    ~src:(Html5.D.make_uri ~service:imageservice ())
     ()
 let canvas_elt =
-  HTML5.canvas ~a:[ HTML5.a_width width; HTML5.a_height height ]
-           [HTML5.pcdata "your browser doesn't support canvas";
-            HTML5.br ();
+  Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ]
+           [Html5.D.pcdata "your browser doesn't support canvas";
+            Html5.D.br ();
             image_elt]
 let canvas2_elt =
-  HTML5.canvas ~a:[ HTML5.a_width width; HTML5.a_height height ] []
+  Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ] []
 
 let page =
-  HTML5.html
-    (HTML5.head
-       (HTML5.title (HTML5.pcdata "Graffiti"))
-       [ Eliom_output.Html5_forms.css_link
-	   ~uri:(Eliom_output.Html5.make_uri
-		   (Eliom_services.static_dir ()) ["css";"closure";"common.css"]) ();
-	 Eliom_output.Html5_forms.css_link
-	   ~uri:(Eliom_output.Html5.make_uri
-		   (Eliom_services.static_dir ()) ["css";"closure";"hsvpalette.css"]) ();
-	 Eliom_output.Html5_forms.css_link
-	   ~uri:(Eliom_output.Html5.make_uri
-		   (Eliom_services.static_dir ()) ["css";"slider.css"]) ();
-	 Eliom_output.Html5_forms.css_link
-	   ~uri:(Eliom_output.Html5.make_uri
-		   (Eliom_services.static_dir ()) ["css";"graffiti.css"]) ();
-	 Eliom_output.Html5_forms.js_script
-	   ~uri:(Eliom_output.Html5.make_uri
-		   (Eliom_services.static_dir ()) ["graffiti_oclosure.js"]) ();
+  Html5.D.html
+    (Html5.D.head
+       (Html5.D.title (Html5.D.pcdata "Graffiti"))
+       [ Html5.D.css_link
+	   ~uri:(Html5.D.make_uri
+		   (Eliom_service.static_dir ()) ["css";"closure";"common.css"]) ();
+	 Html5.D.css_link
+	   ~uri:(Html5.D.make_uri
+		   (Eliom_service.static_dir ()) ["css";"closure";"hsvpalette.css"]) ();
+	 Html5.D.css_link
+	   ~uri:(Html5.D.make_uri
+		   (Eliom_service.static_dir ()) ["css";"slider.css"]) ();
+	 Html5.D.css_link
+	   ~uri:(Html5.D.make_uri
+		   (Eliom_service.static_dir ()) ["css";"graffiti.css"]) ();
+	 Html5.D.js_script
+	   ~uri:(Html5.D.make_uri
+		   (Eliom_service.static_dir ()) ["graffiti_oclosure.js"]) ();
        ])
-    (HTML5.body [canvas_elt; canvas2_elt])
+    (Html5.D.body [canvas_elt; canvas2_elt])
 
 let onload_handler = {{
 
-  let canvas = Eliom_client.Html5.of_canvas %canvas_elt in
+  let canvas = Html5.To_dom.of_canvas %canvas_elt in
   let st = canvas##style in
   st##position <- Js.string "absolute";
   st##zIndex <- Js.string "-1";
@@ -123,13 +120,13 @@ let onload_handler = {{
   ctx##lineCap <- Js.string "round";
 
   (* Another canvas, for second layer *)
-  let canvas2 = Eliom_client.Html5.of_canvas %canvas2_elt in
+  let canvas2 = Html5.To_dom.of_canvas %canvas2_elt in
   canvas2##width <- width; canvas2##height <- height;
   let ctx2 = canvas2##getContext (Dom_html._2d_) in
   ctx2##lineCap <- Js.string "round";
 
   (* The initial image: *)
-  let img = Eliom_client.Html5.of_img %image_elt in
+  let img = Html5.To_dom.of_img %image_elt in
   let copy_image () = ctx##drawImage(img, 0., 0.) in
   if Js.to_bool (img##complete)
   then copy_image ()
@@ -180,7 +177,7 @@ let onload_handler = {{
             (function e (* Eliom_comet.Channel_full *) ->
               Firebug.console##log (e);
               Eliom_client.exit_to
-                ~service:Eliom_services.void_coservice' () ();
+                ~service:Eliom_service.void_coservice' () ();
               Lwt.return ()));
   (*                       | e -> Lwt.fail e)); *)
   ignore
@@ -210,7 +207,7 @@ let onload_handler = {{
 }}
 
 let main_service =
-  My_appl.register_service ~path:[""] ~get_params:Eliom_parameters.unit
+  My_appl.register_service ~path:[""] ~get_params:Eliom_parameter.unit
     (fun () () ->
-      Eliom_services.onload onload_handler;
+      Eliom_service.onload onload_handler;
       Lwt.return page)

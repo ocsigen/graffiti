@@ -1,5 +1,6 @@
-open Eliom_pervasives
-open HTML5.M
+open Eliom_content
+open Eliom_lib
+open Html5.F
 open Server
 
 let static_dir =
@@ -16,7 +17,7 @@ let static_dir =
 let image_dir name =
   let dir = static_dir ^ "/graffiti_saved/" ^ (Url.encode name) in
   (try_lwt Lwt_unix.mkdir dir 0o777 with
-    | _ -> debug "could not create the directory %s" dir; Lwt.return ()) >|=
+    | _ -> debug ("could not create the directory "^dir); Lwt.return ()) >|=
   (fun () -> dir)
 
 let make_filename name number =
@@ -43,27 +44,27 @@ let save_image username =
 
 let save_image_box =
   let save_service_reference =
-    Eliom_references.eref ~scope:Eliom_common.session_group None in
+    Eliom_reference.eref ~scope:Eliom_common.session_group None in
   fun name ->
   lwt save_image_service =
-    match_lwt Eliom_references.get save_service_reference with
+    match_lwt Eliom_reference.get save_service_reference with
       | None ->
 	let service = Eliom_output.Action.register_post_coservice'
 	  ~scope:Eliom_common.session_group
-	  ~post_params:Eliom_parameters.unit
+	  ~post_params:Eliom_parameter.unit
 	  (fun () () -> save_image name) in
-	lwt () = Eliom_references.set save_service_reference (Some service) in
+	lwt () = Eliom_reference.set save_service_reference (Some service) in
 	Lwt.return service
       | Some service -> Lwt.return service
   in
   Lwt.return (
-    Eliom_output.Html5.post_form save_image_service
+    Html5.D.post_form save_image_service
       (fun _ ->
-	[p [Eliom_output.Html5.string_input
+	[p [Html5.D.string_input
                ~input_type:`Submit ~value:"save" ()]]) ())
 
-let feed_service = Eliom_services.service ~path:["feed"]
-  ~get_params:(Eliom_parameters.string "name") ()
+let feed_service = Eliom_service.service ~path:["feed"]
+  ~get_params:(Eliom_parameter.string "name") ()
 
 let local_filename name number =
   ["graffiti_saved"; Url.encode name ; (string_of_int number) ^ ".png"]
@@ -77,17 +78,17 @@ let rec entries name list = function
 	let title = Atom_feed.plain
 	  ("graffiti " ^ name ^ " " ^ (string_of_int n)) in
 	let uri =
-	  Eliom_output.Html5.make_uri ~absolute:true
-	    ~service:(Eliom_services.static_dir ())
+	  Html5.D.make_uri ~absolute:true
+	    ~service:(Eliom_service.static_dir ())
 	    (local_filename name n)
 	in
 	let entry =
 	  Atom_feed.entry ~title ~id:uri ~updated:saved
-            [Atom_feed.xhtmlC [ XHTML.M.img ~src:uri ~alt:"image" ()]] in
+            [Atom_feed.xhtmlC [ Xhtml.F.img ~src:uri ~alt:"image" ()]] in
 	entry::(entries name q (len - 1))
 
 let feed name () =
-  let id = Eliom_output.Html5.make_uri ~absolute:true
+  let id = Html5.D.make_uri ~absolute:true
     ~service:feed_service name in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   try_lwt
@@ -101,7 +102,7 @@ let feed name () =
     | e -> Lwt.fail e
 
 let feed name () =
-  let id = Eliom_output.Html5.make_uri ~absolute:true ~service:feed_service name in
+  let id = Html5.D.make_uri ~absolute:true ~service:feed_service name in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   Lwt.catch
     (fun () -> Ocsipersist.find image_info_table name >|=

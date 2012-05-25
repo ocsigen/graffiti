@@ -1,4 +1,5 @@
 open Common
+open Eliom_content
 open Event_arrows
 
 let draw ctx (color, size, (x1, y1), (x2, y2)) =
@@ -24,11 +25,11 @@ let stop_drawing { drawing_thread; drawing_arrow } =
   Event_arrows.cancel drawing_arrow
 
 let launch_client_canvas bus image_elt canvas_elt =
-  let canvas = Eliom_client.Html5.of_canvas canvas_elt in
+  let canvas = Html5.To_dom.of_canvas canvas_elt in
   let ctx = canvas##getContext (Dom_html._2d_) in
   ctx##lineCap <- Js.string "round";
 
-  let img = Eliom_client.Html5.of_img image_elt in
+  let img = Html5.To_dom.of_img image_elt in
   let copy_image () = ctx##drawImage(img, 0., 0.) in
   if Js.to_bool (img##complete)
   then copy_image ()
