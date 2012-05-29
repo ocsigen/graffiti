@@ -49,7 +49,7 @@ let save_image_box =
   lwt save_image_service =
     match_lwt Eliom_reference.get save_service_reference with
       | None ->
-	let service = Eliom_output.Action.register_post_coservice'
+	let service = Eliom_registration.Action.register_post_coservice'
 	  ~scope:Eliom_common.session_group
 	  ~post_params:Eliom_parameter.unit
 	  (fun () () -> save_image name) in

@@ -8,7 +8,7 @@
 let _ = Eliom_state.set_global_volatile_data_state_timeout ~scope:Eliom_common.comet_client_process (Some 20.)
 
 module My_appl =
-  Eliom_output.Eliom_appl (struct
+  Eliom_registration.App (struct
     let application_name = "graffiti"
   end)
 
@@ -71,7 +71,7 @@ let draw_server, image_string =
 let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
 let imageservice =
-  Eliom_output.Text.register_service
+  Eliom_registration.Text.register_service
     ~path:["image"]
     ~get_params:Eliom_parameter.unit
     (fun () () -> Lwt.return (image_string (), "image/png"))
