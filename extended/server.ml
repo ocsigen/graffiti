@@ -112,14 +112,14 @@ let () = Eliom_registration.Action.register
   (fun () (name, password) ->
     match_lwt check_pwd name password with
       | true -> Eliom_state.set_volatile_data_session_group
-	~scope:Eliom_common.session name;
+	~scope:Eliom_common.default_session_scope name;
 	Lwt.return ()
       | false -> Lwt.return ())
 
 let () =
   Eliom_registration.Action.register
     ~service:disconnection_service
-    (fun () () -> Eliom_state.discard ~scope:Eliom_common.session ())
+    (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
 
 let disconnect_box () =
   Html5.D.post_form disconnection_service
@@ -175,7 +175,7 @@ struct
   type page = string -> My_app.page Lwt.t
   let translate page =
     match Eliom_state.get_volatile_data_session_group
-      ~scope:Eliom_common.session () with
+      ~scope:Eliom_common.default_session_scope () with
 	| None -> default_content ()
 	| Some username -> page username
 end
@@ -190,4 +190,3 @@ let () = Connected.register ~service:main_service
     make_page
       [Html5.D.h1 [Html5.D.pcdata ("Welcome to Multigraffiti " ^ username)];
        choose_drawing_form ()])
-

@@ -1,11 +1,12 @@
 
 {shared{
+  open Eliom_lib.Lwt_ops
   open Eliom_content
   let width = 700
   let height = 300
 }}
 
-let _ = Eliom_state.set_global_volatile_data_state_timeout ~scope:Eliom_common.comet_client_process (Some 20.)
+let _ = Eliom_state.set_global_volatile_data_state_timeout ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
 
 module My_appl =
   Eliom_registration.App (struct
@@ -28,7 +29,7 @@ module My_appl =
     let c = Eliom_comet.Configuration.new_configuration () in
     Eliom_comet.Configuration.set_active_until_timeout c true
 
-  
+
 
 }}
 
@@ -110,7 +111,7 @@ let page =
        ])
     (Html5.D.body [canvas_elt; canvas2_elt])
 
-let onload_handler = {{
+let init_client = {unit{
 
   let canvas = Html5.To_dom.of_canvas %canvas_elt in
   let st = canvas##style in
@@ -209,5 +210,5 @@ let onload_handler = {{
 let main_service =
   My_appl.register_service ~path:[""] ~get_params:Eliom_parameter.unit
     (fun () () ->
-      Eliom_service.onload onload_handler;
+      ignore init_client;
       Lwt.return page)
