@@ -17,7 +17,7 @@ let static_dir =
 let image_dir name =
   let dir = static_dir ^ "/graffiti_saved/" ^ (Url.encode name) in
   (try_lwt Lwt_unix.mkdir dir 0o777 with
-    | _ -> debug ("could not create the directory "^dir); Lwt.return ()) >|=
+    | _ -> debug "could not create the directory %s" dir; Lwt.return ()) >|=
   (fun () -> dir)
 
 let make_filename name number =
@@ -44,13 +44,13 @@ let save_image username =
 
 let save_image_box =
   let save_service_reference =
-    Eliom_reference.eref ~scope:Eliom_common.session_group None in
+    Eliom_reference.eref ~scope:Eliom_common.default_group_scope None in
   fun name ->
   lwt save_image_service =
     match_lwt Eliom_reference.get save_service_reference with
       | None ->
 	let service = Eliom_registration.Action.register_post_coservice'
-	  ~scope:Eliom_common.session_group
+	  ~scope:Eliom_common.default_group_scope
 	  ~post_params:Eliom_parameter.unit
 	  (fun () () -> save_image name) in
 	lwt () = Eliom_reference.set save_service_reference (Some service) in
@@ -83,13 +83,13 @@ let rec entries name list = function
 	    (local_filename name n)
 	in
 	let entry =
-	  Atom_feed.entry ~title ~id:uri ~updated:saved
-            [Atom_feed.xhtmlC [ Xhtml.F.img ~src:uri ~alt:"image" ()]] in
+	  Atom_feed.entry ~title ~id:(Xml.string_of_uri uri) ~updated:saved
+            [Atom_feed.xhtmlC [ Xhtml.M.img ~src:(Xml.string_of_uri uri) ~alt:"image" ()]] in
 	entry::(entries name q (len - 1))
 
 let feed name () =
-  let id = Html5.D.make_uri ~absolute:true
-    ~service:feed_service name in
+  let id = Xml.string_of_uri (Html5.D.make_uri ~absolute:true
+                                ~service:feed_service name) in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   try_lwt
     Ocsipersist.find image_info_table name >|=
@@ -102,7 +102,7 @@ let feed name () =
     | e -> Lwt.fail e
 
 let feed name () =
-  let id = Html5.D.make_uri ~absolute:true ~service:feed_service name in
+  let id = Xml.string_of_uri (Html5.D.make_uri ~absolute:true ~service:feed_service name) in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   Lwt.catch
     (fun () -> Ocsipersist.find image_info_table name >|=

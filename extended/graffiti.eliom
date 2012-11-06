@@ -10,11 +10,10 @@ open Feed
 
 let start_drawing name image canvas =
   let bus = get_bus name in
-  Eliom_service.onload
-    {{
-      let canceller = launch_client_canvas %bus %image %canvas in
-      Eliom_client.on_unload (fun () -> stop_drawing canceller)
-    }}
+  ignore {unit{
+    let canceller = launch_client_canvas %bus %image %canvas in
+    Eliom_client.onunload (fun () -> stop_drawing canceller)
+  }}
 
 let counter = ref 0
 
@@ -42,4 +41,3 @@ let () = Connected.register ~service:multigraffiti_service
         Html5.D.a feed_service [Html5.D.pcdata "atom feed"] name;
         Html5.D.div [save_box];
         canvas;])
-
