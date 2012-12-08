@@ -111,7 +111,8 @@ let page =
        ])
     (Html5.D.body [canvas_elt; canvas2_elt])
 
-let init_client = {unit{
+{client{
+let init_client () =
 
   let canvas = Html5.To_dom.of_canvas %canvas_elt in
   let st = canvas##style in
@@ -210,5 +211,5 @@ let init_client = {unit{
 let main_service =
   My_appl.register_service ~path:[""] ~get_params:Eliom_parameter.unit
     (fun () () ->
-      ignore init_client;
+      ignore {unit{ init_client () }};
       Lwt.return page)
