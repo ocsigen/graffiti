@@ -72,7 +72,7 @@ let draw_server, image_string =
 let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
 let imageservice =
-  Eliom_registration.Text.register_service
+  Eliom_registration.String.register_service
     ~path:["image"]
     ~get_params:Eliom_parameter.unit
     (fun () () -> Lwt.return (image_string (), "image/png"))
