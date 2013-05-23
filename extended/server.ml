@@ -11,27 +11,26 @@ let rgb_from_string color = (* color is in format "#rrggbb" *)
   let get_color i =
     (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255.
   in
-  try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
+  try get_color 0, get_color 1, get_color 2 with | _ -> 0., 0., 0.
 
 let launch_server_canvas () =
   let bus = Eliom_bus.create Json.t<messages> in
 
   let draw_server, image_string =
-    let surface = Cairo.image_surface_create
-      Cairo.FORMAT_ARGB32 ~width ~height in
+    let surface = Cairo.Image.create Cairo.Image.ARGB32 ~width ~height in
     let ctx = Cairo.create surface in
     ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
 
       (* Set thickness of brush *)
       Cairo.set_line_width ctx (float size) ;
-      Cairo.set_line_join ctx Cairo.LINE_JOIN_ROUND ;
-      Cairo.set_line_cap ctx Cairo.LINE_CAP_ROUND ;
-      let red, green, blue =  rgb_from_string color in
-      Cairo.set_source_rgb ctx ~red ~green ~blue ;
+      Cairo.set_line_join ctx Cairo.JOIN_ROUND ;
+      Cairo.set_line_cap ctx Cairo.ROUND ;
+      let r, g, b =  rgb_from_string color in
+      Cairo.set_source_rgb ctx ~r ~g ~b ;
 
       Cairo.move_to ctx (float x1) (float y1) ;
       Cairo.line_to ctx (float x2) (float y2) ;
-      Cairo.close_path ctx ;
+      Cairo.Path.close ctx ;
 
       (* Apply the ink *)
       Cairo.stroke ctx ;
@@ -39,7 +38,7 @@ let launch_server_canvas () =
      (fun () ->
        let b = Buffer.create 10000 in
        (* Output a PNG in a string *)
-       Cairo_png.surface_write_to_stream surface (Buffer.add_string b);
+       Cairo.PNG.write_to_stream surface (Buffer.add_string b);
        Buffer.contents b
      ))
   in
@@ -49,7 +48,7 @@ let launch_server_canvas () =
 let graffiti_info = Hashtbl.create 0
 
 let imageservice =
-  Eliom_registration.Text.register_service
+  Eliom_registration.String.register_service
     ~path:["image"]
     ~headers:Http_headers.dyn_headers
     ~get_params:(let open Eliom_parameter in string "name" ** int "q")
@@ -70,7 +69,7 @@ let get_bus (name:string) =
   with
     | Not_found ->
       let bus,image_string = launch_server_canvas () in
-      Hashtbl.add graffiti_info name (bus,image_string);
+      Hashtbl.add graffiti_info name (bus, image_string);
       bus
 
 let main_service = Eliom_service.service ~path:[""]
@@ -89,19 +88,24 @@ let choose_drawing_form () =
 
 let connection_service =
   Eliom_service.post_coservice'
-    ~post_params:(let open Eliom_parameter in (string "name" ** string "password"))
+    ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()
-let disconnection_service = Eliom_service.post_coservice' ~post_params:Eliom_parameter.unit ()
+
+let disconnection_service =
+  Eliom_service.post_coservice' ~post_params:Eliom_parameter.unit ()
+
 let create_account_service =
-  Eliom_service.post_coservice ~fallback:main_service ~post_params:(let open Eliom_parameter in (string "name" ** string "password")) ()
+  Eliom_service.post_coservice
+    ~fallback:main_service
+    ~post_params:Eliom_parameter.(string "name" ** string "password")
+    ()
 
 let user_table = Ocsipersist.open_table "user_table"
 let check_pwd name pwd =
   try_lwt
     lwt saved_password = Ocsipersist.find user_table name in
-    Lwt.return ( pwd = saved_password )
-  with
-    Not_found -> Lwt.return false
+    Lwt.return (pwd = saved_password)
+  with Not_found -> Lwt.return false
 
 let () = Eliom_registration.Action.register
   ~service:create_account_service
@@ -119,7 +123,8 @@ let () = Eliom_registration.Action.register
 let () =
   Eliom_registration.Action.register
     ~service:disconnection_service
-    (fun () () -> Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
+    (fun () () ->
+      Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
 
 let disconnect_box () =
   Html5.D.post_form disconnection_service
@@ -181,11 +186,12 @@ struct
 end
 
 module Connected =
-  Eliom_registration.Customize ( My_app ) ( Connected_translate )
+  Eliom_registration.Customize (My_app) (Connected_translate)
 
 let ( !% ) f = fun a b -> return (fun c -> f a b c)
 
-let () = Connected.register ~service:main_service
+let () = Connected.register
+  ~service:main_service
   !% (fun () () username ->
     make_page
       [Html5.D.h1 [Html5.D.pcdata ("Welcome to Multigraffiti " ^ username)];

@@ -10,19 +10,19 @@ let draw ctx (color, size, (x1, y1), (x2, y2)) =
   ctx##lineTo(float x2, float y2);
   ctx##stroke()
 
-(* type containing all informations we need to stop interraction
+(* type containing all informations we need to stop interaction
    inside the page *)
 type drawing_canceller =
-    { drawing_thread : unit Lwt.t;
+    { message_thread : unit Lwt.t;
       (* the thread reading messages from the bus *)
-      drawing_arrow : Event_arrows.canceller;
+      drawing_thread : unit Lwt.t;
       (* the arrow handling mouse events *)
     }
 
-let stop_drawing { drawing_thread; drawing_arrow } =
-  Lwt.cancel drawing_thread;
+let stop_drawing { message_thread; drawing_thread } =
+  Lwt.cancel message_thread;
   (* cancelling this thread also close the bus *)
-  Event_arrows.cancel drawing_arrow
+  Lwt.cancel drawing_thread
 
 let launch_client_canvas bus image_elt canvas_elt =
   let canvas = Html5.To_dom.of_canvas canvas_elt in
@@ -65,14 +65,17 @@ let launch_client_canvas bus image_elt canvas_elt =
   let line ev =
     let v = compute_line ev in
     let _ = Eliom_bus.write bus v in
-    draw ctx v
+    draw ctx v;
+    Lwt.return ()
   in
   let t = Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus) in
-  let drawing_arrow =
-    run (mousedowns canvas
-           (arr (fun ev -> set_coord ev; line ev)
-                   >>> first [mousemoves Dom_html.document (arr line);
-                              mouseup Dom_html.document >>>
-				(arr line)])) () in
-  { drawing_thread = t;
-    drawing_arrow = drawing_arrow }
+  let drawing_thread =
+    Lwt_js_events.(
+      mousedowns canvas (fun ev elt ->
+        set_coord ev;
+        lwt () = line ev in
+        Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
+	          lwt ev = mouseup Dom_html.document in line ev]))
+  in
+  { message_thread = t;
+    drawing_thread = drawing_thread }
