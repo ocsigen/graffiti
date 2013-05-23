@@ -24,11 +24,13 @@ let () = Connected.register ~service:multigraffiti_service
     incr counter;
     let image =
       Html5.D.img ~alt:name ~src:(Html5.D.make_uri
-				  ~service:imageservice (name,!counter)) () in
+				  ~service:imageservice (name, !counter)) ()
+    in
     let canvas =
       Html5.D.canvas
         ~a:[Html5.D.a_width width; Html5.D.a_height height ]
-        [ Html5.D.pcdata "your browser doesn't support canvas";  Html5.D.br (); image] in
+        [ Html5.D.pcdata "your browser doesn't support canvas";
+          Html5.D.br (); image] in
     lwt save_box = if name = username
       then save_image_box name
       else Lwt.return (Html5.D.pcdata "no saving")

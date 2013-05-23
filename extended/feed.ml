@@ -9,7 +9,7 @@ let static_dir =
         dir
     | [] ->
       raise (Ocsigen_extensions.Error_in_config_file
-               ("staticdir must be configured"))
+               ("<staticdir> option required for <graffiti>"))
     | _ ->
       raise (Ocsigen_extensions.Error_in_config_file
                ("Unexpected content inside graffiti config"))

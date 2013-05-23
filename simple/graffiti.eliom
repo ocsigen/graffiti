@@ -6,7 +6,9 @@
   let height = 300
 }}
 
-let _ = Eliom_state.set_global_volatile_data_state_timeout ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
+let _ =
+  Eliom_state.set_global_volatile_data_state_timeout
+    ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
 
 module My_appl =
   Eliom_registration.App (struct
@@ -40,24 +42,26 @@ module My_appl =
 let bus = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 Json.t<messages>
 
 let rgb_from_string color = (* color is in format "#rrggbb" *)
-  let get_color i = (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255. in
+  let get_color i =
+    (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255.
+  in
   try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
 
 let draw_server, image_string =
-  let surface = Cairo.image_surface_create Cairo.FORMAT_ARGB32 ~width ~height in
+  let surface = Cairo.Image.create Cairo.Image.ARGB32 ~width ~height in
   let ctx = Cairo.create surface in
   ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
 
     (* Set thickness of brush *)
     Cairo.set_line_width ctx (float size) ;
-    Cairo.set_line_join ctx Cairo.LINE_JOIN_ROUND ;
-    Cairo.set_line_cap ctx Cairo.LINE_CAP_ROUND ;
-    let red, green, blue =  rgb_from_string color in
-    Cairo.set_source_rgb ctx ~red ~green ~blue ;
+    Cairo.set_line_join ctx Cairo.JOIN_ROUND ;
+    Cairo.set_line_cap ctx Cairo.ROUND ;
+    let r, g, b =  rgb_from_string color in
+    Cairo.set_source_rgb ctx ~r ~g ~b ;
 
     Cairo.move_to ctx (float x1) (float y1) ;
     Cairo.line_to ctx (float x2) (float y2) ;
-    Cairo.close_path ctx ;
+    Cairo.Path.close ctx ;
 
     (* Apply the ink *)
     Cairo.stroke ctx ;
@@ -65,7 +69,7 @@ let draw_server, image_string =
    (fun () ->
      let b = Buffer.create 10000 in
      (* Output a PNG in a string *)
-     Cairo_png.surface_write_to_stream surface (Buffer.add_string b);
+     Cairo.PNG.write_to_stream surface (Buffer.add_string b);
      Buffer.contents b
    ))
 
@@ -170,7 +174,8 @@ let init_client () =
   let line ev =
     let v = compute_line set_coord x y ev in
     let _ = Eliom_bus.write bus v in
-    draw ctx v
+    draw ctx v;
+    Lwt.return ()
   in
   ignore (Lwt_js.sleep 0.1 >>= fun () -> (* avoid chromium looping cursor *)
           Lwt.catch
@@ -182,11 +187,12 @@ let init_client () =
                 ~service:Eliom_service.void_coservice' () ();
               Lwt.return ()));
   (*                       | e -> Lwt.fail e)); *)
-  ignore
-    Event_arrows.(run (mousedowns canvas2
-			 (arr (fun ev -> set_coord ev; line ev)
-					 >>> first [mousemoves Dom_html.document (arr line);
-						    mouseup Dom_html.document >>> (arr line)])) ());
+  Lwt_js_events.(async (fun () ->
+    mousedowns canvas2 (fun ev elt ->
+      set_coord ev;
+      lwt () = line ev in
+      Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
+	        lwt ev = mouseup Dom_html.document in line ev])));
 
 
 
@@ -198,13 +204,14 @@ let init_client () =
   let set_coord ev =
     let x0, y0 = Dom_html.elementClientPosition canvas2 in
     x := ev##clientX - x0; y := ev##clientY - y0 in
-  let brush ev =
+  let brush ev _ =
     let (color, newsize, oldv, v) = compute_line set_coord x y ev in
     draw ctx2 ("rgba(0,0,0,0)", !size+3, oldv, oldv);
     size := newsize;
-    draw ctx2 (color, newsize, v, v)
+    draw ctx2 (color, newsize, v, v);
+    Lwt.return ()
   in
-  ignore Event_arrows.(run (mousemoves Dom_html.document (arr brush)) ())
+  ignore Lwt_js_events.(async (fun () -> (mousemoves Dom_html.document brush)))
 
 }}
 
