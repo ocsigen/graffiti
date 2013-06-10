@@ -1,0 +1,37 @@
+
+@media only screen and (min-device-width: 769px)
+{
+
+    body
+    {
+	font-size:1.3em;
+    }
+
+    .header_table
+    {
+	height:100px;
+	background-size:auto 100px;
+    }
+
+    .header_left_td
+    {
+	width:90%;
+    }
+
+    .menu_button
+    {
+	width:10%;
+    }
+
+    .menu_div
+    {
+	left:90%;
+	width:10%;
+    }
+
+    .menu_option
+    {
+	height:3em;
+    }
+
+}

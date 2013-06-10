@@ -1,0 +1,39 @@
+
+@media only screen and (max-device-width: 480px)
+{
+
+    body
+    {
+	background-image:url('/img/small_textured_paper.png');
+	font-size:0.8em;
+    }
+
+    .header_table
+    {
+	height:80px;
+	background-size:auto 80px;
+    }
+
+    .header_left_td
+    {
+	width:75%;
+    }
+
+    .menu_button
+    {
+	width:25%;
+    }
+
+    .menu_div
+    {
+	left:75%;
+	width:25%;
+    }
+
+    .menu_option
+    {
+	font-size:1.3em;
+	height:2em;
+    }
+
+}

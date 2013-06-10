@@ -1,0 +1,37 @@
+
+@media only screen and (min-device-width: 481px) and (max-device-width: 768px)
+{
+
+    body
+    {
+	font-size:1.8em;
+    }
+
+    .header_table
+    {
+	height:90px;
+	background-size:auto 90px;
+    }
+
+    .header_left_td
+    {
+	width:80%;
+    }
+
+    .menu_button
+    {
+	width:20%;
+    }
+
+    .menu_div
+    {
+	left:80%;
+	width:20%;
+    }
+
+    .menu_option
+    {
+	height:5em;
+    }
+
+}
