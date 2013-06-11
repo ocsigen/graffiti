@@ -127,8 +127,12 @@ let imageservice =
     ~path:["image"; "adaptation.png"]
     ~get_params:Eliom_parameter.(int "width" ** int "height" ** int "time")
     (fun (width, (height, _)) () -> Lwt.return
-      ((match width, height with
-        | w, h when (cmp_small w h)     -> small_image_string ()
-        | w, h when (cmp_medium w h)    -> medium_image_string ()
-        | _                             -> large_image_string ()),
-      "image/png"))
+      (let width', height' = if width >= height
+	then width, height
+	else height, width
+       in
+       (match width', height' with
+         | w, h when (cmp_small w h)     -> small_image_string ()
+         | w, h when (cmp_medium w h)    -> medium_image_string ()
+         | _                             -> large_image_string ()),
+       "image/png"))
