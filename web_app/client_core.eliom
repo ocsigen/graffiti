@@ -22,11 +22,14 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
+    let base_size = ref (Client_tools.get_smaller !width !height)
+    in
 
     let dom_canvas =
       Eliom_content.Html5.To_dom.of_canvas %Server_html.canvas_elt
     in
-    let dom_body = Eliom_content.Html5.To_dom.of_body %Server_html.body_elt
+    let dom_body =
+      Eliom_content.Html5.To_dom.of_body %Server_html.body_elt
     in
 
     let ctx = dom_canvas##getContext (Dom_html._2d_) in
@@ -70,7 +73,9 @@
         let image_elt =
           img ~a:[a_class["unselectable"]]
             ~alt:"canvas"
-            ~src:(make_uri ~service:%Server_image.medium_imageservice attr)
+            ~src:(make_uri ~service:%Server_image.imageservice
+                    (int_of_float !width,
+                       (int_of_float !height, attr)))
             ()
         in Eliom_content.Html5.To_dom.of_img image_elt
       in
@@ -108,8 +113,8 @@
 
       (* Format for canvas and bus *)
       (* It is differente when you are in Portrait view *)
-      (("#ff9933", 5, (oldx', oldy'), (!x, !y)),
-       ("#ff9933", 5, (x1, y1), (x2, y2)))
+      (("#ff9933", 0.02, (oldx', oldy'), (!x, !y)),
+       ("#ff9933", 0.02, (x1, y1), (x2, y2)))
 
     in
 
@@ -122,7 +127,7 @@
         | _            ->
           ignore (Eliom_bus.write %Server_image.bus vb);
           (* Draw in advance to avoid visual lag *)
-          Client_tools.draw ctx !float_size vo;
+          Client_tools.draw ctx !base_size !float_size vo;
       in
       Lwt.return ()
     in
@@ -132,7 +137,7 @@
         | Client_tools.Portrait -> 1. -. y1, x1, 1. -. y2, x2
         | _                     -> x1, y1, x2, y2
       in
-      Client_tools.draw ctx !float_size
+      Client_tools.draw ctx !base_size !float_size
         (color, brush_size, (x1', y1'), (x2', y2'))
     in
 
@@ -202,11 +207,13 @@
       width := float_of_int rc_width;
       height := float_of_int rc_height;
       float_size := (!width, !height);
+      base_size := Client_tools.get_smaller !width !height;
+      ctx##lineCap <- Js.string "round";
       reset_image ();
       resize := Finishresize));
 
     (* Start detect 'touch to start' for mobile *)
-    Client_detect_mobile.start ();
+    Client_detect_mobile.detect ();
 
     (* Start menu script *)
     Client_menu.start ();

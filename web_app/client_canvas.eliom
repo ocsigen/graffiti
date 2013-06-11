@@ -13,9 +13,7 @@
     let dom_header = Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
     in
     let width = (fst size) - (margin * 2) in
-    let height = (snd size) - (margin * 2) - dom_header##clientHeight in
-    let max_resolution = 16 in
-    let min_resolution = 8 in
+    let height = (snd size) - (margin * 4) - dom_header##clientHeight in
 
     (*** Tool ***)
 
@@ -34,10 +32,9 @@
       else Client_tools.Landscape, height
     in
 
-    let max =
-      int_of_float (Client_tools.round (
-        (float_of_int (min * max_resolution)) /.
-          (float_of_int min_resolution) ))
+    let max = int_of_float (Client_tools.round (
+      ( float_of_int (min * %Server_image.max_resolution) ) /.
+        (float_of_int %Server_image.min_resolution) ))
     in
 
     (*** Check result ***)
@@ -57,8 +54,9 @@
           else height
         in
         let min = int_of_float (Client_tools.round (
-          (float_of_int (max * min_resolution)) /.
-            (float_of_int max_resolution) )) in
+          ( float_of_int (max * %Server_image.min_resolution) ) /.
+            (float_of_int %Server_image.max_resolution) ))
+        in
 
         (* Second way set *)
         set_size false min )

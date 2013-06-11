@@ -90,8 +90,8 @@ a
     padding:0px;
     position:absolute;
     zIndex:2;
-    height:100%;
-    visibility:hidden;
+    right:0px;
+    display:none;
     background-color:#d6d6d6;
     border-style:solid;
     border-width:3px;
@@ -129,7 +129,7 @@ a
     top:0em;
     left:0em;
     opacity:0.75;
-    visibility:hidden;
+    display:none;
 }
 
 .about_block
@@ -142,7 +142,7 @@ a
     background-color:white;
     width:80%;
     max-height:90%;
-    visibility:hidden;
+    display:none;
 }
 
 .about_logo

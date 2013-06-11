@@ -15,15 +15,20 @@
     let doc = Dom_html.document##documentElement in
     doc##clientWidth, doc##clientHeight
 
-  let draw ctx (width, height) (color, size, (x1, y1), (x2, y2)) =
+  let get_smaller width height =
+    if (width < height)
+    then width
+    else height
+
+  let round value = ceil (value -. 0.5)
+
+  let draw ctx base_size (width, height) (color, size, (x1, y1), (x2, y2)) =
     ctx##strokeStyle <- (Js.string color);
-    ctx##lineWidth <- float size;
+    ctx##lineWidth <- (size *. base_size);
     ctx##beginPath();
     ctx##moveTo(x1 *. width, y1 *. height);
     ctx##lineTo(x2 *. width, y2 *. height);
     ctx##stroke()
-
-  let round value = ceil (value -. 0.5)
 
   let get_timestamp () =
     (let date = jsnew Js.date_now () in
@@ -31,20 +36,6 @@
 
 
   (*** Smartphone's tool events ***)
-
-  (** Launch func for next touch and click event **)
-  let touch_click html_elt func =
-    (Lwt.async (fun () ->
-      Lwt_js_events.mouseup html_elt >>= fun _ -> func ());
-     Lwt.async (fun () ->
-      Lwt_js_events.touchend html_elt >>= fun _ -> func ()))
-
-  (** Launch func for all touch and click event **)
-  let touchs_clicks html_elt func =
-    (Lwt.async (fun () -> Lwt_js_events.mouseups html_elt
-      (fun _ _ -> func ()));
-     Lwt.async (fun () -> Lwt_js_events.touchends html_elt
-      (fun _ _ -> func ())))
 
   (** Disable Js event with stopping propagation during capture phase **)
   let disable_event event html_elt =
@@ -62,14 +53,14 @@
 
   (* mobile scroll events *)
   let disable_mobile_scroll body_elt =
-    (disable_event Dom_html.Event.touchstart body_elt)
+    (disable_event Dom_html.Event.touchmove body_elt)
 
   (*** window resize ***)
   let window_resize_function = ref []
 
   (** Add func to launch at window resize event **)
   (** The id is essential to could remove it **)
-  let add_window_resize_function ((id:int), (func:unit->unit)) =
+  let add_window_resize_function ((id : int), (func : unit -> unit)) =
     window_resize_function := (id, func)::!window_resize_function
 
   (** Remove func assossiate to id, to launch at window resize event **)

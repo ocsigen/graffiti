@@ -11,7 +11,7 @@
     let str_logo = "/img/Logo_GRAFFITIbyOcsigen_" ^
       (if (width <= 480 || height <= 800)
        then "small_"    (* mobile screen *)
-       else ""  (* normal screen *))
+       else ""          (* normal screen *))
     in
 
     let rand_img =

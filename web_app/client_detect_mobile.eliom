@@ -1,8 +1,10 @@
 
 {client{
 
+  open Lwt
+
   (** Handle image 'touch to start' apparition on smartphone  **)
-  let start () =
+  let detect () =
 
     (*** Init data ***)
     (*** Get device size to avoid appearance it on computer ***)
@@ -20,14 +22,19 @@
 
     (* Set touch action *)
     let mobile_screen () =
-      Client_tools.touch_click dom_statring_logo (fun () ->
-        Lwt.return (remove_starting_logo ()) )
+      Lwt.async (fun () ->
+        Lwt_js_events.click dom_statring_logo >>= (fun _ ->
+          Lwt.return (remove_starting_logo ())))
+    in
+
+    let normal_screen () =
+      remove_starting_logo ()
     in
 
     (* Check to let or not 'touch to start' image *)
     if (width <= 480 || height <= 800)
-    then mobile_screen ()             (* let image *)
-    else remove_starting_logo ()      (* remove image *)
+    then ignore (mobile_screen ())
+    else ignore (normal_screen ())
 
 
 }}

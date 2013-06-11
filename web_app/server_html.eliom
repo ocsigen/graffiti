@@ -17,7 +17,8 @@ let canvas_elt =
 
 let about_link_elt =
     Html5.F.Raw.a
-        ~a:[a_href (Xml.uri_of_string "http://ocsigen.org")]
+        ~a:[a_href (Xml.uri_of_string "http://ocsigen.org");
+           a_target "_blank"]
         [pcdata "Ocsigen"]
 
 let about_elt =
@@ -42,19 +43,19 @@ let gray_layer_elt =
   div ~a:[a_class["gray_layer"]] []
 
 let save_option_elt =
-  td ~a:[a_class["menu_option"]]
-    [a ~service:Server_image.download_service
-        ~a:[D.Unsafe.string_attrib "download" "graffiti.png"]
-        [pcdata "Save"] ("/img/medium?time=42", ("graffiti.png", "image/png"))]
+  tr [td ~a:[a_class["menu_option"]]
+	 [a ~a:[D.Unsafe.string_attrib "download" "graffiti.png"]
+             ~service:Server_image.download_imageservice
+             [pcdata "Save"] ()]]
 
-let about_option_elt =
-  td ~a:[a_class["menu_option"]] [pcdata "About"]
+let about_option_elt = td ~a:[a_class["menu_option"]] [pcdata "About"]
 
-let menu_elt =
-  div ~a:[a_class["menu_div"; "unselectable"]]
-  [table ~a:[a_class["menu_table"]]
-      (tr [save_option_elt])
-      [tr [about_option_elt]] ]
+let menu_table_elt = table ~a:[a_class["menu_table"]]
+  (tr [])
+  [save_option_elt;
+   tr [about_option_elt] ]
+
+let menu_elt = div ~a:[a_class["menu_div"; "unselectable"]] [menu_table_elt]
 
 (** change image in css with class menu_button **)
 let menu_button_elt =
