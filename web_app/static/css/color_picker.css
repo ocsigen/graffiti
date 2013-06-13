@@ -1,0 +1,38 @@
+
+.color_picker_square
+{
+    height:20px;
+    width:20px;
+    display:inline-block;
+}
+
+.color_picker_td
+{
+
+}
+
+.color_picker_tr
+{
+
+}
+
+.color_picker_table
+{
+    display:inline-block;
+    margin:0px;
+    paddind:0px;
+}
+
+.color_picker_color_div
+{
+    display:inline-block;
+    width:32px;
+    height:32px;
+}
+
+.color_picker_block
+{
+    margin:0px;
+    paddind:0px;
+    height:100%;
+}
