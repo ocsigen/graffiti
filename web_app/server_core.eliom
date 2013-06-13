@@ -1,7 +1,5 @@
 
-open Eliom_content
-open Eliom_content.Html5
-open Eliom_content.Html5.D
+open Eliom_content.Html5.F
 
 let _ =
   Server_tools.My_app.register
@@ -11,25 +9,18 @@ let _ =
       (* html generation *)
       let html_page =
         (html
-           (head (title (pcdata "Graffiti"))
-              [meta ~a:[a_http_equiv "X-UA-Compatible";
-                        a_content "IE=edge,chrome=1"]
-                  ();
-               meta ~a:[a_name "viewport";
-                        a_content "width=device-width; user-scalable=0; initial-scale=1.0; maximum-scale=1.0;"]
-                 ();
-               css_link
-                  ~uri:(make_uri (Eliom_service.static_dir ())
-                          ["css"; "graffiti.css"]) ();
-               css_link
-                 ~uri:(make_uri (Eliom_service.static_dir ())
-                         ["css"; "graffiti_small_screen.css"]) ();
-               css_link
-                 ~uri:(make_uri (Eliom_service.static_dir ())
-                         ["css"; "graffiti_medium_screen.css"]) ();
-               css_link
-                 ~uri:(make_uri (Eliom_service.static_dir ())
-                         ["css"; "graffiti_large_screen.css"]) ()])
+           (Eliom_tools.F.head ~title:"Graffiti"
+              ~css:(Color_picker.css_list@
+                      [["css"; "graffiti.css"];
+                       ["css"; "graffiti_small_screen.css"];
+                       ["css"; "graffiti_medium_screen.css"];
+                       ["css"; "graffiti_large_screen.css"]])
+              ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";
+                               a_content "IE=edge,chrome=1"]
+                         ();
+                      meta ~a:[a_name "viewport";
+                               a_content "width=device-width; user-scalable=0; initial-scale=1.0; maximum-scale=1.0;"]
+                     () ] ())
            Server_html.body_elt)
       in
 

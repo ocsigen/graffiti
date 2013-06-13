@@ -14,17 +14,17 @@
 	background-size:auto 80px;
     }
 
-    .header_left_td
+    .header_center_td
     {
-	width:75%;
+	width:50%;
     }
 
-    .menu_button
+    .palette_button
     {
 	width:25%;
     }
 
-    .menu_div
+    .menu_button
     {
 	width:25%;
     }

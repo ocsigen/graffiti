@@ -13,9 +13,14 @@
 	background-size:auto 90px;
     }
 
-    .header_left_td
+    .header_center_td
     {
-	width:80%;
+	width:60%;
+    }
+
+    .palette_button
+    {
+	width:20%;
     }
 
     .menu_button
@@ -23,14 +28,9 @@
 	width:20%;
     }
 
-    .menu_div
-    {
-	width:20%;
-    }
-
     .menu_option
     {
-	height:5em;
+	height:2.5em;
     }
 
 }

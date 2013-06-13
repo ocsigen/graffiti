@@ -6,10 +6,8 @@
 
     Random.init (Client_tools.get_timestamp ());
     let logo_list = ["blue"; "green"; "purple"; "yellow"] in
-    let size = Client_tools.get_device_size () in
-    let width = fst size and height = snd size in
     let str_logo = "/img/Logo_GRAFFITIbyOcsigen_" ^
-      (if (width <= 480 || height <= 800)
+      (if Client_mobile.is_on_mobile ()
        then "small_"    (* mobile screen *)
        else ""          (* normal screen *))
     in

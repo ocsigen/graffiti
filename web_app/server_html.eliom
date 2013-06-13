@@ -44,24 +44,45 @@ let gray_layer_elt =
 
 let save_option_elt =
   tr [td ~a:[a_class["menu_option"]]
-	 [a ~a:[D.Unsafe.string_attrib "download" "graffiti.png"]
+         [a ~a:[D.Unsafe.string_attrib "download" "graffiti.png"]
              ~service:Server_image.download_imageservice
              [pcdata "Save"] ()]]
 
 let about_option_elt = td ~a:[a_class["menu_option"]] [pcdata "About"]
 
 let menu_table_elt = table ~a:[a_class["menu_table"]]
-  (tr [])
-  [save_option_elt;
-   tr [about_option_elt] ]
+  (tr []) [save_option_elt; tr [about_option_elt] ]
 
-let menu_elt = div ~a:[a_class["menu_div"; "unselectable"]] [menu_table_elt]
+let menu_div = div ~a:[a_class["menu_div"; "unselectable"]] [menu_table_elt]
 
 (** change image in css with class menu_button **)
 let menu_button_elt =
   td ~a:[a_class["menu_button"]] []
 
-let menu_elements = [menu_elt; gray_layer_elt; about_elt]
+let menu_elements = [menu_div; gray_layer_elt; about_elt]
+
+(* palette *)
+
+let color_picker, color_div, block = Color_picker.create
+  ~lll_color:Color_picker.lll_color_p2' ()
+
+let td_block = td ~a:[a_class["td_block"]] [block]
+
+let slider_elt = Html5.D.raw_input ~input_type:`Range ~value:"10"
+  ~a:[a_class["brush_slider"](* ; a_min 0.001; a_max 0.5 *)] ()
+
+let td_slider = td ~a:[a_class["td_slider"]] [slider_elt]
+
+let palette_table_elt = table ~a:[a_class["palette_table"]]
+  (tr []) [tr [td_block; td_slider]]
+
+let palette_div = div ~a:[a_class["palette_div"; "unselectable"]]
+  [palette_table_elt]
+
+let palette_button_elt =
+  td ~a:[a_class["palette_button"]] [color_div]
+
+let palette_elements = [palette_div]
 
 (* starting logo *)
 
@@ -78,13 +99,14 @@ let starting_logo_elt =
 
 (* header / body *)
 
-let header_center_elt = div []
-
 let header_elt =
   table ~a:[a_class["header_table"; "unselectable"]]
     (tr
-       [td ~a:[a_class["header_left_td"]] [];
+       [palette_button_elt;
+        td ~a:[a_class["header_center_td"]] [];
         menu_button_elt])
     []
 
-let body_elt = body ([header_elt; canvas_elt; starting_logo_elt]@menu_elements)
+let body_elt = body ~a:[a_class["unselectable"]]
+  ([header_elt; canvas_elt; starting_logo_elt]@
+      palette_elements@menu_elements)

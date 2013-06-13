@@ -31,6 +31,9 @@
     let dom_body =
       Eliom_content.Html5.To_dom.of_body %Server_html.body_elt
     in
+    let dom_slider =
+      Eliom_content.Html5.To_dom.of_input %Server_html.slider_elt
+    in
 
     let ctx = dom_canvas##getContext (Dom_html._2d_) in
     ctx##lineCap <- Js.string "round";
@@ -111,10 +114,15 @@
         | _                     -> oldx', oldy', !x, !y
       in
 
+      let color = Color_picker.get_color %Server_html.color_picker in
+      let brush_size =
+        (float_of_string (Js.to_string dom_slider##value)) /. 500.
+      in
+
       (* Format for canvas and bus *)
       (* It is differente when you are in Portrait view *)
-      (("#ff9933", 0.02, (oldx', oldy'), (!x, !y)),
-       ("#ff9933", 0.02, (x1, y1), (x2, y2)))
+      ((color, brush_size, (oldx', oldy'), (!x, !y)),
+       (color, brush_size, (x1, y1), (x2, y2)))
 
     in
 
@@ -213,10 +221,13 @@
       resize := Finishresize));
 
     (* Start detect 'touch to start' for mobile *)
-    Client_detect_mobile.detect ();
+    Client_mobile.detect ();
 
     (* Start menu script *)
     Client_menu.start ();
+
+    (* Start palette script *)
+    Client_palette.start ();
 
     (* return value *)
     Lwt.return ()

@@ -18,13 +18,13 @@ let get_max_resolution min =
                   (( float_of_int (min * max_resolution) ) /.
                       (float_of_int min_resolution) ))
 
-let small_image_width = 960
+let small_image_width = 480
 let small_image_height = get_min_resolution small_image_width
 
-let medium_image_width = 2800
+let medium_image_width = 1400
 let medium_image_height = get_min_resolution medium_image_width
 
-let large_image_width = 8400
+let large_image_width = 2800
 let large_image_height = get_min_resolution large_image_width
 
 (* bus *)
@@ -128,8 +128,8 @@ let imageservice =
     ~get_params:Eliom_parameter.(int "width" ** int "height" ** int "time")
     (fun (width, (height, _)) () -> Lwt.return
       (let width', height' = if width >= height
-	then width, height
-	else height, width
+        then width, height
+        else height, width
        in
        (match width', height' with
          | w, h when (cmp_small w h)     -> small_image_string ()
