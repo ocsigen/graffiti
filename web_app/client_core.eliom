@@ -2,8 +2,6 @@
 {client{
 
   open Lwt
-  open Eliom_content
-  open Eliom_content.Html5
   open Eliom_content.Html5.D
 
   (** This type allow in theory to handle drawing during resize **)

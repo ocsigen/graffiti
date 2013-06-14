@@ -2,8 +2,8 @@
 open Eliom_content.Html5.F
 
 let _ =
-  Server_tools.My_app.register
-    ~service:Server_tools.main_service
+  Server_service.My_app.register
+    ~service:Server_service.main_service
     (fun () () ->
 
       (* html generation *)

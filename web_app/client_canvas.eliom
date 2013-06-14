@@ -15,7 +15,7 @@
     then 0
     else let dom_header =
            Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
-	 in dom_header##clientHeight
+         in dom_header##clientHeight
 
   (** Calcul and set size of canvas **)
   let init () =
@@ -62,7 +62,7 @@
           then width
           else height
         in
-	let min = Shared_tools.get_min_resolution max in
+        let min = Shared_tools.get_min_resolution max in
 
         (* Second way set *)
         set_size false min )

@@ -19,7 +19,7 @@
   let get_min_resolution max =
     int_of_float (round
                     (( float_of_int (max * min_resolution) ) /.
-			(float_of_int max_resolution) ))
+                        (float_of_int max_resolution) ))
 
   let get_max_resolution min =
     int_of_float (round

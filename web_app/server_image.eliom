@@ -1,8 +1,4 @@
 
-open Eliom_content
-open Eliom_content.Html5
-open Eliom_content.Html5.D
-
 (* values *)
 
 let small_image_width = 480
@@ -17,7 +13,7 @@ let large_image_height = Shared_tools.get_min_resolution large_image_width
 (* bus *)
 
 let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
-  ~size:500 Json.t<Server_tools.messages>
+  ~size:500 Json.t<Shared_tools.messages>
 
 (* surfaces *)
 
@@ -45,7 +41,7 @@ let medium_ctx = Cairo.create medium_surface
 let ctx = Cairo.create large_surface
 
 let base_size = float_of_int
-  (Server_tools.get_smaller large_image_width large_image_height)
+  (Shared_tools.get_smaller large_image_width large_image_height)
 
 let draw_server ((color : string), size, (x1, y1), (x2, y2)) =
   (* Set thickness of brush *)

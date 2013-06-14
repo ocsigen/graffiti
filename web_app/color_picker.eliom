@@ -2,7 +2,7 @@
 {shared{
 
 open Eliom_content.Html5
-open Eliom_content.Html5.D
+open Eliom_content.Html5.F
 
 type div = [ Html5_types.div ] Eliom_content.Html5.D.elt
 type t = (string ref * div * div list)
@@ -68,16 +68,16 @@ let lll_color_p6 = genere_lll_color 6
 let genere_color_table lll_color =
 
   let build_color_div color =
-    div ~a:[a_class["color_picker_square"];
+    D.div ~a:[a_class["color_picker_square"];
             a_title color;
             a_style ("background-color: " ^ color ^ ";")]
       []
   in
   let build_td_color color_div =
-    F.td ~a:[a_class["color_picker_td"]] [color_div]
+    td ~a:[a_class["color_picker_td"]] [color_div]
   in
   let build_tr_color tds =
-    F.tr ~a:[a_class["color_picker_tr"]] tds
+    tr ~a:[a_class["color_picker_tr"]] tds
   in
 
   let rec build_table div_color_list tables = function
@@ -107,7 +107,7 @@ let genere_color_table lll_color =
       in
 
       let div_color_list', trs = build_column div_color_list [] head in
-      let tbl = F.table ~a:[a_class["color_picker_table"]] (tr []) trs in
+      let tbl = table ~a:[a_class["color_picker_table"]] (tr []) trs in
       build_table
         div_color_list'
         (tbl::tables)
@@ -128,11 +128,11 @@ let genere_color_table lll_color =
 let create ?(initial_color = "#0000FF") ?(lll_color = lll_color_p5) () =
   let color_ref = ref initial_color in
   let div_color_list, tables = genere_color_table lll_color in
-  let color_div = div ~a:[a_class["color_picker_color_div"];
+  let color_div = D.div ~a:[a_class["color_picker_color_div"];
                           a_title !color_ref;
                           a_style ("background-color: " ^ !color_ref ^ ";")] []
   in
-  let block = F.div ~a:[a_class["color_picker_block"]] tables in
+  let block = div ~a:[a_class["color_picker_block"]] tables in
   let type_t = (color_ref, color_div, div_color_list) in
   type_t, color_div, block
 
