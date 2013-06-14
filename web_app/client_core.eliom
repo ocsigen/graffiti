@@ -26,9 +26,6 @@
     let dom_canvas =
       Eliom_content.Html5.To_dom.of_canvas %Server_html.canvas_elt
     in
-    let dom_body =
-      Eliom_content.Html5.To_dom.of_body %Server_html.body_elt
-    in
     let dom_slider =
       Eliom_content.Html5.To_dom.of_input %Server_html.slider_elt
     in
@@ -201,7 +198,7 @@
     Client_tools.disable_drag_and_drop dom_canvas;
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    Client_tools.disable_mobile_scroll dom_body;
+    Client_tools.disable_mobile_scroll ();
 
     (* add window resize listenner *)
     (* handle resize of canvas and redraw image *)

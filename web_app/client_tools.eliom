@@ -37,8 +37,8 @@
      disable_event Dom_html.Event.drop html_elt)
 
   (* mobile scroll events *)
-  let disable_mobile_scroll body_elt =
-    (disable_event Dom_html.Event.touchmove body_elt)
+  let disable_mobile_scroll () =
+    (disable_event Dom_html.Event.touchmove Dom_html.document)
 
   (*** window resize ***)
   let window_resize_function = ref []

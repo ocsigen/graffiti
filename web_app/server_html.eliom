@@ -68,7 +68,7 @@ let color_picker, color_div, block = Color_picker.create
 let td_block = td ~a:[a_class["td_block"]] [block]
 
 let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
-  ~a:[a_class["brush_slider"](* ; a_min 0.001; a_max 0.5 *)] ()
+  ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
 
 let td_slider = td ~a:[a_class["td_slider"]] [slider_elt]
 
