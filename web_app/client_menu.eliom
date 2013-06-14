@@ -6,13 +6,7 @@
   (** Handle client menu action **)
   let start ()  =
 
-    (*** Initi data ***)
-
-    let size = Client_tools.get_size () in
-    let width = fst size and height = snd size in
-
     (*** Elements ***)
-
     let dom_menu = Eliom_content.Html5.To_dom.of_div %Server_html.menu_div in
     let dom_about_option =
       Eliom_content.Html5.To_dom.of_td %Server_html.about_option_elt
@@ -25,7 +19,11 @@
     (* Add listenner of local click events *)
     (* for menu *)
     let detect_local_click () =
-      Client_menu_tools.detect_local_clicks (width - 100, width, 0, 100)
+      Client_menu_tools.detect_local_clicks
+        (Client_menu_tools.Max_value (-100),    (* start_x *)
+         Client_menu_tools.Max_value 0,         (* end_x *)
+         Client_menu_tools.Value 0,             (* start_y *)
+         Client_menu_tools.Value 100)           (* end_y *)
         (fun () -> Client_menu_tools.show_if_hide dom_menu)
     in
 
@@ -33,7 +31,11 @@
     Client_mobile.launch_func_only_on_mobile detect_local_click;
 
     (* on body *)
-    Client_menu_tools.detect_local_clicks (0, width - 100, 0, height)
+    Client_menu_tools.detect_local_clicks
+      (Client_menu_tools.Value 0,               (* start_x *)
+       Client_menu_tools.Max_value (-100),      (* end_x *)
+       Client_menu_tools.Value 0,               (* start_y *)
+       Client_menu_tools.Max_value 0)           (* end_y *)
       (fun () -> Client_menu_tools.hide_if_show dom_menu);
 
     (* Add listenner of touch click events *)
