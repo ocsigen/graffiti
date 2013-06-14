@@ -5,9 +5,11 @@
 
 PROJECT_NAME := graffiti
 
-FILES :=     server_tools.eliom		\
+FILES :=     server_service.eliom	\
       	     server_image.eliom		\
 	     color_picker.eliom		\
+	     color_picker.eliomi	\
+	     shared_tools.eliom		\
       	     server_html.eliom		\
 	     client_tools.eliom		\
 	     client_mobile.eliom	\
@@ -16,9 +18,8 @@ FILES :=     server_tools.eliom		\
 	     client_menu_tools.eliom	\
 	     client_menu.eliom		\
 	     client_palette.eliom	\
-	     client_palette.eliomi	\
 	     client_core.eliom		\
-	     server_core.eliom
+	     server_register.eliom
 
 # Source files for the server
 SERVER_FILES := $(wildcard $(FILES))

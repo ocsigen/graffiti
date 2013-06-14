@@ -22,7 +22,7 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
-    let base_size = ref (Client_tools.get_smaller !width !height)
+    let base_size = ref (Shared_tools.get_smaller !width !height)
     in
 
     let dom_canvas =
@@ -135,7 +135,7 @@
         | _            ->
           ignore (Eliom_bus.write %Server_image.bus vb);
           (* Draw in advance to avoid visual lag *)
-          Client_tools.draw ctx !base_size !float_size vo;
+          Client_canvas.draw ctx !base_size !float_size vo;
       in
       Lwt.return ()
     in
@@ -145,7 +145,7 @@
         | Client_tools.Portrait -> 1. -. y1, x1, 1. -. y2, x2
         | _                     -> x1, y1, x2, y2
       in
-      Client_tools.draw ctx !base_size !float_size
+      Client_canvas.draw ctx !base_size !float_size
         (color, brush_size, (x1', y1'), (x2', y2'))
     in
 
@@ -215,18 +215,18 @@
       width := float_of_int rc_width;
       height := float_of_int rc_height;
       float_size := (!width, !height);
-      base_size := Client_tools.get_smaller !width !height;
+      base_size := Shared_tools.get_smaller !width !height;
       ctx##lineCap <- Js.string "round";
       reset_image ();
       resize := Finishresize));
 
-    (* Start detect 'touch to start' for mobile *)
-    Client_mobile.detect ();
+    (* Check if 'touch to start' have to be removed (on pc) *)
+    Client_mobile.handle_touch_to_start_mobile ();
 
     (* Start menu script *)
     Client_menu.start ();
 
-    (* Start palette script *)
+    (* Start palette menu script *)
     Client_palette.start ();
 
     (* return value *)

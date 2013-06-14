@@ -5,27 +5,14 @@ open Eliom_content.Html5.D
 
 (* values *)
 
-let max_resolution = 16
-let min_resolution = 8
-
-let get_min_resolution max =
-  int_of_float (Server_tools.round
-                  (( float_of_int (max * min_resolution) ) /.
-                      (float_of_int max_resolution) ))
-
-let get_max_resolution min =
-  int_of_float (Server_tools.round
-                  (( float_of_int (min * max_resolution) ) /.
-                      (float_of_int min_resolution) ))
-
 let small_image_width = 480
-let small_image_height = get_min_resolution small_image_width
+let small_image_height = Shared_tools.get_min_resolution small_image_width
 
 let medium_image_width = 1400
-let medium_image_height = get_min_resolution medium_image_width
+let medium_image_height = Shared_tools.get_min_resolution medium_image_width
 
 let large_image_width = 2800
-let large_image_height = get_min_resolution large_image_width
+let large_image_height = Shared_tools.get_min_resolution large_image_width
 
 (* bus *)
 

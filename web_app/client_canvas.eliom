@@ -1,15 +1,21 @@
 
 {client{
 
+  let draw ctx base_size (width, height) (color, size, (x1, y1), (x2, y2)) =
+    ctx##strokeStyle <- (Js.string color);
+    ctx##lineWidth <- (size *. base_size);
+    ctx##beginPath();
+    ctx##moveTo(x1 *. width, y1 *. height);
+    ctx##lineTo(x2 *. width, y2 *. height);
+    ctx##stroke()
+
   (** launch check to remove header and get it's height **)
   let get_header_height () =
-    if (Client_mobile.remove_header ())
+    if (Client_mobile.remove_header_mobile ())
     then 0
-    else
-      let dom_header =
-        Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
-      in dom_header##clientHeight
-
+    else let dom_header =
+           Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
+	 in dom_header##clientHeight
 
   (** Calcul and set size of canvas **)
   let init () =
@@ -24,7 +30,6 @@
     let height = (snd size) - (margin * 4) - (get_header_height ()) in
 
     (*** Tool ***)
-
     (** if max = true, set max size, else, set min size **)
     let set_size max value =
       if ((width <= height && max) ||
@@ -40,13 +45,9 @@
       else Client_tools.Landscape, height
     in
 
-    let max = int_of_float (Client_tools.round (
-      ( float_of_int (min * %Server_image.max_resolution) ) /.
-        (float_of_int %Server_image.min_resolution) ))
-    in
+    let max = Shared_tools.get_max_resolution min in
 
     (*** Check result ***)
-
     (* If max value is out of window, it is wrong *)
     let good_result =
       if (width <= height)
@@ -61,10 +62,7 @@
           then width
           else height
         in
-        let min = int_of_float (Client_tools.round (
-          ( float_of_int (max * %Server_image.min_resolution) ) /.
-            (float_of_int %Server_image.max_resolution) ))
-        in
+	let min = Shared_tools.get_min_resolution max in
 
         (* Second way set *)
         set_size false min )

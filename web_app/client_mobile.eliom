@@ -17,8 +17,14 @@
     then func ()
     else ()
 
-  (** Remove header, on mobile **)
-  let remove_header () = if !already_removed
+  let not_launch_func_on_mobile func =
+    if is_on_mobile ()
+    then ()
+    else func ()
+
+  (** remove header on mobile
+  *** and return true if it removed **)
+  let remove_header_mobile () = if !already_removed
       then true
       else (
 
@@ -38,15 +44,14 @@
 
 
   (** Handle image 'touch to start' apparition **)
-  let detect () =
+  let handle_touch_to_start_mobile () =
 
-    (*** Init data ***)
-
+    (*** Tools  ***)
     let dom_statring_logo =
       Eliom_content.Html5.To_dom.of_table %Server_html.starting_logo_elt
     in
 
-    let remove_starting_logo () =
+    let remove_touch_to_start_logo () =
       Eliom_content.Html5.Manip.removeChild
        %Server_html.body_elt %Server_html.starting_logo_elt
     in
@@ -55,17 +60,16 @@
     let mobile_screen () =
       Lwt.async (fun () ->
         Lwt_js_events.click dom_statring_logo >>= (fun _ ->
-          Lwt.return (remove_starting_logo ())))
+          Lwt.return (remove_touch_to_start_logo ())))
     in
 
     let normal_screen () =
-      remove_starting_logo ()
+      remove_touch_to_start_logo ()
     in
 
     (* Check to let or not 'touch to start' image *)
     if is_on_mobile ()
     then mobile_screen ()
     else normal_screen ()
-
 
 }}

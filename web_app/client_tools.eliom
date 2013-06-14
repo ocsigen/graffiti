@@ -15,21 +15,6 @@
     let doc = Dom_html.document##documentElement in
     doc##clientWidth, doc##clientHeight
 
-  let get_smaller width height =
-    if (width < height)
-    then width
-    else height
-
-  let round value = ceil (value -. 0.5)
-
-  let draw ctx base_size (width, height) (color, size, (x1, y1), (x2, y2)) =
-    ctx##strokeStyle <- (Js.string color);
-    ctx##lineWidth <- (size *. base_size);
-    ctx##beginPath();
-    ctx##moveTo(x1 *. width, y1 *. height);
-    ctx##lineTo(x2 *. width, y2 *. height);
-    ctx##stroke()
-
   let get_timestamp () =
     (let date = jsnew Js.date_now () in
      int_of_float (Js.to_float (date##getTime ())))
