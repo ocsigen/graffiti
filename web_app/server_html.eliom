@@ -79,7 +79,7 @@ let palette_div = D.div ~a:[a_class["palette_div"; "unselectable"]]
   [palette_table_elt]
 
 let palette_button_elt =
-  D.td [div ~a:[a_class["palette_button"]] [color_div]]
+  D.td ~a:[a_class["palette_button"]] [color_div]
 
 let palette_elements = [palette_div]
 
