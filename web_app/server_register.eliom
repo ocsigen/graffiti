@@ -38,11 +38,7 @@ let _ =
                   %Server_html.header_elt
                   %Server_html.canvas_elt
                   %Server_html.slider_elt
-                  %Server_html.color_picker
-                  (Client_canvas.init
-                     %Server_html.body_elt
-                     %Server_html.header_elt
-                     %Server_html.canvas_elt));
+                  %Server_html.color_picker);
 
         (* Start menu script *)
         Client_menu.start

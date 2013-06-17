@@ -9,10 +9,12 @@
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
-  let rec start body_elt header_elt canvas_elt slider_elt color_picker
-      (window_orientation, size) =
+  let rec start body_elt header_elt canvas_elt slider_elt color_picker =
 
     (*** Init data***)
+    let (window_orientation, size) =
+      Client_canvas.init body_elt header_elt canvas_elt
+    in
     let win_orientation = ref window_orientation in
     let width = ref (float_of_int (fst size)) in
     let height = ref (float_of_int (snd size)) in
