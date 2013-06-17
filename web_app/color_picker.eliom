@@ -54,11 +54,17 @@ let genere_lll_color precision =
 
 (* Some pre-genereated ll_color in several precision *)
 let lll_color_p2 = genere_lll_color 2
-let lll_color_p2' = lll_color_p2@[[["#582900"; "#87591A"]]]
 let lll_color_p3 = genere_lll_color 3
 let lll_color_p4 = genere_lll_color 4
 let lll_color_p5 = genere_lll_color 5
 let lll_color_p6 = genere_lll_color 6
+
+(* Some hand-mained lll_color *)
+let lll_color_6 = [[["#FF0505"; "#FF8000"];
+		    ["#2E2EFE"; "#00FFFF"];
+		    ["#F7FE2E"; "#2EFE2E"];
+		    ["#7401DF"; "#8A2908"];
+		    ["#FFFFFF"; "#000000"]]]
 
 
 (**
@@ -107,7 +113,9 @@ let genere_color_table lll_color =
       in
 
       let div_color_list', trs = build_column div_color_list [] head in
-      let tbl = table ~a:[a_class["color_picker_table"]] (tr []) trs in
+      let first_tr = List.hd trs in
+      let trs' = try List.tl trs with | Failure "tl" -> [] in
+      let tbl = table ~a:[a_class["color_picker_table"]] (first_tr) trs' in
       build_table
         div_color_list'
         (tbl::tables)

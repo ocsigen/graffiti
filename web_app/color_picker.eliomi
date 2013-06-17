@@ -8,13 +8,15 @@ type div = [ Html5_types.div ] Eliom_content.Html5.D.elt
 *** It have to  be greater than 1 **)
 val genere_lll_color : int -> string list list list
 
-(* Some pre-genereated ll_color in several precision *)
+(* Some pre-genereated lll_color in several precision *)
 val lll_color_p2 : string list list list
-val lll_color_p2' : string list list list
 val lll_color_p3 : string list list list
 val lll_color_p4 : string list list list
 val lll_color_p5 : string list list list
 val lll_color_p6 : string list list list
+
+(* Some hand-mained lll_color *)
+val lll_color_6 : string list list list (* 1 table 2 columns 5 lines *)
 
 (**
 *** Take one list (tables) of list (columns) of list (lines) of color (string)

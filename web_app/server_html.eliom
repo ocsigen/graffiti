@@ -63,7 +63,7 @@ let menu_elements = [menu_div; gray_layer_elt; about_elt]
 (* palette *)
 
 let color_picker, color_div, block = Color_picker.create
-  ~lll_color:Color_picker.lll_color_p2' ()
+  ~lll_color:Color_picker.lll_color_6 ()
 
 let td_block = td ~a:[a_class["td_block"]] [block]
 
