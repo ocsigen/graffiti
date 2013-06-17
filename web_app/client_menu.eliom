@@ -30,7 +30,7 @@
     (* Launch it only on mobile to avoid conflit with button menu *)
     Client_mobile.launch_func_only_on_mobile detect_local_click;
 
-    (* on body *)
+
     Client_menu_tools.detect_local_clicks
       (Client_menu_tools.Value 0,               (* start_x *)
        Client_menu_tools.Max_value (-100),      (* end_x *)

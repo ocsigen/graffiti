@@ -7,18 +7,17 @@
   let mobile_height = 800
   let already_removed = ref false
 
-  let is_on_mobile () =
-    let size = Client_tools.get_device_size () in
-    let width = fst size and height = snd size in
+  let is_small_screen () =
+    let width, height = Client_tools.get_device_size () in
     (width <= mobile_width || height <= mobile_height)
 
   let launch_func_only_on_mobile func =
-    if is_on_mobile ()
+    if is_small_screen ()
     then func ()
     else ()
 
   let not_launch_func_on_mobile func =
-    if is_on_mobile ()
+    if is_small_screen ()
     then ()
     else func ()
 
@@ -37,7 +36,7 @@
         in
 
         (* Check to let or not header *)
-        if is_on_mobile ()
+        if is_small_screen ()
         then mobile_screen ()
         else false
       )
@@ -68,7 +67,7 @@
     in
 
     (* Check to let or not 'touch to start' image *)
-    if is_on_mobile ()
+    if is_small_screen ()
     then mobile_screen ()
     else normal_screen ()
 
