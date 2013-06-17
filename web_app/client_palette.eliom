@@ -4,16 +4,14 @@
   open Lwt
 
   (** Handle client palette action **)
-  let start ()  =
+  let start palette_button_elt palette_div color_picker =
 
     (*** Elements ***)
 
-    let dom_palette = Eliom_content.Html5.To_dom.of_div %Server_html.palette_div
-    in
-
     let dom_button_palette =
-      Eliom_content.Html5.To_dom.of_div %Server_html.palette_button_elt
+      Eliom_content.Html5.To_dom.of_div palette_button_elt
     in
+    let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
 
     (* Add listenner of touch slide events *)
     (* for palette menu *)
@@ -43,6 +41,6 @@
         (Client_menu_tools.switch_display dom_palette)));
 
     (* Start color picker stript *)
-    Color_picker.start %Server_html.color_picker
+    Color_picker.start color_picker
 
 }}

@@ -1,7 +1,7 @@
 {client{
 
   (** Handle switching logo on each reload of page **)
-  let rand_logo () =
+  let rand_logo body_elt header_elt =
 
     Random.init (Client_tools.get_timestamp ());
 
@@ -14,11 +14,11 @@
       ^ ".png')"
     in
 
-    if Client_mobile.remove_header_mobile ()
+    if Client_mobile.remove_header_mobile body_elt header_elt
     then ()     (* Not rand on mobile because of header's removed *)
     else
       (let dom_header =
-         Eliom_content.Html5.To_dom.of_div %Server_html.header_elt
+         Eliom_content.Html5.To_dom.of_div header_elt
        in dom_header##style##backgroundImage <- (Js.string rand_img))
 
 }}

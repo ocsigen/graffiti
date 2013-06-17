@@ -28,10 +28,7 @@
       | _             -> show_element dom_html
 
   (** switch display on fullscreen element with gray layer **)
-  let rec switch_fullscreen_display dom_html =
-    let dom_gray_layer =
-      Eliom_content.Html5.To_dom.of_div %Server_html.gray_layer_elt
-    in
+  let rec switch_fullscreen_display dom_gray_layer dom_html =
     match (Js.to_string dom_html##style##display) with
       | "inline"     ->
         (hide_element dom_gray_layer;
@@ -39,7 +36,7 @@
       | _            ->
         ((* Catch click / touch event to hide again elements *)
           let catch_hide_event elt = Lwt_js_events.click elt >>= (fun _ ->
-            Lwt.return (switch_fullscreen_display dom_html))
+            Lwt.return (switch_fullscreen_display dom_gray_layer dom_html))
           in
           ignore (catch_hide_event dom_html);
           ignore (catch_hide_event dom_gray_layer);

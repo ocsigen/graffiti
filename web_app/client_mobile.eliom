@@ -23,14 +23,14 @@
 
   (** remove header on mobile
   *** and return true if it removed **)
-  let remove_header_mobile () = if !already_removed
+  let remove_header_mobile body_elt header_elt = if !already_removed
       then true
       else (
 
         (* Remove header *)
         let mobile_screen () =
           Eliom_content.Html5.Manip.removeChild
-           %Server_html.body_elt %Server_html.header_elt;
+            body_elt header_elt;
           already_removed := true;
           !already_removed
         in
@@ -43,16 +43,15 @@
 
 
   (** Handle image 'touch to start' apparition **)
-  let handle_touch_to_start_mobile () =
+  let handle_touch_to_start_mobile body_elt starting_logo_elt =
 
     (*** Tools  ***)
     let dom_statring_logo =
-      Eliom_content.Html5.To_dom.of_table %Server_html.starting_logo_elt
+      Eliom_content.Html5.To_dom.of_table starting_logo_elt
     in
 
     let remove_touch_to_start_logo () =
-      Eliom_content.Html5.Manip.removeChild
-       %Server_html.body_elt %Server_html.starting_logo_elt
+      Eliom_content.Html5.Manip.removeChild body_elt starting_logo_elt
     in
 
     (* Set touch action *)

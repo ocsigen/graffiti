@@ -9,10 +9,8 @@
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
-  let rec start (window_orientation, size) =
-
-    (* rand logo image *)
-    Client_header.rand_logo ();
+  let rec start body_elt header_elt canvas_elt slider_elt color_picker
+      (window_orientation, size) =
 
     (*** Init data***)
     let win_orientation = ref window_orientation in
@@ -23,12 +21,8 @@
     let base_size = ref (min !width !height)
     in
 
-    let dom_canvas =
-      Eliom_content.Html5.To_dom.of_canvas %Server_html.canvas_elt
-    in
-    let dom_slider =
-      Eliom_content.Html5.To_dom.of_input %Server_html.slider_elt
-    in
+    let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let dom_slider = Eliom_content.Html5.To_dom.of_input slider_elt in
 
     let ctx = dom_canvas##getContext (Dom_html._2d_) in
     ctx##lineCap <- Js.string "round";
@@ -109,7 +103,7 @@
         | _                     -> oldx', oldy', !x, !y
       in
 
-      let color = Color_picker.get_color %Server_html.color_picker in
+      let color = Color_picker.get_color color_picker in
       let brush_size =
         (float_of_string (Js.to_string dom_slider##value)) /. 500.
       in
@@ -204,7 +198,9 @@
     (* handle resize of canvas and redraw image *)
     Client_tools.add_window_resize_function (1, (fun _ ->
       resize := Startresize;
-      let (rc_win_o, (rc_width, rc_height)) = Client_canvas.init () in
+      let (rc_win_o, (rc_width, rc_height)) =
+	Client_canvas.init body_elt header_elt canvas_elt
+      in
       get_origine_canvas ();
       win_orientation := rc_win_o;
       width := float_of_int rc_width;
@@ -214,15 +210,6 @@
       ctx##lineCap <- Js.string "round";
       reset_image ();
       resize := Finishresize));
-
-    (* Check if 'touch to start' have to be removed (on pc) *)
-    Client_mobile.handle_touch_to_start_mobile ();
-
-    (* Start menu script *)
-    Client_menu.start ();
-
-    (* Start palette menu script *)
-    Client_palette.start ();
 
     (* return value *)
     Lwt.return ()

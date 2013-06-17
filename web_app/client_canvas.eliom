@@ -10,24 +10,23 @@
     ctx##stroke()
 
   (** launch check to remove header and get it's height **)
-  let get_header_height () =
-    if (Client_mobile.remove_header_mobile ())
+  let get_header_height body_elt header_elt =
+    if (Client_mobile.remove_header_mobile body_elt header_elt)
     then 0
-    else let dom_header =
-           Eliom_content.Html5.To_dom.of_div %Server_html.header_elt
+    else let dom_header = Eliom_content.Html5.To_dom.of_div header_elt
          in dom_header##clientHeight
 
   (** Calcul and set size of canvas **)
-  let init () =
+  let init body_elt header_elt canvas_elt =
 
     (*** Init data ***)
     let size = Client_tools.get_size () in
-    let dom_canvas =
-      Eliom_content.Html5.To_dom.of_canvas %Server_html.canvas_elt
-    in
+    let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let margin = 3 in
     let width = (fst size) - (margin * 2) in
-    let height = (snd size) - (margin * 4) - (get_header_height ()) in
+    let height = (snd size) - (margin * 4) -
+      (get_header_height body_elt header_elt)
+    in
 
     (*** Tool ***)
     (** if max = true, set max size, else, set min size **)
