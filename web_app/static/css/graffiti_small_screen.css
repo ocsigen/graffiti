@@ -8,15 +8,10 @@
 	font-size:0.8em;
     }
 
-    .header_table
+    .header_div
     {
 	height:80px;
 	background-size:auto 80px;
-    }
-
-    .header_center_td
-    {
-	width:50%;
     }
 
     .palette_button
@@ -27,12 +22,6 @@
     .menu_button
     {
 	width:25%;
-    }
-
-    .menu_option
-    {
-	font-size:1.3em;
-	height:2em;
     }
 
 }

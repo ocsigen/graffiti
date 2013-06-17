@@ -12,7 +12,7 @@
     in
 
     let dom_button_palette =
-      Eliom_content.Html5.To_dom.of_td %Server_html.palette_button_elt
+      Eliom_content.Html5.To_dom.of_div %Server_html.palette_button_elt
     in
 
     (* Add listenner of touch slide events *)

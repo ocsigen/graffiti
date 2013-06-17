@@ -14,7 +14,7 @@
     if (Client_mobile.remove_header_mobile ())
     then 0
     else let dom_header =
-           Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
+           Eliom_content.Html5.To_dom.of_div %Server_html.header_elt
          in dom_header##clientHeight
 
   (** Calcul and set size of canvas **)

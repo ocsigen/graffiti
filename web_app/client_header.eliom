@@ -18,7 +18,7 @@
     then ()     (* Not rand on mobile because of header's removed *)
     else
       (let dom_header =
-         Eliom_content.Html5.To_dom.of_table %Server_html.header_elt
+         Eliom_content.Html5.To_dom.of_div %Server_html.header_elt
        in dom_header##style##backgroundImage <- (Js.string rand_img))
 
 }}

@@ -30,11 +30,10 @@ canvas
    user-select: none;
 }
 
-.header_table
+.header_div
 {
     width:100%;
     height:100px;
-    text-align:center;
     background-image:url('/img/Logo_GRAFFITIbyOcsigen_small_blue.png');
     background-size:auto 100px;
     background-position:center center;
@@ -43,7 +42,6 @@ canvas
 
 .logo
 {
-    margin:0;
     background-color:white;
     position:absolute;
     zIndex:2;
@@ -66,7 +64,8 @@ canvas
     background-position:center center;
     background-repeat:no-repeat;
     height:100%;
-    width:100%;
+    width:10%;
+    float:right;
 }
 
 .menu_button:hover
@@ -87,23 +86,31 @@ canvas
     border-style:solid;
     border-width:3px;
     border-color:#c6c6c6;
+    text-align:center;
     width:100px;
     height:99%;
 }
 
-.menu_table
+.menu_ul
 {
+    list-style-type:none;
     margin:0px;
     padding:0px;
+    padding-top:1em;
     width:100%;
-    text-align:center;
+}
+
+.menu_li
+{
+    width:100%;
+    height:100%;
+    padding:5px;
 }
 
 .menu_option
 {
-    margin:0px;
-    padding:0px;
     width:100%;
+    height:100%;
 }
 
 .menu_option:hover
@@ -148,26 +155,11 @@ canvas
     height:100%;
 }
 
-.palette_table
-{
-    vertical-align:text-top;
-    height:100%
-}
-
-.td_block
-{
-    height:100%;
-}
-
-.td_slider
-{
-    width:0%;
-}
-
 .palette_div
 {
     margin:0px;
     padding:0px;
+    padding-top:1em;
     position:absolute;
     zIndex:2;
     top:0px;
@@ -180,11 +172,31 @@ canvas
     vertical-align:text-top;
     width:100px;
     height:99%;
+    clear:both;
+}
+
+.color_picker_block
+{
+    float:left;
+}
+
+.palette_button
+{
+    height:40%;
+    width:10%;
+    padding-top:34px;
+    float:left;
+}
+
+.brush_div
+{
+    height:95%;
 }
 
 .brush_slider
 {
     -webkit-appearance: slider-vertical;
     height:100%;
-    width:30px;
+    width:45px;
+    float:left;
 }

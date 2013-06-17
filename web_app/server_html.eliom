@@ -36,25 +36,23 @@ let about_elt =
      div [pcdata "Created with "; about_link_elt]
     ]
 
-let gray_layer_elt =
-  D.div ~a:[a_class["gray_layer"]] []
+let gray_layer_elt = D.div ~a:[a_class["gray_layer"]] []
 
-let save_option_elt =
-  tr [td ~a:[a_class["menu_option"]]
-         [a ~a:[Unsafe.string_attrib "download" "graffiti.png"]
-             ~service:Server_image.download_imageservice
-             [pcdata "Save"] ()]]
+let save_option_elt = span ~a:[a_class["menu_option"]]
+  [a ~a:[Unsafe.string_attrib "download" "graffiti.png"]
+      ~service:Server_image.download_imageservice
+      [pcdata "Save"] ()]
 
-let about_option_elt = D.td ~a:[a_class["menu_option"]] [pcdata "About"]
+let about_option_elt = D.span ~a:[a_class["menu_option"]] [pcdata "About"]
 
-let menu_table_elt = table ~a:[a_class["menu_table"]]
-  (tr []) [save_option_elt; tr [about_option_elt] ]
+let menu_ul = ul ~a:[a_class["menu_ul"]]
+  [li ~a:[a_class["menu_li"]] [save_option_elt];
+   li ~a:[a_class["menu_li"]] [about_option_elt]]
 
-let menu_div = D.div ~a:[a_class["menu_div"; "unselectable"]] [menu_table_elt]
+let menu_div = D.div ~a:[a_class["menu_div"; "unselectable"]] [menu_ul]
 
 (** change image in css with class menu_button **)
-let menu_button_elt =
-  D.td ~a:[a_class["menu_button"]] []
+let menu_button_elt = D.div ~a:[a_class["menu_button"]] []
 
 let menu_elements = [menu_div; gray_layer_elt; about_elt]
 
@@ -63,21 +61,13 @@ let menu_elements = [menu_div; gray_layer_elt; about_elt]
 let color_picker, color_div, block = Color_picker.create
   ~lll_color:Color_picker.lll_color_6 ()
 
-let td_block = td ~a:[a_class["td_block"]] [block]
-
 let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
   ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
 
-let td_slider = td ~a:[a_class["td_slider"]] [slider_elt]
-
-let palette_table_elt = table ~a:[a_class["palette_table"]]
-  (tr []) [tr [td_block; td_slider]]
-
 let palette_div = D.div ~a:[a_class["palette_div"; "unselectable"]]
-  [palette_table_elt]
+  [block; div ~a:[a_class["brush_div"]] [slider_elt]]
 
-let palette_button_elt =
-  D.td ~a:[a_class["palette_button"]] [color_div]
+let palette_button_elt = D.div ~a:[a_class["palette_button"]] [color_div]
 
 let palette_elements = [palette_div]
 
@@ -97,12 +87,8 @@ let starting_logo_elt =
 (* header / body *)
 
 let header_elt =
-  D.table ~a:[a_class["header_table"; "unselectable"]]
-    (tr
-       [palette_button_elt;
-        td ~a:[a_class["header_center_td"]] [];
-        menu_button_elt])
-    []
+  D.div ~a:[a_class["header_div"; "unselectable"]]
+    [palette_button_elt; menu_button_elt]
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
   ([header_elt; canvas_elt; starting_logo_elt]@

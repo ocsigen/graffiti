@@ -9,10 +9,10 @@
     (*** Elements ***)
     let dom_menu = Eliom_content.Html5.To_dom.of_div %Server_html.menu_div in
     let dom_about_option =
-      Eliom_content.Html5.To_dom.of_td %Server_html.about_option_elt
+      Eliom_content.Html5.To_dom.of_span %Server_html.about_option_elt
     in
     let dom_button_menu =
-      Eliom_content.Html5.To_dom.of_td %Server_html.menu_button_elt
+      Eliom_content.Html5.To_dom.of_div %Server_html.menu_button_elt
     in
     let dom_about = Eliom_content.Html5.To_dom.of_div %Server_html.about_elt in
 
