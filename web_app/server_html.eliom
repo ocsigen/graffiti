@@ -12,8 +12,6 @@ let canvas_elt =
 
 (* menu elements *)
 
-(* links not work *)
-
 let about_link_elt =
   Raw.a
     ~a:[a_href (Xml.uri_of_string "http://ocsigen.org");

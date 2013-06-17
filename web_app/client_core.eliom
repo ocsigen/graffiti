@@ -5,7 +5,7 @@
   open Eliom_content.Html5.D
 
   (** This type allow in theory to handle drawing during resize **)
-  (** But it not work **)
+  (** But it does not work **)
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
@@ -96,7 +96,7 @@
 
       set_coord coord;
 
-      (** Try to handle drawing during resize but not work **)
+      (** Try to handle drawing during resize but it does not work **)
       let oldx', oldy' =
         match !resize with
           | Finishresize       -> resize := Noresize; (!x, !y)
@@ -124,7 +124,7 @@
     let line coord =
       let vo, vb = compute_line coord in
 
-      (** Try to handle drawing during resize but not work **)
+      (** Try to handle drawing during resize but it does not work **)
       let _ = match !resize with
         | Startresize  -> ()
         | _            ->
