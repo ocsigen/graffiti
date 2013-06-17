@@ -4,11 +4,6 @@
   type messages = (string * float * (float * float) * (float * float))
       deriving (Json)
 
-  let get_smaller x y =
-    if (x < y)
-    then x
-    else y
-
   let round value = ceil (value -. 0.5)
 
   (*** images tools ***)

@@ -60,8 +60,7 @@
       Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
         (*** Initi data ***)
-        let size = Client_tools.get_size () in
-        let width = fst size and height = snd size in
+        let width, height = Client_tools.get_size () in
 
         let current_x, current_y = get_mouse_coord ev in
         let start_x' = get_relative_position width start_x in

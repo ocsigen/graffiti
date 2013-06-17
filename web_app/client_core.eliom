@@ -20,7 +20,7 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
-    let base_size = ref (Shared_tools.get_smaller !width !height)
+    let base_size = ref (min !width !height)
     in
 
     let dom_canvas =
@@ -210,7 +210,7 @@
       width := float_of_int rc_width;
       height := float_of_int rc_height;
       float_size := (!width, !height);
-      base_size := Shared_tools.get_smaller !width !height;
+      base_size := min !width !height;
       ctx##lineCap <- Js.string "round";
       reset_image ();
       resize := Finishresize));
