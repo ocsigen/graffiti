@@ -7,7 +7,7 @@
 
   let has_small_screen () =
     let width, height = Client_tools.get_device_size () in
-    (width <= 480 || height <= 800)
+    (width <= 480 || height <= 480)
 
   let launch_func_only_on_small_screen func =
     if has_small_screen ()
