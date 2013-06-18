@@ -9,13 +9,6 @@
     ctx##lineTo(x2 *. width, y2 *. height);
     ctx##stroke()
 
-  (** launch check to remove header and get it's height **)
-  let get_header_height body_elt header_elt =
-    if (Client_mobile.remove_header_mobile body_elt header_elt)
-    then 0
-    else let dom_header = Eliom_content.Html5.To_dom.of_div header_elt
-         in dom_header##clientHeight
-
   (** Calcul and set size of canvas **)
   let init body_elt header_elt canvas_elt =
 
@@ -25,7 +18,7 @@
     let margin = 3 in
     let width = (fst size) - (margin * 2) in
     let height = (snd size) - (margin * 4) -
-      (get_header_height body_elt header_elt)
+      (Client_header.get_height body_elt header_elt)
     in
 
     (*** Tool ***)

@@ -21,6 +21,13 @@
       | "inline"      -> hide_element dom_html
       | _             -> ()
 
+  let set_position body_elt header_elt dom_html margin =
+    let width, height = Client_tools.get_size () in
+    let header_height = Client_header.get_height body_elt header_elt in
+    dom_html##style##height <- Js.string
+      ((string_of_int (height - header_height - (margin * 2))) ^ "px");
+    dom_html##style##top <- Js.string ((string_of_int header_height) ^ "px")
+
   (** switch simple element display **)
   let switch_display dom_html =
     match (Js.to_string dom_html##style##display) with

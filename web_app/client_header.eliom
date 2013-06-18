@@ -1,5 +1,12 @@
 {client{
 
+  (** launch check to remove header and get it's height **)
+  let get_height body_elt header_elt =
+    if (Client_mobile.remove_header body_elt header_elt)
+    then 0
+    else let dom_header = Eliom_content.Html5.To_dom.of_div header_elt
+         in dom_header##clientHeight
+
   (** Handle switching logo on each reload of page **)
   let rand_logo body_elt header_elt =
 
@@ -14,8 +21,8 @@
       ^ ".png')"
     in
 
-    if Client_mobile.remove_header_mobile body_elt header_elt
-    then ()     (* Not rand on mobile because of header's removed *)
+    if Client_mobile.remove_header body_elt header_elt
+    then ()     (* Not rand on small screen because of header's removed *)
     else
       (let dom_header =
          Eliom_content.Html5.To_dom.of_div header_elt

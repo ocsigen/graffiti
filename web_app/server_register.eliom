@@ -27,35 +27,39 @@ let _ =
       (*** init client ***)
       ignore {unit{
 
-        (* Random logo image *)
-        Client_header.rand_logo
+	(* Random logo image *)
+	Client_header.rand_logo
           %Server_html.body_elt
           %Server_html.header_elt;
 
-        (* start canvs script *)
-        ignore (Client_core.start
+	(* start canvs script *)
+	ignore (Client_core.start
                   %Server_html.body_elt
                   %Server_html.header_elt
                   %Server_html.canvas_elt
                   %Server_html.slider_elt
                   %Server_html.color_picker);
 
-        (* Start menu script *)
-        Client_menu.start
+	(* Start menu script *)
+	Client_menu.start
+          %Server_html.body_elt
+          %Server_html.header_elt
           %Server_html.menu_button_elt
           %Server_html.menu_div
           %Server_html.about_option_elt
           %Server_html.gray_layer_elt
           %Server_html.about_elt;
 
-        (* Start palette menu script *)
-        Client_palette.start
+	(* Start palette menu script *)
+	Client_palette.start
+          %Server_html.body_elt
+          %Server_html.header_elt
           %Server_html.palette_button_elt
           %Server_html.palette_div
           %Server_html.color_picker;
 
-        (* Check if 'touch to start' have to be removed (on pc) *)
-        Client_mobile.handle_touch_to_start_mobile
+	(* Check if 'touch to start' have to be removed (on pc) *)
+	Client_mobile.handle_touch_to_start
           %Server_html.body_elt
           %Server_html.starting_logo_elt;
 

@@ -43,10 +43,17 @@
   (*** window resize ***)
   let window_resize_function = ref []
 
+  let id_ref = ref 0
+
   (** Add func to launch at window resize event **)
-  (** The id is essential to could remove it **)
-  let add_window_resize_function ((id : int), (func : unit -> unit)) =
-    window_resize_function := (id, func)::!window_resize_function
+  (** The return id is essential to could remove it **)
+  let add_window_resize_function (func : unit -> unit) =
+    window_resize_function := (!id_ref, func)::!window_resize_function;
+    incr id_ref;
+    !id_ref
+
+  let add_no_removable_window_resize_function func =
+    ignore (add_window_resize_function func)
 
   (** Remove func assossiate to id, to launch at window resize event **)
   let delete_window_resize_function id_to_rm =

@@ -190,13 +190,13 @@ canvas
 
 .brush_div
 {
-    height:95%;
+    height:100%;
 }
 
 .brush_slider
 {
     -webkit-appearance: slider-vertical;
-    height:100%;
+    height:97%;
     width:45px;
     float:left;
 }

@@ -198,7 +198,7 @@
 
     (* add window resize listenner *)
     (* handle resize of canvas and redraw image *)
-    Client_tools.add_window_resize_function (1, (fun _ ->
+    Client_tools.add_no_removable_window_resize_function (fun _ ->
       resize := Startresize;
       let (rc_win_o, (rc_width, rc_height)) =
 	Client_canvas.init body_elt header_elt canvas_elt
@@ -211,7 +211,7 @@
       base_size := min !width !height;
       ctx##lineCap <- Js.string "round";
       reset_image ();
-      resize := Finishresize));
+      resize := Finishresize);
 
     (* return value *)
     Lwt.return ()
