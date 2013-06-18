@@ -6,10 +6,10 @@
 PROJECT_NAME := graffiti
 
 FILES :=     server_service.eliom	\
+	     shared_tools.eliom		\
       	     server_image.eliom		\
 	     color_picker.eliom		\
 	     color_picker.eliomi	\
-	     shared_tools.eliom		\
       	     server_html.eliom		\
 	     client_tools.eliom		\
 	     client_mobile.eliom	\
