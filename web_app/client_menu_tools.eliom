@@ -60,22 +60,20 @@
       | Max_value v     -> max + v
     in
 
-    Lwt_js_events.async (fun () ->
-      Lwt_js_events.clicks Dom_html.document (fun ev _ ->
+    Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
-        (*** Initi data ***)
-        let width, height = Client_tools.get_size () in
+      (*** Initi data ***)
+      let width, height = Client_tools.get_size () in
 
-        let current_x, current_y = get_mouse_coord ev in
-        let start_x' = get_relative_position width start_x in
-        let start_y' = get_relative_position height start_y in
-        let end_x' = get_relative_position width end_x in
-        let end_y' = get_relative_position height end_y in
+      let current_x, current_y = get_mouse_coord ev in
+      let start_x' = get_relative_position width start_x in
+      let start_y' = get_relative_position height start_y in
+      let end_x' = get_relative_position width end_x in
+      let end_y' = get_relative_position height end_y in
 
-        Lwt.return (if (current_x >= start_x' && current_x <= end_x' &&
-                        current_y >= start_y' && current_y <= end_y')
-          then func ()
-          else () )))
-
+      if (current_x >= start_x' && current_x <= end_x' &&
+            current_y >= start_y' && current_y <= end_y')
+      then func ()
+      else Lwt.return () )
 
 }}

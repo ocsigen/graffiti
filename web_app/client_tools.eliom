@@ -22,62 +22,48 @@
 
   (*** Smartphone's tool events ***)
 
-  (** Disable Js event with stopping propagation during capture phase **)
+  (** Disable Dom_html.Event with stopping propagation during capture phase **)
   let disable_event event html_elt =
-    (Lwt.async (fun () ->
-      Lwt_js_events.seq_loop
-        (Lwt_js_events.make_event event) ~use_capture:true html_elt
-        (fun ev _ -> Lwt.return (Lwt_js_events.preventDefault ev)) ))
+    Dom_html.addEventListener html_elt event
+      (Dom.handler (fun _ -> Js._false)) Js._true
+
+  (** Enable Dom_html.Event with id gived by disable_event **)
+  let enable_event id =
+    Dom_html.removeEventListener id
+
+  let enable_events l_id =
+    let rec enable = function
+      | id::t   -> Dom_html.removeEventListener id; enable t
+      | []      -> ()
+    in enable l_id
 
   (* drag events *)
   let disable_drag_and_drop html_elt =
-    (disable_event Dom_html.Event.drag html_elt;
+    [disable_event Dom_html.Event.drag html_elt;
      disable_event Dom_html.Event.dragstart html_elt;
      disable_event Dom_html.Event.dragenter html_elt;
-     disable_event Dom_html.Event.drop html_elt)
+     disable_event Dom_html.Event.drop html_elt]
 
   (* mobile scroll events *)
   let disable_mobile_scroll () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
-  (*** window resize ***)
-  let window_resize_function = ref []
+  (*** window orientationchange and resize ***)
 
-  let id_ref = ref 0
+  let orientationchange = Dom_html.Event.make "orientationchange"
 
-  (** Add func to launch at window resize event **)
-  (** The return id is essential to could remove it **)
-  let add_window_resize_function (func : unit -> unit) =
-    window_resize_function := (!id_ref, func)::!window_resize_function;
-    incr id_ref;
-    !id_ref
+  let onorientationchange () =
+    Lwt_js_events.make_event orientationchange Dom_html.document
 
-  let add_no_removable_window_resize_function func =
-    ignore (add_window_resize_function func)
+  let onorientationchanges t =
+    Lwt_js_events.seq_loop
+      (fun ?use_capture () -> onorientationchange ()) () t
 
-  (** Remove func assossiate to id, to launch at window resize event **)
-  let delete_window_resize_function id_to_rm =
-    let rec aux new_list = function
-      | (id, func)::q when id = id_to_rm -> aux new_list q
-      | h::q                             -> aux (h::new_list) q
-      | []                               -> new_list
-    in window_resize_function := aux [] !window_resize_function
+  let onorientationchange_or_onresize () =
+    Lwt.pick [Lwt_js_events.onresize (); onorientationchange ()]
 
-  (** catch window_resize and launch associate function **)
-  let _ =
-    let launch_window_resize_function () =
-      let rec aux = function
-        | (_, func)::q        -> func (); aux q
-        | []                  -> ()
-      in aux !window_resize_function
-    in
-    let handler =
-      (fun _ _ -> Lwt.return (launch_window_resize_function ()))
-    in
-    (Lwt.async (fun () -> Lwt_js_events.onresizes handler));
-    (Lwt.async (fun () ->
-      Lwt_js_events.seq_loop
-        (Lwt_js_events.make_event (Dom.Event.make "orientationchange"))
-        Dom_html.document handler))
+  let onorientationchanges_or_onresizes t =
+    Lwt_js_events.seq_loop
+      (fun ?use_capture () -> onorientationchange_or_onresize ()) () t
 
 }}

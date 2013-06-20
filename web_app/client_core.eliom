@@ -191,27 +191,29 @@
              Lwt_js_events.touchmoves Lwt_js_events.touchend));
 
     (* fix drag and drop to avoid to catch canvas during drawing *)
-    Client_tools.disable_drag_and_drop dom_canvas;
+    ignore (Client_tools.disable_drag_and_drop dom_canvas);
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    Client_tools.disable_mobile_scroll ();
+    ignore (Client_tools.disable_mobile_scroll ());
 
-    (* add window resize listenner *)
+    (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
-    Client_tools.add_no_removable_window_resize_function (fun _ ->
-      resize := Startresize;
-      let (rc_win_o, (rc_width, rc_height)) =
-	Client_canvas.init body_elt header_elt canvas_elt
-      in
-      get_origine_canvas ();
-      win_orientation := rc_win_o;
-      width := float_of_int rc_width;
-      height := float_of_int rc_height;
-      float_size := (!width, !height);
-      base_size := min !width !height;
-      ctx##lineCap <- Js.string "round";
-      reset_image ();
-      resize := Finishresize);
+    Lwt.async (fun () ->
+      Client_tools.onorientationchanges_or_onresizes (fun _ _ ->
+        resize := Startresize;
+        let (rc_win_o, (rc_width, rc_height)) =
+          Client_canvas.init body_elt header_elt canvas_elt
+        in
+        get_origine_canvas ();
+        win_orientation := rc_win_o;
+        width := float_of_int rc_width;
+        height := float_of_int rc_height;
+        float_size := (!width, !height);
+        base_size := min !width !height;
+        ctx##lineCap <- Js.string "round";
+        reset_image ();
+        resize := Finishresize;
+        Lwt.return ()));
 
     (* return value *)
     Lwt.return ()

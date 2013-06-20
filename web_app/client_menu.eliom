@@ -18,25 +18,29 @@
     (* Add listenner of local click events *)
     (* for menu *)
     let detect_local_click () =
-      Client_menu_tools.detect_local_clicks
-        (Client_menu_tools.Max_value (-100),    (* start_x *)
-         Client_menu_tools.Max_value 0,         (* end_x *)
-         Client_menu_tools.Value 0,             (* start_y *)
-         Client_menu_tools.Value 100)           (* end_y *)
-        (fun () ->
-          Client_menu_tools.set_position body_elt header_elt dom_menu 3;
-          Client_menu_tools.show_if_hide dom_menu)
+      Lwt.async (fun () ->
+        Client_menu_tools.detect_local_clicks
+          (Client_menu_tools.Max_value (-100),    (* start_x *)
+           Client_menu_tools.Max_value 0,         (* end_x *)
+           Client_menu_tools.Value 0,             (* start_y *)
+           Client_menu_tools.Value 100)           (* end_y *)
+          (fun () ->
+            Client_menu_tools.set_position body_elt header_elt dom_menu 3;
+            Client_menu_tools.show_if_hide dom_menu;
+            Lwt.return ()))
     in
 
     (* Launch it only on small screen to avoid conflit with button menu *)
     Client_mobile.launch_func_only_on_small_screen detect_local_click;
 
-    Client_menu_tools.detect_local_clicks
-      (Client_menu_tools.Value 0,               (* start_x *)
-       Client_menu_tools.Max_value (-100),      (* end_x *)
-       Client_menu_tools.Value 0,               (* start_y *)
-       Client_menu_tools.Max_value 0)           (* end_y *)
-      (fun () -> Client_menu_tools.hide_if_show dom_menu);
+    Lwt.async (fun () ->
+      Client_menu_tools.detect_local_clicks
+        (Client_menu_tools.Value 0,               (* start_x *)
+         Client_menu_tools.Max_value (-100),      (* end_x *)
+         Client_menu_tools.Value 0,               (* start_y *)
+         Client_menu_tools.Max_value 0)           (* end_y *)
+        (fun () -> Client_menu_tools.hide_if_show dom_menu;
+          Lwt.return ()));
 
     (* Add listenner of touch click events *)
     (* on menu button *)
@@ -52,7 +56,8 @@
 
     (* Add listenner of resize event*)
     (* on menu *)
-    Client_tools.add_no_removable_window_resize_function
-      (fun () -> Client_menu_tools.set_position body_elt header_elt dom_menu 3)
+    Lwt.async (fun () -> Client_tools.onorientationchanges_or_onresizes
+      (fun _ _ -> Lwt.return
+        (Client_menu_tools.set_position body_elt header_elt dom_menu 3)))
 
 }}
