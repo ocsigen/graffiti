@@ -54,8 +54,6 @@ let menu_div = D.div ~a:[a_class["menu_div"; "unselectable"]] [menu_ul]
 (** change image in css with class menu_button **)
 let menu_button_elt = D.div ~a:[a_class["menu_button"]] []
 
-let menu_elements = [menu_div; gray_layer_elt; about_elt]
-
 (* palette *)
 
 let color_picker, color_div, block = Color_picker.create
@@ -65,11 +63,8 @@ let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
   ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
 
 let palette_div = D.div ~a:[a_class["palette_div"; "unselectable"]]
-  [block; div ~a:[a_class["brush_div"]] [slider_elt]]
-
-let palette_button_elt = D.div ~a:[a_class["palette_button"]] [color_div]
-
-let palette_elements = [palette_div]
+  [div ~a:[a_class["color_div"]] [color_div; block];
+   div ~a:[a_class["brush_div"]] [slider_elt]]
 
 (* starting logo *)
 
@@ -87,9 +82,10 @@ let starting_logo_elt =
 (* header / body *)
 
 let header_elt =
-  D.div ~a:[a_class["header_div"; "unselectable"]]
-    [palette_button_elt; menu_button_elt]
+  D.div ~a:[a_class["header_div"; "unselectable"]] [menu_button_elt]
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; canvas_elt; starting_logo_elt]@
-      palette_elements@menu_elements)
+  ([header_elt; menu_div; gray_layer_elt; about_elt;
+    div ~a:[a_class["content_div"]]
+      [palette_div; div ~a:[a_class["canvas_div"]] [canvas_elt]];
+    starting_logo_elt])

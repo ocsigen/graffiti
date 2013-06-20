@@ -61,10 +61,10 @@ let lll_color_p6 = genere_lll_color 6
 
 (* Some hand-mained lll_color *)
 let lll_color_6 = [[["#FF0505"; "#FF8000"];
-		    ["#2E2EFE"; "#00FFFF"];
-		    ["#F7FE2E"; "#2EFE2E"];
-		    ["#7401DF"; "#8A2908"];
-		    ["#FFFFFF"; "#000000"]]]
+                    ["#2E2EFE"; "#00FFFF"];
+                    ["#F7FE2E"; "#2EFE2E"];
+                    ["#7401DF"; "#8A2908"];
+                    ["#FFFFFF"; "#000000"]]]
 
 
 (**

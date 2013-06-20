@@ -14,14 +14,18 @@
 	background-size:auto 80px;
     }
 
-    .palette_button
+    .palette_div
     {
-	width:25%;
+	position:absolute;
+	top:0px;
+	left:0px;
+	display:none;
+	padding-top:1em;
+	background-color:#d6d6d6;
+	border-style:solid;
+	border-width:3px;
+	border-color:#c6c6c6;
     }
 
-    .menu_button
-    {
-	width:25%;
-    }
 
 }

@@ -24,8 +24,8 @@
          Client_menu_tools.Value 0,             (* start_y *)
          Client_menu_tools.Value 100)           (* end_y *)
         (fun () ->
-	  Client_menu_tools.set_position body_elt header_elt dom_menu 3;
-	  Client_menu_tools.show_if_hide dom_menu)
+          Client_menu_tools.set_position body_elt header_elt dom_menu 3;
+          Client_menu_tools.show_if_hide dom_menu)
     in
 
     (* Launch it only on small screen to avoid conflit with button menu *)
@@ -43,12 +43,12 @@
     Lwt.async (fun () -> Lwt_js_events.clicks dom_button_menu
       (fun _ _ -> Lwt.return
         (Client_menu_tools.set_position body_elt header_elt dom_menu 3;
-	 Client_menu_tools.switch_display dom_menu)));
+         Client_menu_tools.switch_display dom_menu)));
 
     (* on about  *)
     Lwt.async (fun () -> Lwt_js_events.clicks dom_about_option
       (fun _ _ -> Lwt.return (Client_menu_tools.switch_fullscreen_display
-				dom_gray_layer dom_about)));
+                                dom_gray_layer dom_about)));
 
     (* Add listenner of resize event*)
     (* on menu *)

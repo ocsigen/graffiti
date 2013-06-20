@@ -13,14 +13,6 @@ body
     color:black;
 }
 
-canvas
-{
-    background-color:#FFFFFF;
-    border-style:solid;
-    border-width:3px;
-    border-color:#c6c6c6;
-}
-
 .unselectable
 {
    -moz-user-select: -moz-none;
@@ -44,7 +36,6 @@ canvas
 {
     background-color:white;
     position:absolute;
-    zIndex:2;
     top:0em;
     right:0em;
     width:100%;
@@ -78,7 +69,6 @@ canvas
     margin:0px;
     padding:0px;
     position:absolute;
-    zIndex:2;
     right:0px;
     top:0px;
     display:none;
@@ -125,7 +115,6 @@ canvas
     height:100%;
     margin:0px;
     position:absolute;
-    zIndex:3;
     top:0em;
     left:0em;
     opacity:0.75;
@@ -136,7 +125,6 @@ canvas
 {
     position:absolute;
     padding:1px;
-    zIndex:4;
     top:10%;
     left:10%;
     background-color:white;
@@ -150,53 +138,75 @@ canvas
     max-width:80%;
 }
 
-.palette_button
+.content_div
 {
-    height:100%;
+    display: -webkit-flex;
+    display:         flex;
+}
+
+.canvas_div
+{
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+canvas
+{
+    background-color:#FFFFFF;
+    border-style:solid;
+    border-width:3px;
+    border-color:#c6c6c6;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
 .palette_div
 {
     margin:0px;
     padding:0px;
-    padding-top:1em;
-    position:absolute;
-    zIndex:2;
-    top:0px;
-    left:0px;
-    display:none;
-    background-color:#d6d6d6;
-    border-style:solid;
-    border-width:3px;
-    border-color:#c6c6c6;
-    vertical-align:text-top;
-    width:100px;
-    height:99%;
-    clear:both;
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: inline-column;
+    flex-flow: inline-column;
+    width: 100px;
+}
+
+.color_div
+{
+    -webkit-flex-flow: column;
+    flex-flow: column;
 }
 
 .color_picker_block
 {
-    float:left;
+    margin-buttom:0px;
 }
 
-.palette_button
+.color_picker_color_div
 {
-    height:40%;
-    width:10%;
-    padding-top:34px;
-    float:left;
+    margin-left:3px;
+    margin-bottom:3px;
+    width: 60px;
+    height: 30px;
 }
 
 .brush_div
 {
-    height:100%;
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    max-width: 20px;
 }
 
 .brush_slider
 {
     -webkit-appearance: slider-vertical;
-    height:97%;
-    width:45px;
-    float:left;
+    -webkit-flex-flow: inline-column;
+    flex-flow: inline-column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    max-width: 20px;
 }

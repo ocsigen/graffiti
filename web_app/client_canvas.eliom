@@ -15,8 +15,12 @@
     (*** Init data ***)
     let size = Client_tools.get_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let width_canvas_margin = if Client_mobile.has_small_screen ()
+        then 0
+        else 100
+    in
     let margin = 3 in
-    let width = (fst size) - (margin * 2) in
+    let width = (fst size) - (margin * 2) - width_canvas_margin in
     let height = (snd size) - (margin * 4) -
       (Client_header.get_height body_elt header_elt)
     in
