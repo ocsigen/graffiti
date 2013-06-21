@@ -77,7 +77,7 @@
       if (Js.to_bool (dom_img##complete))
       then copy_image dom_img
       else dom_img##onload <- Dom_html.handler
-        (fun _ -> copy_image dom_img; Js._false);
+        (fun _ -> copy_image dom_img; Js._true);
     in reset_image ();
 
     (*** Tools ***)
