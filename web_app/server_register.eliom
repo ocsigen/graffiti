@@ -19,7 +19,7 @@ let _ =
                                a_content "IE=edge,chrome=1"]
                          ();
                       meta ~a:[a_name "viewport";
-                               a_content "width=device-width; user-scalable=0; initial-scale=1.0; maximum-scale=1.0;"]
+                               a_content "user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"]
                      () ] ())
            Server_html.body_elt)
       in
