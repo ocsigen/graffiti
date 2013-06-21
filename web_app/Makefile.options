@@ -12,6 +12,7 @@ FILES :=     server_service.eliom	\
 	     color_picker.eliomi	\
       	     server_html.eliom		\
 	     client_tools.eliom		\
+	     client_tools.eliomi	\
 	     client_mobile.eliom	\
 	     client_header.eliom	\
 	     client_canvas.eliom	\

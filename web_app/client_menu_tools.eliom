@@ -45,35 +45,4 @@
           show_element dom_gray_layer;
           show_element dom_html)
 
-  (** local click position type **)
-  type lc_position =
-    | Value of int      (** Simple value **)
-    | Max_value of int  (** Max value + your value **)
-
-  (** Detect click beetween start_x, end_x, start_y and end_y and launch func
-  *** Use Max_value constructor to make value relative to screen size **)
-  let detect_local_clicks (start_x, end_x, start_y, end_y) func =
-
-    let get_mouse_coord ev = (ev##clientX, ev##clientY) in
-    let get_relative_position max = function
-      | Value v         -> v
-      | Max_value v     -> max + v
-    in
-
-    Lwt_js_events.clicks Dom_html.document (fun ev _ ->
-
-      (*** Initi data ***)
-      let width, height = Client_tools.get_document_size () in
-
-      let current_x, current_y = get_mouse_coord ev in
-      let start_x' = get_relative_position width start_x in
-      let start_y' = get_relative_position height start_y in
-      let end_x' = get_relative_position width end_x in
-      let end_y' = get_relative_position height end_y in
-
-      if (current_x >= start_x' && current_x <= end_x' &&
-            current_y >= start_y' && current_y <= end_y')
-      then func ()
-      else Lwt.return () )
-
 }}
