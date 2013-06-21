@@ -38,8 +38,10 @@
     (* on palette menu *)
     let handle_orientationchange_and_resize () =
       Lwt.async (fun () ->
-        Client_tools.onorientationchanges_or_onresizes (fun _ _ -> Lwt.return
-          (Client_menu_tools.set_position body_elt header_elt dom_palette 14)))
+        Client_tools.limited_onorientationchanges_or_onresizes
+          (fun _ _ -> Lwt.return
+            (Client_menu_tools.set_position
+               body_elt header_elt dom_palette 14)))
     in
     Client_mobile.launch_func_only_on_small_screen
     handle_orientationchange_and_resize;

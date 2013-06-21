@@ -199,7 +199,7 @@
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
     Lwt.async (fun () ->
-      Client_tools.onorientationchanges_or_onresizes (fun _ _ ->
+      Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         resize := Startresize;
         let (rc_win_o, (rc_width, rc_height)) =
           Client_canvas.init body_elt header_elt canvas_elt

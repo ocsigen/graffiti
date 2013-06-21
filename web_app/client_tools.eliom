@@ -7,13 +7,19 @@
 
   type orientation = Portrait | Landscape
 
-  let get_device_size () =
+  let get_window_size () =
     let scr = Dom_html.window##screen in
     scr##width, scr##height
 
-  let get_size () =
-    let doc = Dom_html.document##documentElement in
-    doc##clientWidth, doc##clientHeight
+  let get_window_orientation () =
+    let width, height = get_window_size () in
+    if (width <= height) then Portrait else Landscape
+
+  let get_size dom_html =
+    dom_html##clientWidth, dom_html##clientHeight
+
+  let get_document_size () =
+    get_size Dom_html.document##documentElement
 
   let get_timestamp () =
     (let date = jsnew Js.date_now () in
@@ -31,11 +37,11 @@
   let enable_event id =
     Dom_html.removeEventListener id
 
-  let enable_events l_id =
+  let enable_events ids =
     let rec enable = function
       | id::t   -> Dom_html.removeEventListener id; enable t
       | []      -> ()
-    in enable l_id
+    in enable ids
 
   (* drag events *)
   let disable_drag_and_drop html_elt =
@@ -48,8 +54,20 @@
   let disable_mobile_scroll () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
-  (*** window orientationchange and resize ***)
+  (** Execute handler with last event from events' queue
+  *** separate by the maximum time gived by elapsed_time
+  ***
+  *** Be careful, it is a asynchrone loop, so if you give too little time,
+  *** several instances of your handler could be run in same time **)
+  let limited_loop event ?use_capture ?(elapsed_time=0.2) target handler =
+    let count = ref 0 in
+    Lwt_js_events.async_loop event ?use_capture target
+      (fun ev _ -> incr count;
+        let current_nb = !count in
+        lwt _ = Lwt_js.sleep elapsed_time in
+        if (!count = current_nb) then handler ev () else Lwt.return ())
 
+  (*** window orientationchange and resize ***)
   let orientationchange = Dom_html.Event.make "orientationchange"
 
   let onorientationchange () =
@@ -59,11 +77,23 @@
     Lwt_js_events.seq_loop
       (fun ?use_capture () -> onorientationchange ()) () t
 
+  let limited_onresizes ?elapsed_time t =
+    limited_loop
+      (fun ?use_capture () -> Lwt_js_events.onresize ()) ?elapsed_time () t
+
+  let limited_onorientationchanges ?elapsed_time t =
+    limited_loop
+      (fun ?use_capture () -> onorientationchange ()) ?elapsed_time () t
+
   let onorientationchange_or_onresize () =
     Lwt.pick [Lwt_js_events.onresize (); onorientationchange ()]
 
   let onorientationchanges_or_onresizes t =
     Lwt_js_events.seq_loop
       (fun ?use_capture () -> onorientationchange_or_onresize ()) () t
+
+  let limited_onorientationchanges_or_onresizes ?elapsed_time t =
+    limited_loop (fun ?use_capture () -> onorientationchange_or_onresize ())
+      ?elapsed_time () t
 
 }}

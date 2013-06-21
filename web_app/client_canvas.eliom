@@ -13,7 +13,7 @@
   let init body_elt header_elt canvas_elt =
 
     (*** Init data ***)
-    let size = Client_tools.get_size () in
+    let size = Client_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 0
@@ -35,18 +35,13 @@
     in
 
     (*** First calcul ***)
-    let window_orientation, min =
-      if (width <= height)
-      then Client_tools.Portrait, width
-      else Client_tools.Landscape, height
-    in
-
+    let window_orientation = Client_tools.get_window_orientation () in
+    let min = if (width <= height) then width else height in
     let max = Shared_tools.get_max_resolution min in
 
     (*** Check result ***)
     (* If max value is out of window, it is wrong *)
-    let good_result =
-      if (width <= height)
+    let good_result = if (width <= height)
       then (height >= max)
       else (width >= max)
     in
@@ -54,14 +49,11 @@
     (* Try the other way if result is not a good_result *)
     let width', height' = if (not good_result)
       then (
-        let max = if (width > height)
-          then width
-          else height
-        in
+        let max = if (width > height) then width else height in
         let min = Shared_tools.get_min_resolution max in
 
         (* Second way set *)
-        set_size false min )
+        set_size false min)
 
       (* First way set *)
       else (set_size true max)

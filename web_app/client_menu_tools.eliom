@@ -2,11 +2,6 @@
 
   open Lwt
 
-  (** local click position type **)
-  type lc_osition =
-    | Value of int      (** Simple value **)
-    | Max_value of int  (** Max value + your value **)
-
   (*** Tools **)
   let hide_element dom_html = dom_html##style##display <- Js.string "none"
   let show_element dom_html = dom_html##style##display <- Js.string "inline"
@@ -22,7 +17,7 @@
       | _             -> ()
 
   let set_position body_elt header_elt dom_html margin =
-    let width, height = Client_tools.get_size () in
+    let width, height = Client_tools.get_document_size () in
     let header_height = Client_header.get_height body_elt header_elt in
     dom_html##style##height <- Js.string
       ((string_of_int (height - header_height - (margin * 2))) ^ "px");
@@ -50,8 +45,13 @@
           show_element dom_gray_layer;
           show_element dom_html)
 
-  (** Detect click beetween start_x, end_x, start_y and end_y and launch func **)
-  (** Use Max_value constructor to make value relative to screen size **)
+  (** local click position type **)
+  type lc_position =
+    | Value of int      (** Simple value **)
+    | Max_value of int  (** Max value + your value **)
+
+  (** Detect click beetween start_x, end_x, start_y and end_y and launch func
+  *** Use Max_value constructor to make value relative to screen size **)
   let detect_local_clicks (start_x, end_x, start_y, end_y) func =
 
     let get_mouse_coord ev = (ev##clientX, ev##clientY) in
@@ -63,7 +63,7 @@
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
       (*** Initi data ***)
-      let width, height = Client_tools.get_size () in
+      let width, height = Client_tools.get_document_size () in
 
       let current_x, current_y = get_mouse_coord ev in
       let start_x' = get_relative_position width start_x in
