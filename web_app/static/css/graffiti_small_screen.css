@@ -4,23 +4,17 @@
 
     body
     {
-	background-image:url('/img/small_textured_paper.png');
 	font-size:0.8em;
     }
 
-    .header_div
+    canvas
     {
-	height:80px;
-	background-size:auto 80px;
+	margin: 0px;
     }
 
     .palette_div
     {
-	position:absolute;
-	top:0px;
-	left:0px;
 	display:none;
-	padding-top:1em;
 	background-color:#d6d6d6;
 	border-style:solid;
 	border-width:3px;

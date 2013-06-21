@@ -3,9 +3,7 @@ body
     max-width:100%;
     max-height:100%;
     overflow:hidden;
-    background-image:url('/img/textured_paper.png');
-    background-position:left top;
-    background-repeat:repeat;
+    background-color: #DADADA;
     margin:0px;
     paddind:0px;
     text-align:center;
@@ -28,7 +26,7 @@ body
     height:100px;
     background-image:url('/img/Logo_GRAFFITIbyOcsigen_blue.png');
     background-size:auto 100px;
-    background-position:center center;
+    background-position:106px center;
     background-repeat:no-repeat;
 }
 
@@ -138,58 +136,110 @@ body
     max-width:80%;
 }
 
-.content_div
-{
-    display: -webkit-flex;
-    display:         flex;
-}
-
-.canvas_div
-{
-    -webkit-flex-flow: column;
-    flex-flow: column;
-    -webkit-flex: 1 1 auto;
-    flex: 1 1 auto;
-}
-
 canvas
 {
+    margin-left: 106px;
     background-color:#FFFFFF;
     border-style:solid;
     border-width:3px;
     border-color:#c6c6c6;
-    -webkit-flex: 1 1 auto;
-    flex: 1 1 auto;
 }
 
 .palette_div
 {
+    position:absolute;
+    top:0px;
+    left:0px;
     margin:0px;
-    padding:0px;
+    padding:5px;
     display: -webkit-flex;
     display:         flex;
-    -webkit-flex-flow: inline-column;
-    flex-flow: inline-column;
     width: 100px;
+    height: 98%;
 }
 
 .color_div
 {
+    display: -webkit-flex;
+    display:         flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-}
-
-.color_picker_block
-{
-    margin-buttom:0px;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 45%;
+    margin-bottom: auto;
 }
 
 .color_picker_color_div
 {
-    margin-left:3px;
-    margin-bottom:3px;
-    width: 60px;
-    height: 30px;
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 5px;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: 40px;
+}
+
+.color_picker_block
+{
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+}
+
+.color_picker_table
+{
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    line-height: 0;
+}
+
+.color_picker_tr
+{
+    margin: 0px;
+    padding: 0px;
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    max-height: 40px;
+}
+
+.color_picker_td
+{
+    margin: 0px;
+    padding: 0px;
+    display: -webkit-flex;
+    display:         flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.color_picker_square
+{
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: auto;
 }
 
 .brush_div

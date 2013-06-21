@@ -57,7 +57,8 @@ let menu_button_elt = D.div ~a:[a_class["menu_button"]] []
 (* palette *)
 
 let color_picker, color_div, block = Color_picker.create
-  ~lll_color:Color_picker.lll_color_6 ()
+  ~initial_color:(0, 3, 0)
+  ~lll_color:Color_picker.lll_color_10 ()
 
 let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
   ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
@@ -86,6 +87,5 @@ let header_elt =
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
   ([header_elt; menu_div; gray_layer_elt; about_elt;
-    div ~a:[a_class["content_div"]]
-      [palette_div; div ~a:[a_class["canvas_div"]] [canvas_elt]];
+    palette_div; canvas_elt;
     starting_logo_elt])

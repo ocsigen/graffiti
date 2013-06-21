@@ -5,7 +5,7 @@ open Eliom_content.Html5
 open Eliom_content.Html5.F
 
 type div = [ Html5_types.div ] Eliom_content.Html5.D.elt
-type t = (string ref * div * div list)
+type t = (string ref * div * div list * div)
 
 let raise_exception str =
   failwith "Color_picker." ^ str
@@ -60,11 +60,15 @@ let lll_color_p5 = genere_lll_color 5
 let lll_color_p6 = genere_lll_color 6
 
 (* Some hand-mained lll_color *)
-let lll_color_6 = [[["#FF0505"; "#FF8000"];
-                    ["#2E2EFE"; "#00FFFF"];
-                    ["#F7FE2E"; "#2EFE2E"];
-                    ["#7401DF"; "#8A2908"];
-                    ["#FFFFFF"; "#000000"]]]
+let lll_color_10 = [[["#E03625"; "#FF4B3A"];
+                     ["#FF7E02"; "#FFC503"];
+                     ["#01CD64"; "#AF58B9"];
+                     ["#0198DD"; "#254760"];
+                     ["#FFFFFF"; "#000000"]]]
+
+let lll_color_6 = [[["#BEC3C7"; "#7A8E8D"];
+                    ["#1C3D50"; "#0280B4"];
+                    ["#00A385"; "#A444B2"]]]
 
 
 (**
@@ -133,15 +137,16 @@ let genere_color_table lll_color =
 *** color_div, to display current select color,
 *** and the block with all color square
 **)
-let create ?(initial_color = "#0000FF") ?(lll_color = lll_color_p5) () =
-  let color_ref = ref initial_color in
+let create ?(initial_color = 0, 0, 0) ?(lll_color = lll_color_p5) () =
+  let tbl, trl, tdl = initial_color in
+  let color_ref = ref (List.nth (List.nth (List.nth lll_color tbl) trl) tdl) in
   let div_color_list, tables = genere_color_table lll_color in
   let color_div = D.div ~a:[a_class["color_picker_color_div"];
                           a_title !color_ref;
                           a_style ("background-color: " ^ !color_ref ^ ";")] []
   in
-  let block = div ~a:[a_class["color_picker_block"]] tables in
-  let type_t = (color_ref, color_div, div_color_list) in
+  let block = D.div ~a:[a_class["color_picker_block"]] tables in
+  let type_t = (color_ref, color_div, div_color_list, block) in
   type_t, color_div, block
 
 let css_list = [["css"; "color_picker.css"]]
@@ -152,7 +157,10 @@ let css_list = [["css"; "color_picker.css"]]
 
 open Lwt
 
-let start (color_ref, color_div, list) =
+let fusion (color_ref, color_div, fst_list, block) (_, _, snd_list, _) =
+  (color_ref, color_div, fst_list@snd_list, block)
+
+let start (color_ref, color_div, color_list, _) =
   let dom_color_div = Eliom_content.Html5.To_dom.of_div color_div in
   let rec aux = function
     | []                -> ()
@@ -166,8 +174,26 @@ let start (color_ref, color_div, list) =
              dom_color_div##title <- color;
              color_ref := (Js.to_string color))));
       aux tail
-  in aux list
+  in aux color_list
 
-let get_color (color_ref, _ , _) = !color_ref
+let genere_and_append (color_ref, color_div, fst_list, block) new_list =
+  let div_color_list, tables = genere_color_table new_list in
+  let aux = function
+    | tbl::t    -> Eliom_content.Html5.Manip.appendChild block tbl
+    | []        -> ()
+  in aux tables;
+  div_color_list
+
+let add_square_color color_picker new_list =
+  let color_ref, color_div, fst_list, block = color_picker in
+  color_ref, color_div,
+  fst_list@(genere_and_append color_picker new_list), block
+
+let add_square_color_and_start color_picker new_list =
+  let color_ref, color_div, fst_list, block = color_picker in
+  ignore (start (color_ref, color_div,
+                 genere_and_append color_picker new_list, block))
+
+let get_color (color_ref, _ , _, _) = !color_ref
 
 }}

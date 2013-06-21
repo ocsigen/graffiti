@@ -46,7 +46,12 @@
     Client_mobile.launch_func_only_on_small_screen
     handle_orientationchange_and_resize;
 
+    let color_picker' = if (not (Client_mobile.has_small_screen ()))
+      then Color_picker.add_square_color color_picker Color_picker.lll_color_6
+      else color_picker
+    in
+
     (* Start color picker stript *)
-    Color_picker.start color_picker
+    Color_picker.start color_picker'
 
 }}
