@@ -25,7 +25,6 @@
     (let date = jsnew Js.date_now () in
      int_of_float (Js.to_float (date##getTime ())))
 
-
   (*** events's tools ***)
 
   (** Disable Dom_html.Event with stopping propagation during capture phase **)
@@ -61,9 +60,9 @@
     let count = ref 0 in
     Lwt_js_events.async_loop event ?use_capture target
       (fun ev lt -> incr count;
-        let current_nb = !count in
+        let nb = !count in
         lwt _ = limited_func () in
-        if (!count = current_nb)
+        if (!count = nb)
         then handler ev lt
         else Lwt.return ())
 
@@ -117,9 +116,7 @@
 
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
-      (*** Init data ***)
       let width, height = get_document_size () in
-
       let current_x, current_y = get_mouse_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in

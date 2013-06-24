@@ -9,11 +9,12 @@
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
-  let rec start body_elt header_elt canvas_elt slider_elt color_picker =
+  let rec start body_elt header_elt canvas_elt angle_elt
+      slider_elt color_picker =
 
     (*** Init data***)
     let (window_orientation, size) =
-      Client_canvas.init body_elt header_elt canvas_elt
+      Client_canvas.init body_elt header_elt canvas_elt angle_elt
     in
     let win_orientation = ref window_orientation in
     let width = ref (float_of_int (fst size)) in
@@ -41,7 +42,7 @@
 
     (*** The initial image ***)
 
-    let copy_image img =
+    let copy_image dom_img =
       let width', height' = match !win_orientation with
         | Client_tools.Portrait         ->
           ctx##save(); (* Essential to restore context after it *)
@@ -50,7 +51,7 @@
           !height, !width
         | _                             -> !width, !height
       in
-      ctx##drawImage_withSize(img, 0., 0., width', height');
+      ctx##drawImage_withSize(dom_img, 0., 0., width', height');
       match !win_orientation with
         | Client_tools.Portrait         ->
           (* It is very important to restore context *)
@@ -65,19 +66,20 @@
         (* allow to avoid cach image *)
         let attr = Client_tools.get_timestamp () in
         let image_elt =
-          img ~a:[a_class["unselectable"]]
-            ~alt:"canvas"
+          img ~alt:("source image")
             ~src:(make_uri ~service:%Server_image.imageservice
-                    (int_of_float !width,
-                       (int_of_float !height, attr)))
-            ()
-        in Eliom_content.Html5.To_dom.of_img image_elt
+                      (int_of_float !width,
+                       (int_of_float !height, attr))) ()
+        in
+        Eliom_content.Html5.To_dom.of_img image_elt
       in
 
-      if (Js.to_bool (dom_img##complete))
-      then copy_image dom_img
-      else dom_img##onload <- Dom_html.handler
-        (fun _ -> copy_image dom_img; Js._true);
+      let check_load_image copy_func img =
+        if (Js.to_bool (img##complete))
+        then copy_func img
+        else img##onload <- Dom_html.handler (fun _ -> copy_func img; Js._true)
+      in check_load_image copy_image dom_img;
+
     in reset_image ();
 
     (*** Tools ***)
@@ -202,7 +204,7 @@
       Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         resize := Startresize;
         let (rc_win_o, (rc_width, rc_height)) =
-          Client_canvas.init body_elt header_elt canvas_elt
+          Client_canvas.init body_elt header_elt canvas_elt angle_elt
         in
         get_origine_canvas ();
         win_orientation := rc_win_o;

@@ -11,7 +11,8 @@ let _ =
         (html
            (Eliom_tools.F.head ~title:"Graffiti"
               ~css:(Color_picker.css_list@
-                      [["css"; "graffiti.css"];
+                      [["css"; "knacss.css"];
+                       ["css"; "graffiti.css"];
                        ["css"; "graffiti_small_screen.css"];
                        ["css"; "graffiti_medium_screen.css"];
                        ["css"; "graffiti_large_screen.css"]])
@@ -37,6 +38,7 @@ let _ =
                   %Server_html.body_elt
                   %Server_html.header_elt
                   %Server_html.canvas_elt
+                  %Server_html.angle_elt
                   %Server_html.slider_elt
                   %Server_html.color_picker);
 
@@ -44,9 +46,8 @@ let _ =
         Client_menu.start
           %Server_html.body_elt
           %Server_html.header_elt
-          %Server_html.menu_button_elt
-          %Server_html.menu_div
-          %Server_html.about_option_elt
+          %Server_html.save_button_elt
+          %Server_html.about_point
           %Server_html.gray_layer_elt
           %Server_html.about_elt;
 

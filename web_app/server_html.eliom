@@ -1,14 +1,20 @@
+
 open Eliom_content.Html5
 open Eliom_content.Html5.F
 
 let start_width = 400
 let start_height = 200
 
+(* canvas element *)
+
 let canvas_elt =
   D.canvas ~a:[a_width start_width; a_height start_height;
              a_class["unselectable"]]
     [pcdata "your browser doesn't support canvas"]
 
+let about_point = D.div ~a:[a_class["about_point"]] []
+
+let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
 
 (* menu elements *)
 
@@ -38,21 +44,8 @@ let about_elt =
 
 let gray_layer_elt = D.div ~a:[a_class["gray_layer"]] []
 
-let save_option_elt = span ~a:[a_class["menu_option"]]
-  [a ~a:[Unsafe.string_attrib "download" "graffiti.png"]
-      ~service:Server_image.download_imageservice
-      [pcdata "Save"] ()]
-
-let about_option_elt = D.span ~a:[a_class["menu_option"]] [pcdata "About"]
-
-let menu_ul = ul ~a:[a_class["menu_ul"]]
-  [li ~a:[a_class["menu_li"]] [save_option_elt];
-   li ~a:[a_class["menu_li"]] [about_option_elt]]
-
-let menu_div = D.div ~a:[a_class["menu_div"; "unselectable"]] [menu_ul]
-
-(** change image in css with class menu_button **)
-let menu_button_elt = D.div ~a:[a_class["menu_button"]] []
+(** change image in css with class save_button *)
+let save_button_elt = D.div ~a:[a_class["save_button"]] []
 
 (* palette *)
 
@@ -83,9 +76,9 @@ let starting_logo_elt =
 (* header / body *)
 
 let header_elt =
-  D.div ~a:[a_class["header_div"; "unselectable"]] [menu_button_elt]
+  D.div ~a:[a_class["header_div"; "unselectable"]] [save_button_elt]
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; menu_div; gray_layer_elt; about_elt;
-    palette_div; canvas_elt;
+  ([header_elt; palette_div; canvas_elt; angle_elt;
+    gray_layer_elt; about_elt;
     starting_logo_elt])

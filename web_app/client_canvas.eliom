@@ -10,16 +10,17 @@
     ctx##stroke()
 
   (** Calcul and set size of canvas **)
-  let init body_elt header_elt canvas_elt =
+  let init body_elt header_elt canvas_elt angle_elt =
 
     (*** Init data ***)
     let size = Client_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let dom_angle = Eliom_content.Html5.To_dom.of_div angle_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 0
         else 106
     in
-    let margin = 3 in
+    let margin = 2 in
     let width = (fst size) - (margin * 2) - width_canvas_margin in
     let height = (snd size) - (margin * 4) -
       (Client_header.get_height body_elt header_elt)
@@ -62,6 +63,13 @@
     (* Init canvas *)
     dom_canvas##width <- width';
     dom_canvas##height <- height';
+
+    (* Set position angle *)
+    let width_angle' =
+      let ox, _ = Dom_html.elementClientPosition dom_canvas in
+      let width_angle = dom_angle##clientWidth in
+      Js.string (string_of_int (ox + width' - width_angle + 1) ^ "px")
+    in dom_angle##style##left <- width_angle';
 
     (* return result *)
     (window_orientation, (width', height'))
