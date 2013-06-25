@@ -5,18 +5,9 @@ open Eliom_content.Html5.F
 let start_width = 400
 let start_height = 200
 
-(* canvas element *)
-
-let canvas_elt =
-  D.canvas ~a:[a_width start_width; a_height start_height;
-             a_class["unselectable"]]
-    [pcdata "your browser doesn't support canvas"]
+(* about elements *)
 
 let about_point = D.div ~a:[a_class["about_point"]] []
-
-let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
-
-(* menu elements *)
 
 let about_link_elt =
   Raw.a
@@ -44,8 +35,26 @@ let about_elt =
 
 let gray_layer_elt = D.div ~a:[a_class["gray_layer"]] []
 
+(* canvas element *)
+
+let canvas_elt =
+  D.canvas ~a:[a_width start_width; a_height start_height;
+             a_class["unselectable"]]
+    [pcdata "your browser doesn't support canvas"]
+
+let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
+
+(* save elements *)
+
+let save_div_elt = D.div ~a:[a_class["save_div"]] []
+
 (** change image in css with class save_button *)
-let save_button_elt = D.div ~a:[a_class["save_button"]] []
+let save_link_elt = D.a
+  ~service:Server_image.download_imageservice
+  ~a:[a_class["save_link"]; D.Unsafe.string_attrib "download" "graffiti.png"]
+   [save_div_elt] ()
+
+let save_button_elt = D.div ~a:[a_class["save_button"]] [save_link_elt]
 
 (* palette *)
 
@@ -76,9 +85,9 @@ let starting_logo_elt =
 (* header / body *)
 
 let header_elt =
-  D.div ~a:[a_class["header_div"; "unselectable"]] [save_button_elt]
+  D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
   ([header_elt; palette_div; canvas_elt; angle_elt;
-    gray_layer_elt; about_elt;
+    save_button_elt; gray_layer_elt; about_elt;
     starting_logo_elt])

@@ -7,9 +7,15 @@
 	font-size:0.8em;
     }
 
-    canvas
+    .save_button
     {
-	margin: 0px;
+	width: 30px;
+	top: 50px;
+    }
+
+    .save_div
+    {
+	width: 13px;
     }
 
     .palette_div

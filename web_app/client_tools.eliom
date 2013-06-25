@@ -38,7 +38,7 @@
 
   let enable_events ids =
     let rec enable = function
-      | id::t   -> Dom_html.removeEventListener id; enable t
+      | id::t   -> enable_event id; enable t
       | []      -> ()
     in enable ids
 
