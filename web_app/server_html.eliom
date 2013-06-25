@@ -44,6 +44,8 @@ let canvas_elt =
 
 let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
 
+let canvas_div_elt = div ~a:[a_class["canvas_div"]] [canvas_elt; angle_elt]
+
 (* save elements *)
 
 let save_div_elt = D.div ~a:[a_class["save_div"]] []
@@ -88,6 +90,6 @@ let header_elt =
   D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; palette_div; canvas_elt; angle_elt;
+  ([header_elt; palette_div; canvas_div_elt;
     save_button_elt; gray_layer_elt; about_elt;
     starting_logo_elt])

@@ -111,17 +111,27 @@ body
 
 canvas
 {
-    margin-left: 106px;
     background-color:white;
+    transition: width 0.2s, height 0.2s;
+    -webkit-transition: width 0.2s, height 0.2s;
+}
+
+.canvas_div
+{
+    margin-left: 106px;
+    width: auto;
+    height: auto;
+    display: inline-block;
 }
 
 .angle_div
 {
-    position: absolute;
-    top: 100px;
+    float: right;
     width: 43px;
     height: 43px;
     background-image: url('/img/angle.png');
+    position: relative;
+    left: -43px;
 }
 
 .about_point

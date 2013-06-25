@@ -61,15 +61,8 @@
     in
 
     (* Init canvas *)
-    dom_canvas##width <- width';
-    dom_canvas##height <- height';
-
-    (* Set position angle *)
-    let width_angle' =
-      let ox, _ = Dom_html.elementClientPosition dom_canvas in
-      let width_angle = dom_angle##clientWidth in
-      Js.string (string_of_int (ox + width' - width_angle + 1) ^ "px")
-    in dom_angle##style##left <- width_angle';
+    dom_canvas##style##width <- Js.string ((string_of_int width') ^ "px");
+    dom_canvas##style##height <- Js.string ((string_of_int height') ^ "px");
 
     (* return result *)
     (window_orientation, (width', height'))
