@@ -65,9 +65,12 @@ let color_picker, color_div, block = Color_picker.create
 let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
   ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
 
-let palette_div = D.div ~a:[a_class["palette_div"; "unselectable"]]
-  [div ~a:[a_class["color_div"]] [color_div; block];
-   div ~a:[a_class["brush_div"]] [slider_elt]]
+let palette_button = D.div ~a:[a_class["palette_button"]] [color_div]
+
+let palette_div = D.div ~a:[a_class["palette_wrap"]]
+  [div ~a:[a_class["palette_color_brush"]]
+      [div ~a:[a_class["brush_div"]] [slider_elt]; block];
+   palette_button]
 
 (* starting logo *)
 

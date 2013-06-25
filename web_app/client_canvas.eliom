@@ -18,11 +18,11 @@
     let dom_angle = Eliom_content.Html5.To_dom.of_div angle_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 0
-        else 106
+        else 226
     in
-    let margin = 4 in
+    let margin = 6 in
     let width = (fst size) - (margin * 2) - width_canvas_margin in
-    let height = (snd size) - (margin * 4) -
+    let height = (snd size) - (margin * 2) -
       (Client_header.get_height body_elt header_elt)
     in
 
