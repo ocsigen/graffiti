@@ -20,7 +20,7 @@
         then 0
         else 106
     in
-    let margin = 2 in
+    let margin = 4 in
     let width = (fst size) - (margin * 2) - width_canvas_margin in
     let height = (snd size) - (margin * 4) -
       (Client_header.get_height body_elt header_elt)
@@ -67,9 +67,10 @@
     (* set angle position *)
     let angle_width = dom_angle##clientWidth - 1 in
     let _ =
+      let css_margin = 2 in
       let ox, _ = Dom_html.elementClientPosition dom_canvas in
       dom_angle##style##left <- Js.string
-	(string_of_int (ox + width' + (margin * 2) - angle_width) ^ "px")
+	(string_of_int (ox + width' + (css_margin * 2) - angle_width) ^ "px")
     in
 
     (* return result *)
