@@ -59,7 +59,9 @@ let _ =
           %Server_html.header_elt
           %Server_html.canvas_elt
           %Server_html.palette_div
-          %Server_html.color_picker;
+          %Server_html.color_picker
+          %Server_html.slider_elt
+          %Server_html.color_div;
 
         (* Check if 'touch to start' have to be removed (on pc) *)
         Client_mobile.handle_touch_to_start

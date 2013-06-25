@@ -174,7 +174,13 @@ canvas
     flex-flow: column;
     width: 20px;
     height: 20px;
+    max-width: 35px;
+    max-height: 35px;
+    min-width: 1px;
+    min-height: 1px;
     border-radius: 20px 20px 20px 20px;
+    transition: width 0.2s, height 0.2s;
+    -webkit-transition: width 0.2s, height 0.2s;
 }
 
 .palette_color_brush
@@ -259,6 +265,14 @@ canvas
     display:         flex;
     -webkit-flex-flow: column;
     flex-flow: column;
+    background-color: #4C4C4C;
+    border-radius: 20px 20px 20px 20px;
+    background-image: url('/img/maxibrush.png'), url('/img/minibrush.png');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center 4px, center bottom 3px;
+    margin-right: 8px;
+    margin-top: 5%;
+    margin-bottom: 5%;
 }
 
 .brush_slider
@@ -268,5 +282,5 @@ canvas
     flex-flow: inline-column;
     -webkit-flex: 1 1 auto;
     flex: 1 1 auto;
-    max-width: 30px;
+    max-width: 32px;
 }

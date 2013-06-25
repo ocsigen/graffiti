@@ -21,8 +21,7 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
-    let base_size = ref (min !width !height)
-    in
+    let base_size = ref (min !width !height) in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_slider = Eliom_content.Html5.To_dom.of_input slider_elt in
