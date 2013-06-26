@@ -41,6 +41,7 @@ val remove_click_callback : t -> unit
 (** return value between 0. and 1. *)
 val get_value : t -> float
 
+(** launch click callback at start with initialize value *)
 val start : t -> unit
 
 }}

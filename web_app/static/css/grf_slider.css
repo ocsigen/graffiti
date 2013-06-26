@@ -10,6 +10,7 @@
 {
     -webkit-flex-flow: row;
     flex-flow: row;
+    top: 4px;
     height: auto;
     width: 45px;
 }
@@ -18,6 +19,7 @@
 {
     -webkit-flex-flow: column;
     flex-flow: column;
+    left: 4px;
     width: auto;
     height: 45px;
 }
@@ -26,7 +28,7 @@
 {
     margin: 0px;
     position: relative;
-    background-color: white;
+    background-color: #868686;
     border-radius: 20px 20px 20px 20px;
     width: 28px;
     height: 28px;

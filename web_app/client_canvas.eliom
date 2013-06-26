@@ -6,7 +6,7 @@
     ctx##lineWidth <- (size *. base_size);
     ctx##beginPath();
     ctx##moveTo(x1 *. width, y1 *. height);
-    ctx##lineTo(x2 *. width, y2 *. height);
+    ctx##lineTo(x2 *. width, y2 *. height +. 0.1);
     ctx##stroke()
 
   (** Calcul and set size of canvas **)
@@ -18,7 +18,7 @@
     let dom_angle = Eliom_content.Html5.To_dom.of_div angle_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 0
-        else 226
+        else 242
     in
     let margin = 6 in
     let width = (fst size) - (margin * 2) - width_canvas_margin in

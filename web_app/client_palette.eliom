@@ -10,8 +10,8 @@
     (*** Elements ***)
 
     let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
-    let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
     let width, height = Client_tools.get_size dom_canvas in
     let base_size = min width height in
 
@@ -56,9 +56,6 @@
       else color_picker
     in
 
-    (* start slider script *)
-    Grf_slider.start slider;
-
     (* catch slider move and click *)
     let handler () =
       let brush_size = Js.string (string_of_int
@@ -72,6 +69,9 @@
     in
     Grf_slider.change_move_slide_callback slider handler;
     Grf_slider.change_click_callback slider handler;
+
+    (* start slider script *)
+    Grf_slider.start slider;
 
     (* Start color picker stript *)
     Color_picker.start color_picker'

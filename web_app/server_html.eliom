@@ -65,10 +65,12 @@ let color_picker, color_div, block = Color_picker.create
 let grf_slider, slider_elt =
   Grf_slider.create ~orientation:Grf_slider.Vertical ()
 
-let palette_button = D.div ~a:[a_class["palette_button"]] [color_div]
+let palette_button = D.td [table ~a:[a_class["palette_button"]]
+			      (tr [td [color_div]]) []]
 
 let palette_div = D.div ~a:[a_class["palette_wrap"]]
-  [div ~a:[a_class["palette_color_brush"]] [slider_elt; block]; palette_button]
+  [div ~a:[a_class["palette_color_brush"]] [slider_elt; block];
+   table ~a:[a_class["palette_table_button"]] (tr [palette_button]) []]
 
 (* starting logo *)
 
@@ -89,6 +91,6 @@ let header_elt =
   D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; palette_div; canvas_elt; angle_elt;
-    save_button_elt; gray_layer_elt; about_elt;
+  ([header_elt; canvas_elt; angle_elt;
+    save_button_elt; palette_div; gray_layer_elt; about_elt;
     starting_logo_elt])

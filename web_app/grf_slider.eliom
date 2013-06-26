@@ -76,9 +76,11 @@ let start (slider, dragger, ori, value,
   (* get data *)
   let dom_slider = Eliom_content.Html5.To_dom.of_div slider in
   let dom_dragger = Eliom_content.Html5.To_dom.of_div dragger in
+  let margin = 4 in
   let o_slider_x, o_slider_y = Dom_html.elementClientPosition dom_slider in
+  let o_slider_x', o_slider_y' = o_slider_x + margin, o_slider_y + margin in
   let slider_width, slider_height =
-    dom_slider##clientWidth, dom_slider##clientHeight
+    dom_slider##clientWidth - margin * 2, dom_slider##clientHeight - margin * 2
   in
   let dragger_width, dragger_height =
     dom_dragger##clientWidth, dom_dragger##clientHeight
@@ -115,9 +117,9 @@ let start (slider, dragger, ori, value,
 
   let set_dragger_position () = match ori with
     | Vertical		-> dom_dragger##style##top <- Js.string
-      ((string_of_int (y_of_value ())) ^ "px")
+      ((string_of_int (y_of_value () + margin)) ^ "px")
     | Horizontal	-> dom_dragger##style##left <- Js.string
-      ((string_of_int (x_of_value ())) ^ "px")
+      ((string_of_int (x_of_value () + margin)) ^ "px")
   in
 
   let set_coord ev =
@@ -136,7 +138,10 @@ let start (slider, dragger, ori, value,
   in
 
   (* initialize dragger position *)
-  set_dragger_position ();
+  let _ =
+    set_dragger_position ();
+    launch_callback !click
+  in
 
   (* move actions *)
   Lwt.async (fun () -> Lwt_js_events.mousedowns dom_dragger (fun ev _ ->
@@ -151,8 +156,8 @@ let start (slider, dragger, ori, value,
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->
     let x, y = ev##clientX, ev##clientY in
     let _ = match ori with
-      | Vertical	-> value_of_y (y - o_slider_y - (dragger_height / 2))
-      | Horizontal	-> value_of_x (x - o_slider_x - (dragger_width / 2))
+      | Vertical	-> value_of_y (y - o_slider_y' - (dragger_height / 2))
+      | Horizontal	-> value_of_x (x - o_slider_x' - (dragger_width / 2))
     in
     set_dragger_position ();
     Lwt.return (launch_callback !click)
