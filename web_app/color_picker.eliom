@@ -149,8 +149,6 @@ let create ?(initial_color = 0, 0, 0) ?(lll_color = lll_color_p5) () =
   let type_t = (color_ref, color_div, div_color_list, block) in
   type_t, color_div, block
 
-let css_list = [["css"; "color_picker.css"]]
-
 }}
 
 {client{

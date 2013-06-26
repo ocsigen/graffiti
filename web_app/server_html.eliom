@@ -62,15 +62,13 @@ let color_picker, color_div, block = Color_picker.create
   ~initial_color:(0, 3, 0)
   ~lll_color:Color_picker.lll_color_10 ()
 
-let slider_elt = D.raw_input ~input_type:`Range ~value:"10"
-  ~a:[a_class["brush_slider"](* ; a_input_min 1; a_input_max 100 *)] ()
+let grf_slider, slider_elt =
+  Grf_slider.create ~orientation:Grf_slider.Vertical ()
 
 let palette_button = D.div ~a:[a_class["palette_button"]] [color_div]
 
 let palette_div = D.div ~a:[a_class["palette_wrap"]]
-  [div ~a:[a_class["palette_color_brush"]]
-      [div ~a:[a_class["brush_div"]] [slider_elt]; block];
-   palette_button]
+  [div ~a:[a_class["palette_color_brush"]] [slider_elt; block]; palette_button]
 
 (* starting logo *)
 

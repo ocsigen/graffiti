@@ -35,9 +35,6 @@ val create :
   unit ->
   (t * div * div)
 
-(* css list to include in page *)
-val css_list : string list list
-
 }}
 
 {client{

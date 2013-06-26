@@ -10,6 +10,8 @@ FILES :=     server_service.eliom	\
       	     server_image.eliom		\
 	     color_picker.eliom		\
 	     color_picker.eliomi	\
+	     grf_slider.eliom		\
+	     grf_slider.eliomi		\
       	     server_html.eliom		\
 	     client_tools.eliom		\
 	     client_tools.eliomi	\

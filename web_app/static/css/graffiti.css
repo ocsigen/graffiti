@@ -193,7 +193,7 @@ canvas
     flex-flow: row;
     flex: 1 1 auto;
     width: 220px;
-    height: 100%;
+    height: auto;
     background-color:#3E3E3E;
     box-shadow: 0px 0px 5px #555555;
 }
@@ -259,28 +259,13 @@ canvas
     min-height: 22px;
 }
 
-.brush_div
+.GrfSlider_slider
 {
-    display: -webkit-flex;
-    display:         flex;
-    -webkit-flex-flow: column;
-    flex-flow: column;
-    background-color: #4C4C4C;
-    border-radius: 20px 20px 20px 20px;
     background-image: url('/img/maxibrush.png'), url('/img/minibrush.png');
     background-repeat: no-repeat, no-repeat;
     background-position: center 4px, center bottom 3px;
     margin-right: 8px;
     margin-top: 5%;
     margin-bottom: 5%;
-}
-
-.brush_slider
-{
-    -webkit-appearance: slider-vertical;
-    -webkit-flex-flow: inline-column;
-    flex-flow: inline-column;
-    -webkit-flex: 1 1 auto;
-    flex: 1 1 auto;
-    max-width: 32px;
+    height: auto;
 }

@@ -4,13 +4,12 @@
   open Lwt
 
   (** Handle client palette action **)
-  let start body_elt header_elt canvas_elt palette_div color_picker
-      slider_elt color_div =
+  let start body_elt header_elt canvas_elt palette_div
+      slider color_picker color_div =
 
     (*** Elements ***)
 
     let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
-    let dom_slider = Eliom_content.Html5.To_dom.of_input slider_elt in
     let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let width, height = Client_tools.get_size dom_canvas in
@@ -57,18 +56,22 @@
       else color_picker
     in
 
-    Lwt.async (fun () ->
-    Lwt_js_events.async_loop (fun ?use_capture () -> Lwt_js.sleep 0.01) ()
-    (fun _ _ ->
-      let brush_size = Js.string (string_of_int (
+    (* start slider script *)
+    Grf_slider.start slider;
+
+    (* catch slider move and click *)
+    let handler () =
+      let brush_size = Js.string (string_of_int
         (int_of_float (
-	  ((float_of_string (Js.to_string dom_slider##value)) /. 500.) *.
-	   (float_of_int base_size)))) ^ "px")
+	  ((Client_tools.get_slider_value slider) *.
+	    (float_of_int base_size)))) ^ "px")
       in
       dom_color##style##width <- brush_size;
       dom_color##style##height <- brush_size;
       Lwt.return ()
-    ));
+    in
+    Grf_slider.change_move_slide_callback slider handler;
+    Grf_slider.change_click_callback slider handler;
 
     (* Start color picker stript *)
     Color_picker.start color_picker'

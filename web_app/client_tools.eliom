@@ -128,4 +128,6 @@
       then func ()
       else Lwt.return () )
 
+  let get_slider_value slider = (Grf_slider.get_value slider) /. 5.
+
 }}

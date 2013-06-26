@@ -9,8 +9,7 @@
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
-  let rec start body_elt header_elt canvas_elt angle_elt
-      slider_elt color_picker =
+  let rec start body_elt header_elt canvas_elt angle_elt slider color_picker =
 
     (*** Init data***)
     let (window_orientation, size) =
@@ -24,7 +23,6 @@
     let base_size = ref (min !width !height) in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
-    let dom_slider = Eliom_content.Html5.To_dom.of_input slider_elt in
 
     let ctx = dom_canvas##getContext (Dom_html._2d_) in
     ctx##lineCap <- Js.string "round";
@@ -107,9 +105,7 @@
       in
 
       let color = Color_picker.get_color color_picker in
-      let brush_size =
-        (float_of_string (Js.to_string dom_slider##value)) /. 500.
-      in
+      let brush_size = Client_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
       (* It is differente when you are in Portrait view *)

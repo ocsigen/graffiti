@@ -10,12 +10,12 @@ let _ =
       let html_page =
         (html
            (Eliom_tools.F.head ~title:"Graffiti"
-              ~css:(Color_picker.css_list@
-                      [["css"; "knacss.css"];
-                       ["css"; "graffiti.css"];
-                       ["css"; "graffiti_small_screen.css"];
-                       ["css"; "graffiti_medium_screen.css"];
-                       ["css"; "graffiti_large_screen.css"]])
+              ~css:[["css"; "color_picker.css"];
+		    ["css"; "grf_slider.css"];
+                    ["css"; "graffiti.css"];
+                    ["css"; "graffiti_small_screen.css"];
+                    ["css"; "graffiti_medium_screen.css"];
+                    ["css"; "graffiti_large_screen.css"]]
               ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";
                                a_content "IE=edge,chrome=1"]
                          ();
@@ -39,7 +39,7 @@ let _ =
                   %Server_html.header_elt
                   %Server_html.canvas_elt
                   %Server_html.angle_elt
-                  %Server_html.slider_elt
+                  %Server_html.grf_slider
                   %Server_html.color_picker);
 
         (* Start menu script *)
@@ -59,8 +59,8 @@ let _ =
           %Server_html.header_elt
           %Server_html.canvas_elt
           %Server_html.palette_div
+          %Server_html.grf_slider
           %Server_html.color_picker
-          %Server_html.slider_elt
           %Server_html.color_div;
 
         (* Check if 'touch to start' have to be removed (on pc) *)
