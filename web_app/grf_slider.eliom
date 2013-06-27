@@ -13,7 +13,7 @@ type t = (div * div * orientation_t * float ref *
 	    callback option ref * callback option ref *
 	    callback option ref * callback option ref)
 
-let base_class = "GrfSlider_"
+let base_class = "grf_slider_"
 let slider_class = base_class ^ "slider"
 let slider_vertical_class = slider_class ^ "_vertical"
 let slider_horizontal_class = slider_class ^ "_horizontal"
