@@ -60,4 +60,8 @@ val add_square_color_and_start : t -> string list list list -> unit
 (** It is not disturbe by fusion or add square **)
 val get_color: t -> string
 
+(** get all square color div element *)
+val get_square_color_div_list : t -> div list
+
+
 }}

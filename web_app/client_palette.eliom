@@ -15,6 +15,13 @@
     let width, height = Client_tools.get_size dom_canvas in
     let base_size = min width height in
 
+    (* Elarge color picker on computer *)
+    let color_picker' = if (not (Client_mobile.has_small_screen ()))
+      then Grf_color_picker.add_square_color color_picker
+	Grf_color_picker.lll_color_6
+      else color_picker
+    in
+
     (* Add listenner of touch events on small screen *)
     (* for palette menu *)
     let detect_local_click () =
@@ -40,6 +47,27 @@
     in Client_mobile.launch_func_only_on_small_screen detect_local_click;
 
     (* Add listenner of resize event on small screen (menu mode) *)
+    (* on color square *)
+    let handle_color_square_resize () =
+      let margin = 8 in
+      let body_height = Dom_html.document##documentElement##clientHeight in
+      let color_square_list =
+	Grf_color_picker.get_square_color_div_list color_picker'
+      in
+      let n_row = (List.length color_square_list) / 2 in
+      let new_height = (body_height - (margin * 2)) / n_row in
+      let rec aux = function
+	| []		-> ()
+	| div::tail	->
+	  let dom_div = Eliom_content.Html5.To_dom.of_div div in
+	  dom_div##style##height <- Js.string
+	    (string_of_int (new_height) ^ "px");
+	  aux tail
+      in aux color_square_list
+    in handle_color_square_resize (); (* To initialize view *)
+    Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
+      (fun _ _ -> Lwt.return (handle_color_square_resize ())));
+
     (* on palette menu *)
     let handle_orientationchange_and_resize () =
       Lwt.async (fun () ->
@@ -50,12 +78,6 @@
     in
     Client_mobile.launch_func_only_on_small_screen
     handle_orientationchange_and_resize;
-
-    let color_picker' = if (not (Client_mobile.has_small_screen ()))
-      then Grf_color_picker.add_square_color color_picker
-	Grf_color_picker.lll_color_6
-      else color_picker
-    in
 
     (* catch slider move and click *)
     let handler () =

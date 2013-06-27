@@ -194,4 +194,6 @@ let add_square_color_and_start color_picker new_list =
 
 let get_color (color_ref, _ , _, _) = !color_ref
 
+let get_square_color_div_list (_, _, color_list, _) = color_list
+
 }}

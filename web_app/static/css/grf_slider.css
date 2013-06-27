@@ -1,27 +1,23 @@
 .grf_slider_slider
 {
-    display: -webkit-flex;
-    display:         flex;
     background-color: #4C4C4C;
     border-radius: 20px 20px 20px 20px;
 }
 
 .grf_slider_slider_vertical
 {
-    -webkit-flex-flow: row;
-    flex-flow: row;
     top: 4px;
     height: auto;
-    width: 45px;
+    width: 38px;
+    text-align: center;
 }
 
 .grf_slider_slider_horizontal
 {
-    -webkit-flex-flow: column;
-    flex-flow: column;
     left: 4px;
     width: auto;
-    height: 45px;
+    height: 38px;
+    vertical-align: middle;
 }
 
 .grf_slider_dragger
@@ -32,16 +28,13 @@
     border-radius: 20px 20px 20px 20px;
     width: 28px;
     height: 28px;
+    display: inline-block;
 }
 
 .grf_slider_dragger_vertical
 {
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .grf_slider_dragger_horizontal
 {
-    margin-top: auto;
-    margin-bottom: auto;
 }
