@@ -174,8 +174,8 @@
     | Mouse_event of Dom_html.mouseEvent Js.t
 
   let get_slide_coord idx = function
-    | Touch_event ev	-> get_touch_coord idx ev
-    | Mouse_event ev	-> get_coord ev
+    | Touch_event ev    -> get_touch_coord idx ev
+    | Mouse_event ev    -> get_coord ev
 
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
@@ -183,9 +183,9 @@
   let touch_or_mouse_slide_base touchevent mouseevent
       dom_elt start_func move_func end_func =
     Lwt.pick [touchevent dom_elt (touch_handler start_func)
-  		(touch_handler move_func) (touch_handler end_func);
-  	      mouseevent dom_elt (mouse_handler start_func)
-  		(mouse_handler move_func) (mouse_handler end_func)]
+                (touch_handler move_func) (touch_handler end_func);
+              mouseevent dom_elt (mouse_handler start_func)
+                (mouse_handler move_func) (mouse_handler end_func)]
 
   (** Functions in parameter take an slide_event instead of simple event *)
   let touch_or_mouse_slide (dom_elt: #Dom_html.eventTarget Js.t) =

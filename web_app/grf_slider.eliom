@@ -10,8 +10,8 @@ type orientation_t = Vertical | Horizontal
 type callback = unit -> unit Lwt.t
 type div = [ Html5_types.div ] Eliom_content.Html5.D.elt
 type t = (div * div * orientation_t * float ref *
-	    callback option ref * callback option ref *
-	    callback option ref * callback option ref)
+            callback option ref * callback option ref *
+            callback option ref * callback option ref)
 
 let base_class = "grf_slider_"
 let slider_class = base_class ^ "slider"
@@ -27,8 +27,8 @@ let create ?(orientation = Horizontal)
   if (initial_value < 0. || initial_value > 1.)
   then failwith "Grf_slider.create initial_value have to be between 0. and 1.";
   let dragger_ori_class, slider_ori_class = match orientation with
-    | Vertical		-> dragger_vertical_class, slider_vertical_class
-    | Horizontal	-> dragger_horizontal_class, slider_horizontal_class
+    | Vertical          -> dragger_vertical_class, slider_vertical_class
+    | Horizontal        -> dragger_horizontal_class, slider_horizontal_class
   in
   let dragger = D.div ~a:[a_class[dragger_class; dragger_ori_class]] [] in
   let slider = D.div ~a:[a_class[slider_class; slider_ori_class]] [dragger] in
@@ -67,11 +67,11 @@ let remove_click_callback (_, _, _, _, _, _, _, click_callback) =
   click_callback := None
 
 let get_value (_, _, ori, value, _, _, _, _) = match ori with
-    | Vertical		-> 1. -. !value
-    | Horizontal	-> !value
+    | Vertical          -> 1. -. !value
+    | Horizontal        -> !value
 
 let start (slider, dragger, ori, value,
-	   start_slide, move_slide, end_slide, click) =
+           start_slide, move_slide, end_slide, click) =
 
   (* get data *)
   let dom_slider = Eliom_content.Html5.To_dom.of_div slider in
@@ -115,25 +115,25 @@ let start (slider, dragger, ori, value,
   let value_of_y y = set_value ((float_of_int y) /. !max_height) in
 
   let set_dragger_position () = match ori with
-    | Vertical		-> dom_dragger##style##top <- Js.string
+    | Vertical          -> dom_dragger##style##top <- Js.string
       ((string_of_int (y_of_value () + margin)) ^ "px")
-    | Horizontal	-> dom_dragger##style##left <- Js.string
+    | Horizontal        -> dom_dragger##style##left <- Js.string
       ((string_of_int (x_of_value () + margin)) ^ "px")
   in
 
   let set_coord coord =
     let diff_x, diff_y = diff_coord coord in
     let accepted = match ori with
-      | Vertical	-> value_of_y (!y_value + diff_y)
-      | Horizontal	-> value_of_x (!x_value + diff_x)
+      | Vertical        -> value_of_y (!y_value + diff_y)
+      | Horizontal      -> value_of_x (!x_value + diff_x)
     in
     set_dragger_position ();
     if accepted then save_coord coord
   in
 
   let launch_callback = function
-    | Some func	-> Lwt.async func
-    | _		-> ()
+    | Some func -> Lwt.async func
+    | _         -> ()
   in
 
   (* initialize dragger position *)
@@ -159,8 +159,8 @@ let start (slider, dragger, ori, value,
     let x, y = Client_tools.get_local_event_position dom_slider ev in
     let x', y' = x - margin, y - margin in
     let _ = match ori with
-      | Vertical	-> value_of_y (y' - (dragger_height / 2))
-      | Horizontal	-> value_of_x (x' - (dragger_width / 2))
+      | Vertical        -> value_of_y (y' - (dragger_height / 2))
+      | Horizontal      -> value_of_x (x' - (dragger_width / 2))
     in
     set_dragger_position ();
     Lwt.return (launch_callback !click) ));

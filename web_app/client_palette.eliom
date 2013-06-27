@@ -18,7 +18,7 @@
     (* Elarge color picker on computer *)
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
       then Grf_color_picker.add_square_color color_picker
-	Grf_color_picker.lll_color_6
+        Grf_color_picker.lll_color_6
       else color_picker
     in
 
@@ -52,17 +52,17 @@
       let margin = 8 in
       let body_height = Dom_html.document##documentElement##clientHeight in
       let color_square_list =
-	Grf_color_picker.get_square_color_div_list color_picker'
+        Grf_color_picker.get_square_color_div_list color_picker'
       in
       let n_row = (List.length color_square_list) / 2 in
       let new_height = (body_height - (margin * 2)) / n_row in
       let rec aux = function
-	| []		-> ()
-	| div::tail	->
-	  let dom_div = Eliom_content.Html5.To_dom.of_div div in
-	  dom_div##style##height <- Js.string
-	    (string_of_int (new_height) ^ "px");
-	  aux tail
+        | []            -> ()
+        | div::tail     ->
+          let dom_div = Eliom_content.Html5.To_dom.of_div div in
+          dom_div##style##height <- Js.string
+            (string_of_int (new_height) ^ "px");
+          aux tail
       in aux color_square_list
     in handle_color_square_resize (); (* To initialize view *)
     Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
@@ -83,8 +83,8 @@
     let handler () =
       let brush_size = Js.string (string_of_int
         (int_of_float (
-	  ((Client_ext_mod_tools.get_slider_value slider) *.
-	    (float_of_int base_size)))) ^ "px")
+          ((Client_ext_mod_tools.get_slider_value slider) *.
+            (float_of_int base_size)))) ^ "px")
       in
       dom_color##style##width <- brush_size;
       dom_color##style##height <- brush_size;

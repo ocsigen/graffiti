@@ -4,18 +4,18 @@
 
     body
     {
-	font-size:1.8em;
+        font-size:1.8em;
     }
 
     .header_div
     {
-	height:90px;
-	background-size:auto 90px;
+        height:90px;
+        background-size:auto 90px;
     }
 
     .menu_button
     {
-	width:20%;
+        width:20%;
     }
 
 }

@@ -70,7 +70,7 @@
       let css_margin = 2 in
       let ox, _ = Dom_html.elementClientPosition dom_canvas in
       dom_angle##style##left <- Js.string
-	(string_of_int (ox + width' + (css_margin * 2) - angle_width) ^ "px")
+        (string_of_int (ox + width' + (css_margin * 2) - angle_width) ^ "px")
     in
 
     (* return result *)
