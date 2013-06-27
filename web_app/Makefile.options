@@ -8,13 +8,14 @@ PROJECT_NAME := graffiti
 FILES :=     server_service.eliom	\
 	     shared_tools.eliom		\
       	     server_image.eliom		\
+	     client_tools.eliom		\
+	     client_tools.eliomi	\
 	     grf_color_picker.eliom	\
 	     grf_color_picker.eliomi	\
 	     grf_slider.eliom		\
 	     grf_slider.eliomi		\
       	     server_html.eliom		\
-	     client_tools.eliom		\
-	     client_tools.eliomi	\
+	     client_ext_mod_tools.eliom	\
 	     client_mobile.eliom	\
 	     client_header.eliom	\
 	     client_canvas.eliom	\

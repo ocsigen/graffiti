@@ -77,8 +77,6 @@ let start (slider, dragger, ori, value,
   let dom_slider = Eliom_content.Html5.To_dom.of_div slider in
   let dom_dragger = Eliom_content.Html5.To_dom.of_div dragger in
   let margin = 4 in
-  let o_slider_x, o_slider_y = Dom_html.elementClientPosition dom_slider in
-  let o_slider_x', o_slider_y' = o_slider_x + margin, o_slider_y + margin in
   let slider_width, slider_height =
     dom_slider##clientWidth - margin * 2, dom_slider##clientHeight - margin * 2
   in
@@ -90,11 +88,11 @@ let start (slider, dragger, ori, value,
 
   (* tools *)
   let last_coord = ref (0, 0) in
-  let save_coord ev = last_coord := (ev##clientX, ev##clientY) in
+  let save_coord (x, y) = last_coord := (x, y) in
   let get_x (x, _) = x in
   let get_y (_, y) = y in
-  let diff_coord ev =
-    ev##clientX - get_x !last_coord, ev##clientY - get_y !last_coord
+  let diff_coord (x, y) =
+    x - get_x !last_coord, y - get_y !last_coord
   in
 
   let set_value v =
@@ -122,19 +120,35 @@ let start (slider, dragger, ori, value,
       ((string_of_int (x_of_value () + margin)) ^ "px")
   in
 
-  let set_coord ev =
-    let diff_x, diff_y = diff_coord ev in
+  let set_coord coord =
+    let diff_x, diff_y = diff_coord coord in
     let accepted = match ori with
       | Vertical	-> value_of_y (!y_value + diff_y)
       | Horizontal	-> value_of_x (!x_value + diff_x)
     in
     set_dragger_position ();
-    if accepted then save_coord ev
+    if accepted then save_coord coord
   in
 
   let launch_callback = function
     | Some func	-> Lwt.async func
     | _		-> ()
+  in
+
+  let get_mouse_coord ev = (ev##clientX, ev##clientY) in
+  (**
+     Duplicate code between get_coord (in get_touch_coord below)
+     and get_mouse_coord
+     Without this, error of type.
+     A specialisation is made on mouseevent.
+     However have try this:
+     < clientX : 'a; clientY : 'b; .. > Js.t in get_mouse_coord
+  **)
+
+  let get_touch_coord idx event =
+    let ev = event##touches##item(idx) in
+    let get_coord ev = ev##clientX, ev##clientY in
+    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
   in
 
   (* initialize dragger position *)
@@ -144,23 +158,37 @@ let start (slider, dragger, ori, value,
   in
 
   (* move actions *)
-  Lwt.async (fun () -> Lwt_js_events.mousedowns dom_dragger (fun ev _ ->
-    save_coord ev;
-    launch_callback !start_slide;
-    Lwt.pick [Lwt_js_events.mousemoves Dom_html.document (fun ev _ ->
-      set_coord ev; Lwt.return (launch_callback !move_slide));
-              Lwt_js_events.mouseup Dom_html.document >>= (fun ev ->
-      set_coord ev; Lwt.return (launch_callback !end_slide))]));
+  let handler_event get_event_coord move_events stop_event event _ =
+    let handle_one_event ev action_func callback =
+      let coord = get_event_coord ev in
+      action_func coord;
+      launch_callback callback
+    in
+    handle_one_event event save_coord !start_slide;
+    Lwt.pick [move_events Dom_html.document (fun ev _ ->
+      Lwt.return (handle_one_event ev set_coord !move_slide));
+              stop_event Dom_html.document >>= (fun ev ->
+      Lwt.return (handle_one_event ev set_coord !end_slide))]
+  in
+
+  Lwt.async (fun () ->
+    Lwt_js_events.mousedowns dom_dragger
+      (handler_event get_mouse_coord
+	 Lwt_js_events.mousemoves Lwt_js_events.mouseup));
+  Lwt.async (fun () ->
+    Lwt_js_events.touchstarts dom_dragger
+      (handler_event (get_touch_coord 0)
+	 Lwt_js_events.touchmoves Lwt_js_events.touchend));
 
   (* click action *)
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->
-    let x, y = ev##clientX, ev##clientY in
+    let x, y = Client_tools.get_local_event_position dom_slider ev in
+    let x', y' = x - margin, y - margin in
     let _ = match ori with
-      | Vertical	-> value_of_y (y - o_slider_y' - (dragger_height / 2))
-      | Horizontal	-> value_of_x (x - o_slider_x' - (dragger_width / 2))
+      | Vertical	-> value_of_y (y' - (dragger_height / 2))
+      | Horizontal	-> value_of_x (x' - (dragger_width / 2))
     in
     set_dragger_position ();
-    Lwt.return (launch_callback !click)
-  ))
+    Lwt.return (launch_callback !click) ));
 
 }}

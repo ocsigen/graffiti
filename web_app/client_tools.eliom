@@ -25,6 +25,11 @@
     (let date = jsnew Js.date_now () in
      int_of_float (Js.to_float (date##getTime ())))
 
+  let get_local_event_position dom_elt ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y = ev##clientX, ev##clientY in
+    x - ox, y - oy
+
   (*** events's tools ***)
 
   (** Disable Dom_html.Event with stopping propagation during capture phase **)
@@ -127,7 +132,5 @@
             current_y >= start_y' && current_y <= end_y')
       then func ()
       else Lwt.return () )
-
-  let get_slider_value slider = (Grf_slider.get_value slider) /. 5.
 
 }}

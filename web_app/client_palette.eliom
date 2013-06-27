@@ -61,7 +61,7 @@
     let handler () =
       let brush_size = Js.string (string_of_int
         (int_of_float (
-	  ((Client_tools.get_slider_value slider) *.
+	  ((Client_ext_mod_tools.get_slider_value slider) *.
 	    (float_of_int base_size)))) ^ "px")
       in
       dom_color##style##width <- brush_size;

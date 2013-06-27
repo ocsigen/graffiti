@@ -105,7 +105,7 @@
       in
 
       let color = Grf_color_picker.get_color color_picker in
-      let brush_size = Client_tools.get_slider_value slider in
+      let brush_size = Client_ext_mod_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
       (* It is differente when you are in Portrait view *)
@@ -176,7 +176,7 @@
               mouse_lwt_cancel := true)
       in
       let ev = event##touches##item(idx) in
-      let get_coord ev = (ev##clientX, ev##clientY) in
+      let get_coord ev = ev##clientX, ev##clientY in
       Js.Optdef.case ev (fun () -> (0, 0)) get_coord
     in
 
