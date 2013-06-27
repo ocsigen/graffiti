@@ -185,7 +185,7 @@ canvas
     height: 60px;
 }
 
-.color_picker_color_div
+.grf_color_picker_color_div
 {
     padding: 0px;
     position: relative;
@@ -213,7 +213,7 @@ canvas
     box-shadow: 0px 0px 5px #555555;
 }
 
-.color_picker_block
+.grf_color_picker_block
 {
     display: -webkit-flex;
     display:         flex;
@@ -226,7 +226,7 @@ canvas
     height: 99.9%;
 }
 
-.color_picker_table
+.grf_color_picker_table
 {
     display: -webkit-flex;
     display:         flex;
@@ -240,7 +240,7 @@ canvas
     height: auto;
 }
 
-.color_picker_tr
+.grf_color_picker_tr
 {
     display: -webkit-flex;
     display:         flex;
@@ -250,7 +250,7 @@ canvas
     flex: 1 1 auto;
 }
 
-.color_picker_td
+.grf_color_picker_td
 {
     margin: 0px;
     padding: 0px;
@@ -262,7 +262,7 @@ canvas
     flex: 1 1 auto;
 }
 
-.color_picker_square
+.grf_color_picker_square
 {
     -webkit-flex-flow: column;
     flex-flow: column;
@@ -272,7 +272,7 @@ canvas
     min-height: 40px;
 }
 
-.GrfSlider_slider
+.grf_slider_slider
 {
     background-image: url('/img/maxibrush.png'), url('/img/minibrush.png');
     background-repeat: no-repeat, no-repeat;

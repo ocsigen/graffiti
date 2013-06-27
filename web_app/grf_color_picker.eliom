@@ -8,7 +8,7 @@ type div = [ Html5_types.div ] Eliom_content.Html5.D.elt
 type t = (string ref * div * div list * div)
 
 let raise_exception str =
-  failwith "Color_picker." ^ str
+  failwith "Grf_color_picker." ^ str
 
 (** The agrument is the divisor of 255
 ** It have to  be greater than 1 **)
@@ -78,16 +78,16 @@ let lll_color_6 = [[["#BEC3C7"; "#7A8E8D"];
 let genere_color_table lll_color =
 
   let build_color_div color =
-    D.div ~a:[a_class["color_picker_square"];
+    D.div ~a:[a_class["grf_color_picker_square"];
             a_title color;
             a_style ("background-color: " ^ color ^ ";")]
       []
   in
   let build_td_color color_div =
-    td ~a:[a_class["color_picker_td"]] [color_div]
+    td ~a:[a_class["grf_color_picker_td"]] [color_div]
   in
   let build_tr_color tds =
-    tr ~a:[a_class["color_picker_tr"]] tds
+    tr ~a:[a_class["grf_color_picker_tr"]] tds
   in
 
   let rec build_table div_color_list tables = function
@@ -119,7 +119,7 @@ let genere_color_table lll_color =
       let div_color_list', trs = build_column div_color_list [] head in
       let first_tr = List.hd trs in
       let trs' = try List.tl trs with | Failure "tl" -> [] in
-      let tbl = table ~a:[a_class["color_picker_table"]] (first_tr) trs' in
+      let tbl = table ~a:[a_class["grf_color_picker_table"]] (first_tr) trs' in
       build_table
         div_color_list'
         (tbl::tables)
@@ -141,11 +141,11 @@ let create ?(initial_color = 0, 0, 0) ?(lll_color = lll_color_p5) () =
   let tbl, trl, tdl = initial_color in
   let color_ref = ref (List.nth (List.nth (List.nth lll_color tbl) trl) tdl) in
   let div_color_list, tables = genere_color_table lll_color in
-  let color_div = D.div ~a:[a_class["color_picker_color_div"];
+  let color_div = D.div ~a:[a_class["grf_color_picker_color_div"];
                           a_title !color_ref;
                           a_style ("background-color: " ^ !color_ref ^ ";")] []
   in
-  let block = D.div ~a:[a_class["color_picker_block"]] tables in
+  let block = D.div ~a:[a_class["grf_color_picker_block"]] tables in
   let type_t = (color_ref, color_div, div_color_list, block) in
   type_t, color_div, block
 

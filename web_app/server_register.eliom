@@ -10,7 +10,7 @@ let _ =
       let html_page =
         (html
            (Eliom_tools.F.head ~title:"Graffiti"
-              ~css:[["css"; "color_picker.css"];
+              ~css:[["css"; "grf_color_picker.css"];
 		    ["css"; "grf_slider.css"];
                     ["css"; "graffiti.css"];
                     ["css"; "graffiti_small_screen.css"];

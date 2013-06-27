@@ -8,8 +8,8 @@ PROJECT_NAME := graffiti
 FILES :=     server_service.eliom	\
 	     shared_tools.eliom		\
       	     server_image.eliom		\
-	     color_picker.eliom		\
-	     color_picker.eliomi	\
+	     grf_color_picker.eliom	\
+	     grf_color_picker.eliomi	\
 	     grf_slider.eliom		\
 	     grf_slider.eliomi		\
       	     server_html.eliom		\

@@ -52,7 +52,8 @@
     handle_orientationchange_and_resize;
 
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
-      then Color_picker.add_square_color color_picker Color_picker.lll_color_6
+      then Grf_color_picker.add_square_color color_picker
+	Grf_color_picker.lll_color_6
       else color_picker
     in
 
@@ -74,6 +75,6 @@
     Grf_slider.start slider;
 
     (* Start color picker stript *)
-    Color_picker.start color_picker'
+    Grf_color_picker.start color_picker'
 
 }}

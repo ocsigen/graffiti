@@ -1,35 +1,35 @@
 
-.color_picker_square
+.grf_color_picker_square
 {
     height:28px;
     width:28px;
     display:inline-block;
 }
 
-.color_picker_td
+.grf_color_picker_td
 {
 
 }
 
-.color_picker_tr
+.grf_color_picker_tr
 {
 
 }
 
-.color_picker_table
+.grf_color_picker_table
 {
     margin:0px;
     padding:0px;
 }
 
-.color_picker_color_div
+.grf_color_picker_color_div
 {
     display:inline-block;
     width:32px;
     height:32px;
 }
 
-.color_picker_block
+.grf_color_picker_block
 {
     margin:0px;
     padding:0px;

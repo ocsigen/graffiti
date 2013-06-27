@@ -58,9 +58,9 @@ let save_button_elt = D.div ~a:[a_class["save_button"]] [save_link_elt]
 
 (* palette *)
 
-let color_picker, color_div, block = Color_picker.create
+let color_picker, color_div, block = Grf_color_picker.create
   ~initial_color:(0, 3, 0)
-  ~lll_color:Color_picker.lll_color_10 ()
+  ~lll_color:Grf_color_picker.lll_color_10 ()
 
 let grf_slider, slider_elt =
   Grf_slider.create ~orientation:Grf_slider.Vertical ()

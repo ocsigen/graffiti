@@ -104,7 +104,7 @@
         | _                     -> oldx', oldy', !x, !y
       in
 
-      let color = Color_picker.get_color color_picker in
+      let color = Grf_color_picker.get_color color_picker in
       let brush_size = Client_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)

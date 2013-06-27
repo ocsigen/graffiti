@@ -1,4 +1,4 @@
-.GrfSlider_slider
+.grf_slider_slider
 {
     display: -webkit-flex;
     display:         flex;
@@ -6,7 +6,7 @@
     border-radius: 20px 20px 20px 20px;
 }
 
-.GrfSlider_slider_vertical
+.grf_slider_slider_vertical
 {
     -webkit-flex-flow: row;
     flex-flow: row;
@@ -15,7 +15,7 @@
     width: 45px;
 }
 
-.GrfSlider_slider_horizontal
+.grf_slider_slider_horizontal
 {
     -webkit-flex-flow: column;
     flex-flow: column;
@@ -24,7 +24,7 @@
     height: 45px;
 }
 
-.GrfSlider_dragger
+.grf_slider_dragger
 {
     margin: 0px;
     position: relative;
@@ -34,13 +34,13 @@
     height: 28px;
 }
 
-.GrfSlider_dragger_vertical
+.grf_slider_dragger_vertical
 {
     margin-left: auto;
     margin-right: auto;
 }
 
-.GrfSlider_dragger_horizontal
+.grf_slider_dragger_horizontal
 {
     margin-top: auto;
     margin-bottom: auto;
