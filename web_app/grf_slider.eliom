@@ -136,22 +136,6 @@ let start (slider, dragger, ori, value,
     | _		-> ()
   in
 
-  let get_mouse_coord ev = (ev##clientX, ev##clientY) in
-  (**
-     Duplicate code between get_coord (in get_touch_coord below)
-     and get_mouse_coord
-     Without this, error of type.
-     A specialisation is made on mouseevent.
-     However have try this:
-     < clientX : 'a; clientY : 'b; .. > Js.t in get_mouse_coord
-  **)
-
-  let get_touch_coord idx event =
-    let ev = event##touches##item(idx) in
-    let get_coord ev = ev##clientX, ev##clientY in
-    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
-  in
-
   (* initialize dragger position *)
   let _ =
     set_dragger_position ();
@@ -159,27 +143,16 @@ let start (slider, dragger, ori, value,
   in
 
   (* move actions *)
-  let handler_event get_event_coord move_events stop_event event _ =
-    let handle_one_event ev action_func callback =
-      let coord = get_event_coord ev in
-      action_func coord;
-      launch_callback callback
-    in
-    handle_one_event event save_coord !start_slide;
-    Lwt.pick [move_events Dom_html.document (fun ev _ ->
-      Lwt.return (handle_one_event ev set_coord !move_slide));
-              stop_event Dom_html.document >>= (fun ev ->
-      Lwt.return (handle_one_event ev set_coord !end_slide))]
+  let handle_one_event action_func callback ev =
+    let coord = Client_tools.get_slide_coord 0 ev in
+    action_func coord;
+    Lwt.return (launch_callback callback)
   in
 
-  Lwt.async (fun () ->
-    Lwt_js_events.mousedowns dom_dragger
-      (handler_event get_mouse_coord
-	 Lwt_js_events.mousemoves Lwt_js_events.mouseup));
-  Lwt.async (fun () ->
-    Lwt_js_events.touchstarts dom_dragger
-      (handler_event (get_touch_coord 0)
-	 Lwt_js_events.touchmoves Lwt_js_events.touchend));
+  Lwt.async (fun () -> Client_tools.touch_or_mouse_slides dom_dragger
+    (fun ev _ -> handle_one_event save_coord !start_slide ev)
+    (fun ev _ -> handle_one_event set_coord !move_slide ev)
+    (handle_one_event set_coord !end_slide));
 
   (* click action *)
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->

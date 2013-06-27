@@ -5,6 +5,8 @@
 
   (*** Js' tools ***)
 
+  (* size and orientation *)
+
   type orientation = Portrait | Landscape
 
   let get_window_size () =
@@ -21,16 +23,28 @@
   let get_document_size () =
     get_size Dom_html.document##documentElement
 
+  (* time *)
+
   let get_timestamp () =
     (let date = jsnew Js.date_now () in
      int_of_float (Js.to_float (date##getTime ())))
 
+  (* position / coordinated *)
+
+  let get_coord ev = ev##clientX, ev##clientY
+
+  let get_touch_coord idx event =
+    let ev = event##touches##item(idx) in
+    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
+
   let get_local_event_position dom_elt ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y = ev##clientX, ev##clientY in
+    let x, y = get_coord ev in
     x - ox, y - oy
 
   (*** events's tools ***)
+
+  (* Enable / disable *)
 
   (** Disable Dom_html.Event with stopping propagation during capture phase **)
   let disable_event event html_elt =
@@ -56,6 +70,26 @@
   let disable_mobile_scroll () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
+  (* orientation / resize *)
+
+  let orientationchange = Dom_html.Event.make "orientationchange"
+
+  let onorientationchange () =
+    Lwt_js_events.make_event orientationchange Dom_html.document
+
+  let onorientationchange_or_onresize () =
+    Lwt.pick [Lwt_js_events.onresize (); onorientationchange ()]
+
+  let onorientationchanges t =
+    Lwt_js_events.seq_loop
+      (fun ?use_capture () -> onorientationchange ()) () t
+
+  let onorientationchanges_or_onresizes t =
+    Lwt_js_events.seq_loop
+      (fun ?use_capture () -> onorientationchange_or_onresize ()) () t
+
+  (* limited *)
+
   (** Execute handler with last event from events' queue
   *** separate by the maximum time gived by execute time of limited_func
   ***
@@ -76,15 +110,6 @@
   let limited_loop event ?(elapsed_time=0.1) =
     func_limited_loop event (fun () -> Lwt_js.sleep elapsed_time)
 
-  let orientationchange = Dom_html.Event.make "orientationchange"
-
-  let onorientationchange () =
-    Lwt_js_events.make_event orientationchange Dom_html.document
-
-  let onorientationchanges t =
-    Lwt_js_events.seq_loop
-      (fun ?use_capture () -> onorientationchange ()) () t
-
   let limited_onresizes ?elapsed_time t =
     limited_loop
       (fun ?use_capture () -> Lwt_js_events.onresize ()) ?elapsed_time () t
@@ -93,16 +118,85 @@
     limited_loop
       (fun ?use_capture () -> onorientationchange ()) ?elapsed_time () t
 
-  let onorientationchange_or_onresize () =
-    Lwt.pick [Lwt_js_events.onresize (); onorientationchange ()]
-
-  let onorientationchanges_or_onresizes t =
-    Lwt_js_events.seq_loop
-      (fun ?use_capture () -> onorientationchange_or_onresize ()) () t
-
   let limited_onorientationchanges_or_onresizes ?elapsed_time t =
     limited_loop (fun ?use_capture () -> onorientationchange_or_onresize ())
       ?elapsed_time () t
+
+  (* slide *)
+
+  let slide_without_start move_events end_event move_func end_func =
+    Lwt.pick [move_events Dom_html.document##body move_func;
+              end_event Dom_html.document##body >>= end_func]
+
+  (** Lwt.t returned is the start Lwt *)
+  let slide_event
+      (start_event: #Dom_html.eventTarget Js.t -> 'b Lwt.t)
+      slide_without_start
+      (dom_elt: #Dom_html.eventTarget Js.t)
+      start_func move_func end_func =
+
+    start_event dom_elt >>= (fun ev ->
+      Lwt.async (fun () -> start_func ev);
+      slide_without_start move_func end_func)
+
+  (** Lwt.t returned is the starts Lwt *)
+  let slide_events start_events slide_without_start
+      dom_elt start_func move_func end_func =
+
+    start_events dom_elt (fun ev lt ->
+      Lwt.async (fun () -> start_func ev lt);
+      slide_without_start move_func end_func)
+
+  let mouseslide_without_start =
+    slide_without_start Lwt_js_events.mousemoves Lwt_js_events.mouseup
+
+  (** Lwt.t returned is the mousedown Lwt *)
+  let mouseslide (dom_elt: #Dom_html.eventTarget Js.t) =
+    slide_event Lwt_js_events.mousedown mouseslide_without_start dom_elt
+
+  (** Lwt.t returned is the mousedowns Lwt *)
+  let mouseslides (dom_elt: #Dom_html.eventTarget Js.t) =
+    slide_events Lwt_js_events.mousedowns mouseslide_without_start dom_elt
+
+  let touchslide_without_start =
+    slide_without_start Lwt_js_events.touchmoves Lwt_js_events.touchend
+
+  (** Lwt.t returned is the touchstart Lwt *)
+  let touchslide (dom_elt: #Dom_html.eventTarget Js.t) =
+    slide_event Lwt_js_events.touchstart touchslide_without_start dom_elt
+
+  (** Lwt.t returned is the touchstarts Lwt *)
+  let touchslides (dom_elt: #Dom_html.eventTarget Js.t) =
+    slide_events Lwt_js_events.touchstarts touchslide_without_start dom_elt
+
+  type slide_event =
+      Touch_event of Dom_html.touchEvent Js.t
+    | Mouse_event of Dom_html.mouseEvent Js.t
+
+  let get_slide_coord idx = function
+    | Touch_event ev	-> get_touch_coord idx ev
+    | Mouse_event ev	-> get_coord ev
+
+  let touch_handler func ev = func (Touch_event ev)
+  let mouse_handler func ev = func (Mouse_event ev)
+
+  let touch_or_mouse_slide_base touchevent mouseevent
+      dom_elt start_func move_func end_func =
+    Lwt.pick [touchevent dom_elt (touch_handler start_func)
+  		(touch_handler move_func) (touch_handler end_func);
+  	      mouseevent dom_elt (mouse_handler start_func)
+  		(mouse_handler move_func) (mouse_handler end_func)]
+
+  (** Functions in parameter take an slide_event instead of simple event *)
+  let touch_or_mouse_slide (dom_elt: #Dom_html.eventTarget Js.t) =
+    touch_or_mouse_slide_base touchslide mouseslide dom_elt
+
+  (** Same as touch_or_mouse_slide
+      but catch all event instead of only the first *)
+  let touch_or_mouse_slides (dom_elt: #Dom_html.eventTarget Js.t) =
+    touch_or_mouse_slide_base touchslides mouseslides dom_elt
+
+  (* click *)
 
   (** local click position type **)
   type lc_position =

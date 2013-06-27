@@ -137,55 +137,16 @@
         (color, brush_size, (x1', y1'), (x2', y2'))
     in
 
-    let get_mouse_coord ev = (ev##clientX, ev##clientY) in
-    (**
-       Duplicate code between get_coord (in get_touch_coord below)
-       and get_mouse_coord
-       Without this, error of type.
-       A specialisation is made on mouseevent.
-       However have try this:
-       < clientX : 'a; clientY : 'b; .. > Js.t in get_mouse_coord
-    **)
-
-    (** Generic function for mouse and touch events **)
-    let handle_input_event get_coord move_event stop_event event _ =
-      set_coord (get_coord event);
-      lwt _ = line (get_coord event) in
-      Lwt.pick [move_event Dom_html.document (fun ev _ ->
-        line (get_coord ev));
-                stop_event Dom_html.document >>= (fun ev ->
-                  Lwt.return ())]
-    in
-
     (*** Catch events ***)
     Lwt.async (fun () ->
       Lwt_stream.iter bus_draw (Eliom_bus.stream %Server_image.bus));
 
-    (** Mouse drawing events **)
-    let mouse_lwt_cancel = ref false in
-    let mouse_catch_thread =
-      Lwt_js_events.mousedowns dom_canvas
-        (handle_input_event get_mouse_coord
-           Lwt_js_events.mousemoves Lwt_js_events.mouseup)
-    in Lwt.async (fun () -> mouse_catch_thread);
-
-    (** Duplication code with get_mouse_coord, see that above **)
-    let get_touch_coord idx event =
-      let _ = if (not !mouse_lwt_cancel)
-        then (Lwt.cancel mouse_catch_thread;
-              mouse_lwt_cancel := true)
-      in
-      let ev = event##touches##item(idx) in
-      let get_coord ev = ev##clientX, ev##clientY in
-      Js.Optdef.case ev (fun () -> (0, 0)) get_coord
-    in
-
-    (** Touch drawing events **)
-    Lwt.async
-      (fun () ->
-        Lwt_js_events.touchstarts dom_canvas
-          (handle_input_event (get_touch_coord 0)
-             Lwt_js_events.touchmoves Lwt_js_events.touchend));
+    (** drawing events **)
+    Lwt.async (fun () -> Client_tools.touch_or_mouse_slides dom_canvas
+      (fun ev _ -> set_coord (Client_tools.get_slide_coord 0 ev);
+                   line (Client_tools.get_slide_coord 0 ev))
+      (fun ev _ -> line (Client_tools.get_slide_coord 0 ev))
+      (fun _ -> Lwt.return ()));
 
     (* fix drag and drop to avoid to catch canvas during drawing *)
     ignore (Client_tools.disable_drag_and_drop dom_canvas);
