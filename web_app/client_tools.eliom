@@ -72,8 +72,8 @@
         else Lwt.return ())
 
   (** Same as func_limited_loop but take time instead of function
-  *** By default elapsed_time = 0.2s **)
-  let limited_loop event ?(elapsed_time=0.2) =
+  *** By default elapsed_time = 0.1s **)
+  let limited_loop event ?(elapsed_time=0.1) =
     func_limited_loop event (fun () -> Lwt_js.sleep elapsed_time)
 
   let orientationchange = Dom_html.Event.make "orientationchange"

@@ -78,13 +78,14 @@ let start (slider, dragger, ori, value,
   let dom_dragger = Eliom_content.Html5.To_dom.of_div dragger in
   let margin = 4 in
   let slider_width, slider_height =
-    dom_slider##clientWidth - margin * 2, dom_slider##clientHeight - margin * 2
+    ref (dom_slider##clientWidth - margin * 2),
+    ref (dom_slider##clientHeight - margin * 2)
   in
   let dragger_width, dragger_height =
     dom_dragger##clientWidth, dom_dragger##clientHeight
   in
-  let max_width = float_of_int (slider_width - dragger_width) in
-  let max_height = float_of_int (slider_height - dragger_height) in
+  let max_width = ref (float_of_int (!slider_width - dragger_width)) in
+  let max_height = ref (float_of_int (!slider_height - dragger_height)) in
 
   (* tools *)
   let last_coord = ref (0, 0) in
@@ -103,15 +104,15 @@ let start (slider, dragger, ori, value,
 
   let x_value = ref 0 in
   let x_of_value () =
-    x_value := int_of_float (max_width *. !value); !x_value
+    x_value := int_of_float (!max_width *. !value); !x_value
   in
-  let value_of_x x = set_value ((float_of_int x) /. max_width) in
+  let value_of_x x = set_value ((float_of_int x) /. !max_width) in
 
   let y_value = ref 0 in
   let y_of_value () =
-    y_value := int_of_float (max_height *. !value); !y_value
+    y_value := int_of_float (!max_height *. !value); !y_value
   in
-  let value_of_y y = set_value ((float_of_int y) /. max_height) in
+  let value_of_y y = set_value ((float_of_int y) /. !max_height) in
 
   let set_dragger_position () = match ori with
     | Vertical		-> dom_dragger##style##top <- Js.string
@@ -190,5 +191,14 @@ let start (slider, dragger, ori, value,
     in
     set_dragger_position ();
     Lwt.return (launch_callback !click) ));
+
+  (* resize event *)
+  Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
+    (fun _ _ ->
+      slider_width := (dom_slider##clientWidth - margin * 2);
+      slider_height := (dom_slider##clientHeight - margin * 2);
+      max_width := (float_of_int (!slider_width - dragger_width));
+      max_height := (float_of_int (!slider_height - dragger_height));
+      Lwt.return (set_dragger_position ()) ))
 
 }}
