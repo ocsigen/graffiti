@@ -56,9 +56,9 @@ let _ =
         (* Start palette menu script *)
         Client_palette.start
           %Server_html.body_elt
-          %Server_html.header_elt
           %Server_html.canvas_elt
-          %Server_html.palette_div
+          %Server_html.palette_wrapper
+          %Server_html.palette_button
           %Server_html.grf_slider
           %Server_html.color_picker
           %Server_html.color_div;

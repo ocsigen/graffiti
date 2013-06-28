@@ -17,8 +17,8 @@
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_angle = Eliom_content.Html5.To_dom.of_div angle_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
-        then 0
-        else 242
+        then 35
+        else 230
     in
     let margin = 6 in
     let width = (fst size) - (margin * 2) - width_canvas_margin in

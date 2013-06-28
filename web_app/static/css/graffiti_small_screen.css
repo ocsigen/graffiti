@@ -7,10 +7,20 @@
         font-size:0.8em;
     }
 
+    canvas
+    {
+	margin-left: 25px;
+    }
+
+    .angle_div
+    {
+	top: 0px;
+    }
+
     .save_button
     {
         width: 30px;
-        top: 50px;
+        top: 60px;
     }
 
     .save_div
@@ -18,10 +28,9 @@
         width: 13px;
     }
 
-    .palette_div
+    .palette_wrap
     {
-        display:none;
+	left: -196px;
     }
-
 
 }

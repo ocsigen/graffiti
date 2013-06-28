@@ -68,12 +68,9 @@ let grf_slider, slider_elt =
 let palette_button = D.td [table ~a:[a_class["palette_button"]]
                               (tr [td [color_div]]) []]
 
-let palette_div = D.div ~a:[a_class["palette_wrap"]]
+let palette_wrapper = D.div ~a:[a_class["palette_wrap"]]
   [div ~a:[a_class["palette_color_brush"]]
-      [table ~a:[a_class["slider_wrapper"]]
-          (tr [td ~a:[a_class["max_height"]] [slider_elt]]) [];
-       table ~a:[a_class["block_wrapper"]]
-         (tr [td ~a:[a_class["max_height"]] [block]]) []];
+      [table (tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block]]) []];
    table ~a:[a_class["palette_table_button"]] (tr [palette_button]) []]
 
 (* starting logo *)
@@ -96,5 +93,5 @@ let header_elt =
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
   ([header_elt; canvas_elt; angle_elt;
-    save_button_elt; palette_div; gray_layer_elt; about_elt;
+    save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
     starting_logo_elt])

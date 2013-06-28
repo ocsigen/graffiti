@@ -46,6 +46,6 @@
             | "60px"      -> contract ()
             | _           -> expand ()
         ))
-    in Client_mobile.launch_func_only_on_small_screen save_click
+    in Client_mobile.launch_only_on_small_screen save_click
 
 }}

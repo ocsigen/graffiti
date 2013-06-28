@@ -9,12 +9,12 @@
     let width, height = Client_tools.get_window_size () in
     (width <= 480 || height <= 480)
 
-  let launch_func_only_on_small_screen func =
+  let launch_only_on_small_screen func =
     if has_small_screen ()
     then func ()
     else ()
 
-  let not_launch_func_on_small_screen func =
+  let not_launch_on_small_screen func =
     if has_small_screen ()
     then ()
     else func ()
