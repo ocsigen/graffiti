@@ -46,12 +46,10 @@
 
   (* Enable / disable *)
 
-  (** Disable Dom_html.Event with stopping propagation during capture phase **)
   let disable_event event html_elt =
     Dom_html.addEventListener html_elt event
       (Dom.handler (fun _ -> Js._false)) Js._true
 
-  (** Enable Dom_html.Event with id gived by disable_event **)
   let enable_event id =
     Dom_html.removeEventListener id
 
@@ -90,11 +88,6 @@
 
   (* limited *)
 
-  (** Execute handler with last event from events' queue
-  *** separate by the maximum time gived by execute time of limited_func
-  ***
-  *** Be careful, it is a asynchrone loop, so if you give too little time,
-  *** several instances of your handler could be run in same time **)
   let func_limited_loop event limited_func ?use_capture target handler =
     let count = ref 0 in
     Lwt_js_events.async_loop event ?use_capture target
@@ -105,9 +98,7 @@
         then handler ev lt
         else Lwt.return ())
 
-  (** Same as func_limited_loop but take time instead of function
-  *** By default elapsed_time = 0.1s **)
-  let limited_loop event ?(elapsed_time=0.1) =
+  let limited_loop event ?(elapsed_time=0.05) =
     func_limited_loop event (fun () -> Lwt_js.sleep elapsed_time)
 
   let limited_onresizes ?elapsed_time t =
@@ -128,7 +119,6 @@
     Lwt.pick [move_events Dom_html.document##body move_func;
               end_event Dom_html.document##body >>= end_func]
 
-  (** Lwt.t returned is the start Lwt *)
   let slide_event
       (start_event: #Dom_html.eventTarget Js.t -> 'b Lwt.t)
       slide_without_start
@@ -139,7 +129,6 @@
       Lwt.async (fun () -> start_func ev);
       slide_without_start move_func end_func)
 
-  (** Lwt.t returned is the starts Lwt *)
   let slide_events start_events slide_without_start
       dom_elt start_func move_func end_func =
 
@@ -150,22 +139,18 @@
   let mouseslide_without_start =
     slide_without_start Lwt_js_events.mousemoves Lwt_js_events.mouseup
 
-  (** Lwt.t returned is the mousedown Lwt *)
   let mouseslide (dom_elt: #Dom_html.eventTarget Js.t) =
     slide_event Lwt_js_events.mousedown mouseslide_without_start dom_elt
 
-  (** Lwt.t returned is the mousedowns Lwt *)
   let mouseslides (dom_elt: #Dom_html.eventTarget Js.t) =
     slide_events Lwt_js_events.mousedowns mouseslide_without_start dom_elt
 
   let touchslide_without_start =
     slide_without_start Lwt_js_events.touchmoves Lwt_js_events.touchend
 
-  (** Lwt.t returned is the touchstart Lwt *)
   let touchslide (dom_elt: #Dom_html.eventTarget Js.t) =
     slide_event Lwt_js_events.touchstart touchslide_without_start dom_elt
 
-  (** Lwt.t returned is the touchstarts Lwt *)
   let touchslides (dom_elt: #Dom_html.eventTarget Js.t) =
     slide_events Lwt_js_events.touchstarts touchslide_without_start dom_elt
 
@@ -187,24 +172,18 @@
               mouseevent dom_elt (mouse_handler start_func)
                 (mouse_handler move_func) (mouse_handler end_func)]
 
-  (** Functions in parameter take an slide_event instead of simple event *)
   let touch_or_mouse_slide (dom_elt: #Dom_html.eventTarget Js.t) =
     touch_or_mouse_slide_base touchslide mouseslide dom_elt
 
-  (** Same as touch_or_mouse_slide
-      but catch all event instead of only the first *)
   let touch_or_mouse_slides (dom_elt: #Dom_html.eventTarget Js.t) =
     touch_or_mouse_slide_base touchslides mouseslides dom_elt
 
   (* click *)
 
-  (** local click position type **)
   type lc_position =
-    | Value of int      (** Simple value **)
-    | Max_value of int  (** Max value + your value **)
+    | Value of int
+    | Max_value of int
 
-  (** Detect click beetween start_x, end_x, start_y and end_y and launch func
-  *** Use Max_value constructor to make value relative to screen size **)
   let detect_local_clicks (start_x, end_x, start_y, end_y) func =
 
     let get_mouse_coord ev = (ev##clientX, ev##clientY) in
