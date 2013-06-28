@@ -258,10 +258,11 @@ canvas
     margin-left: 8px;
 }
 
+/* the vertical align is make direclty with image's height */
 .grf_slider_slider
 {
     background-image: url('/img/maxibrush.png'), url('/img/minibrush.png');
     background-repeat: no-repeat, no-repeat;
-    background-position: center 4px, center bottom 3px;
+    background-position: center top, center bottom;
     height: 92%;
 }
