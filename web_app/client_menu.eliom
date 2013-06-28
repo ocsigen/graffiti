@@ -25,13 +25,16 @@
     let save_click () =
 
       let disable_contract = ref false in
-      let rec disable_id = ref
+      let disable_id = ref
         (Client_tools.disable_event Dom_html.Event.click dom_save_link)
-      and contract () =
-        dom_save##style##width <- Js.string "30px";
-        dom_save_div##style##width <- Js.string "13px";
-        disable_id := Client_tools.disable_event
-          Dom_html.Event.click dom_save_link
+      in
+
+      let contract () =
+        if (Js.to_string dom_save##style##width) = "60px"
+        then (dom_save##style##width <- Js.string "30px";
+              dom_save_div##style##width <- Js.string "13px";
+              disable_id := Client_tools.disable_event
+                Dom_html.Event.click dom_save_link)
       and expand () =
         disable_contract := true;
         dom_save##style##width <- Js.string "60px";
@@ -53,7 +56,7 @@
       Lwt.async (fun () -> Lwt_js_events.clicks dom_save
         (fun _ _ -> Lwt.return
           (match (Js.to_string dom_save##style##width) with
-            | "60px"      -> contract ()
+            | "60px"      -> ()
             | _           -> expand ())
         ))
     in Client_mobile.launch_only_on_small_screen save_click
