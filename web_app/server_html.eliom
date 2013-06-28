@@ -15,23 +15,23 @@ let about_link_elt =
         a_target "_blank"]
     [pcdata "Ocsigen"]
 
-let about_elt =
-  D.div ~a:[a_class["about_block"]]
-    [img ~a:[a_class["about_logo"]]
-        ~alt:("Graffiti Logo")
-        ~src:(make_uri
-                ~service:(Eliom_service.static_dir ())
-                ["img"; "Logo_GRAFFITIbyOcsigen_blue.png"])
-        ();
-     br ();
-     pcdata "Web application developed by Vincent Balat";
-     br ();
-     pcdata "Extended and exported on Mobile by Arnaud Parant";
-     br ();
-     pcdata "Design by Bruno Loton";
-     br ();
-     div [pcdata "Created with "; about_link_elt]
-    ]
+let about_elt = D.div ~a:[a_class["about_wrapper"]]
+  [table ~a:[a_class["inline_table"]]
+      (tr [td [div ~a:[a_class["about_block"]]
+                  [img ~a:[a_class["about_logo"]]
+                      ~alt:("Graffiti Logo")
+                      ~src:(make_uri
+                              ~service:(Eliom_service.static_dir ())
+                              ["img"; "Logo_GRAFFITIbyOcsigen_blue.png"])
+                      ();
+                   br ();
+                   pcdata "Web application developed by Vincent Balat";
+                   br ();
+                   pcdata "Extended and exported on Mobile by Arnaud Parant";
+                   br ();
+                   pcdata "Design by Bruno Loton";
+                   br ();
+                   div [pcdata "Created with "; about_link_elt]]]]) []]
 
 let gray_layer_elt = D.div ~a:[a_class["gray_layer"]] []
 
