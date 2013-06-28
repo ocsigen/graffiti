@@ -148,6 +148,7 @@ canvas
     border-width:2px;
     border-color:#F2F2F2;
     background-color:white;
+    vertical-align: middle;
 }
 
 .angle_div
@@ -156,7 +157,6 @@ canvas
     height: 43px;
     background-image: url('/img/angle.png');
     position: absolute;
-    top: 100px;
 }
 
 .about_point

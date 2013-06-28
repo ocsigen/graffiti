@@ -64,13 +64,23 @@
     dom_canvas##width <- width';
     dom_canvas##height <- height';
 
+    let lineHeight = Dom_html.document##body##clientHeight -
+      if Client_mobile.has_small_screen ()
+      then 0
+      else ((Client_header.get_height body_elt header_elt) - 6)
+    in
+
+    Dom_html.document##body##style##lineHeight <-
+      Client_menu_tools.js_string_of_px lineHeight;
+
     (* set angle position *)
     let angle_width = dom_angle##clientWidth - 1 in
     let _ =
       let css_margin = 2 in
-      let ox, _ = Dom_html.elementClientPosition dom_canvas in
-      dom_angle##style##left <- Js.string
-        (string_of_int (ox + width' + (css_margin * 2) - angle_width) ^ "px")
+      let ox, oy = Dom_html.elementClientPosition dom_canvas in
+      dom_angle##style##top <- Client_menu_tools.js_string_of_px oy;
+      dom_angle##style##left <- Client_menu_tools.js_string_of_px
+        (ox + width' + (css_margin * 2) - angle_width)
     in
 
     (* return result *)
