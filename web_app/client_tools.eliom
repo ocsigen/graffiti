@@ -49,13 +49,13 @@
     let direction = if current < target then 1 else -1 in
     let rec aux old =
       if ((direction > 0 && old >= target) ||
-	  (direction < 0 && old <= target))
+          (direction < 0 && old <= target))
       then Lwt.return ()
       else
-	(let newv = old + (step * direction) in
-	 ignore (func newv);
-	 lwt _ = Lwt_js.sleep elapsed_time in
-	 aux newv)
+        (let newv = old + (step * direction) in
+         ignore (func newv);
+         lwt _ = Lwt_js.sleep elapsed_time in
+         aux newv)
     in aux current
 
   (*** events's tools ***)

@@ -36,14 +36,14 @@
     let button () =
       let contract_menu = ref true in
       Lwt.async (fun () -> Lwt_js_events.clicks dom_button_palette
-	(fun _ _ ->
-	  (if not !contract_menu
-	   then (contract_menu := true;
-		 Client_tools.progressive_apply 0 (-196))
-	   else (contract_menu := false;
-		 Client_tools.progressive_apply (-196) 0))
-	    (fun v ->
-	      dom_palette##style##left <- Client_menu_tools.js_string_of_px v)))
+        (fun _ _ ->
+          (if not !contract_menu
+           then (contract_menu := true;
+                 Client_tools.progressive_apply 0 (-196))
+           else (contract_menu := false;
+                 Client_tools.progressive_apply (-196) 0))
+            (fun v ->
+              dom_palette##style##left <- Client_menu_tools.js_string_of_px v)))
     in Client_mobile.launch_only_on_small_screen button;
 
     (* Add listenner of resize event *)
@@ -56,7 +56,7 @@
       let new_height = (body_height - (margin * 2)) / nb_square_row in
       let rec aux = function
         | []            -> ()
-        | dom_div::tail	->
+        | dom_div::tail ->
           dom_div##style##height <- Js.string
             (string_of_int (new_height) ^ "px");
           aux tail
