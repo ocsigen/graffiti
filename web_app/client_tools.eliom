@@ -131,26 +131,26 @@
 
   (* slide *)
 
-  let slide_without_start move_events end_event move_func end_func =
-    Lwt.pick [move_events Dom_html.document##body move_func;
+  let slide_without_start move_events end_event moves_func end_func =
+    Lwt.pick [move_events Dom_html.document##body moves_func;
               end_event Dom_html.document##body >>= end_func]
 
   let slide_event
       (start_event: #Dom_html.eventTarget Js.t -> 'b Lwt.t)
       slide_without_start
       (dom_elt: #Dom_html.eventTarget Js.t)
-      start_func move_func end_func =
+      start_func moves_func end_func =
 
     start_event dom_elt >>= (fun ev ->
       Lwt.async (fun () -> start_func ev);
-      slide_without_start move_func end_func)
+      slide_without_start moves_func end_func)
 
   let slide_events start_events slide_without_start
-      dom_elt start_func move_func end_func =
+      dom_elt starts_func moves_func end_func =
 
     start_events dom_elt (fun ev lt ->
-      Lwt.async (fun () -> start_func ev lt);
-      slide_without_start move_func end_func)
+      Lwt.async (fun () -> starts_func ev lt);
+      slide_without_start moves_func end_func)
 
   let mouseslide_without_start =
     slide_without_start Lwt_js_events.mousemoves Lwt_js_events.mouseup
@@ -181,18 +181,36 @@
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
 
-  let touch_or_mouse_slide_base touchevent mouseevent
-      dom_elt start_func move_func end_func =
-    Lwt.pick [touchevent dom_elt (touch_handler start_func)
-                (touch_handler move_func) (touch_handler end_func);
-              mouseevent dom_elt (mouse_handler start_func)
-                (mouse_handler move_func) (mouse_handler end_func)]
+  let touch_or_mouse_start (dom_elt: #Dom_html.eventTarget Js.t) =
+    Lwt.pick [Lwt_js_events.touchstart dom_elt >>= (fun ev ->
+                Lwt.return (Touch_event ev));
+	      Lwt_js_events.mousedown dom_elt >>= (fun ev ->
+		Lwt.return (Mouse_event ev))]
 
-  let touch_or_mouse_slide (dom_elt: #Dom_html.eventTarget Js.t) =
-    touch_or_mouse_slide_base touchslide mouseslide dom_elt
+  let touch_or_mouse_without_start event moves_func end_func =
+    match event with
+      | Touch_event _	-> touchslide_without_start
+	(touch_handler moves_func) (touch_handler end_func)
+      | Mouse_event _	-> mouseslide_without_start
+	(mouse_handler moves_func) (mouse_handler end_func)
 
-  let touch_or_mouse_slides (dom_elt: #Dom_html.eventTarget Js.t) =
-    touch_or_mouse_slide_base touchslides mouseslides dom_elt
+  let touch_or_mouse_slide (dom_elt: #Dom_html.eventTarget Js.t)
+      start_func moves_func end_func =
+
+    lwt event = touch_or_mouse_start dom_elt in
+    Lwt.async (fun () -> start_func event);
+    touch_or_mouse_without_start event moves_func end_func
+
+
+  let touch_or_mouse_slides (dom_elt: #Dom_html.eventTarget Js.t)
+      starts_func moves_func end_func =
+
+    Lwt_js_events.seq_loop
+      (fun ?use_capture () -> touch_or_mouse_start dom_elt) ()
+      (fun ev lt ->
+	Lwt.async (fun () -> starts_func ev lt);
+	touch_or_mouse_without_start ev moves_func end_func)
+
 
   (* click *)
 
