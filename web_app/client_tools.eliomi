@@ -101,7 +101,7 @@
     'a -> ('b -> unit Lwt.t -> unit Lwt.t) -> unit Lwt.t
 
   (** Same as func_limited_loop but take time instead of function
-      By default elapsed_time = 0.05s = 50ms **)
+      By default elapsed_time = 0.1s = 100ms **)
   val limited_loop:
     (?use_capture:bool -> 'a -> 'b Lwt.t) ->
     ?elapsed_time:float ->

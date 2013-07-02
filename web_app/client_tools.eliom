@@ -114,7 +114,7 @@
         then handler ev lt
         else Lwt.return ())
 
-  let limited_loop event ?(elapsed_time=0.05) =
+  let limited_loop event ?(elapsed_time=0.1) =
     func_limited_loop event (fun () -> Lwt_js.sleep elapsed_time)
 
   let limited_onresizes ?elapsed_time t =
