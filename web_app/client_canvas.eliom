@@ -71,15 +71,15 @@
     in
 
     Dom_html.document##body##style##lineHeight <-
-      Client_menu_tools.js_string_of_px lineHeight;
+      Client_tools.js_string_of_px lineHeight;
 
     (* set angle position *)
     let angle_width = dom_angle##clientWidth - 1 in
     let _ =
       let css_margin = 2 in
       let ox, oy = Dom_html.elementClientPosition dom_canvas in
-      dom_angle##style##top <- Client_menu_tools.js_string_of_px oy;
-      dom_angle##style##left <- Client_menu_tools.js_string_of_px
+      dom_angle##style##top <- Client_tools.js_string_of_px oy;
+      dom_angle##style##left <- Client_tools.js_string_of_px
         (ox + width' + (css_margin * 2) - angle_width)
     in
 

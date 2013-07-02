@@ -31,20 +31,27 @@
     in
     let nb_square_row = (List.length color_square_list) / 2 in
 
-    (* Add listenner of touch events on small screen *)
+    (* Add listenner of click on small screen *)
     (* for palette menu *)
+    let progressive_func v =
+      dom_palette##style##left <- Client_tools.js_string_of_px v
+    in
+    let contract () = Client_tools.progressive_apply 0 (-196) progressive_func
+    in
+    let dilate () = Client_tools.progressive_apply (-196) 0 progressive_func in
+
     let button () =
-      let contract_menu = ref true in
       Lwt.async (fun () -> Lwt_js_events.clicks dom_button_palette
-        (fun _ _ ->
-          (if not !contract_menu
-           then (contract_menu := true;
-                 Client_tools.progressive_apply 0 (-196))
-           else (contract_menu := false;
-                 Client_tools.progressive_apply (-196) 0))
-            (fun v ->
-              dom_palette##style##left <- Client_menu_tools.js_string_of_px v)))
+        (fun _ _ -> match (Js.to_string dom_palette##style##left) with
+          | "0px"       -> contract ()
+          | _           -> dilate ()))
     in Client_mobile.launch_only_on_small_screen button;
+
+    (* Add touch slide listenner on small screen *)
+    let touch_slide_button () = Lwt.async (fun () ->
+      Client_tools.languet dom_button_palette dom_palette
+	Client_tools.Lg_left (-196) 0)
+    in (* Client_mobile.launch_only_on_small_screen  *)touch_slide_button ();
 
     (* Add listenner of resize event *)
 

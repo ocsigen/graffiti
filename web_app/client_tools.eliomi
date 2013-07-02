@@ -32,10 +32,19 @@
   (** First arg is the id of touch *)
   val get_touch_coord : int -> Dom_html.touchEvent Js.t -> int * int
 
-  val get_local_event_position :
+  (** First arg is the target *)
+  val get_local_event_coord :
     #Dom_html.element Js.t ->
     < clientX : < get : int; .. > Js.gen_prop;
       clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
+    int * int
+
+  (** First arg is the target
+      The second is the index of touch *)
+  val get_local_touch_event_coord :
+    #Dom_html.element Js.t ->
+    int ->
+    Dom_html.touchEvent Js.t ->
     int * int
 
   (* mobile tools *)
@@ -55,6 +64,9 @@
     (int -> 'a) ->
     unit Lwt.t
 
+  (* others *)
+
+  val js_string_of_px : int -> Js.js_string Js.t
 
   (*** events' tools ***)
 
@@ -202,6 +214,14 @@
   (** The first arg is the id for touch event *)
   val get_slide_coord : int -> slide_event -> int * int
 
+  (** The first arg is the target
+      The second arg is the id for touch event *)
+  val get_local_slide_coord :
+    #Dom_html.element Js.t ->
+    int ->
+    slide_event ->
+    int * int
+
   (** Same as mouseslide or touchslide but handle the both *)
   val touch_or_mouse_slide:
     #Dom_html.eventTarget Js.t ->
@@ -217,6 +237,27 @@
     (slide_event -> unit Lwt.t -> unit Lwt.t) ->
     (slide_event -> unit Lwt.t -> unit Lwt.t) ->
     (slide_event -> unit Lwt.t) ->
+    unit Lwt.t
+
+ (* languet tools *)
+
+  type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
+
+ (** Handle left languet
+
+     First arg is the target of event
+     Second arg is the element to move
+     First int is min value
+     Second int is max value *)
+  val languet :
+    #Dom_html.eventTarget Js.t ->
+    #Dom_html.element Js.t ->
+    languet_orientation ->
+    ?start_callback: (unit -> 'a Lwt.t) ->
+    ?move_callback: (unit -> 'b Lwt.t) ->
+    ?end_callback: (unit -> 'c Lwt.t) ->
+    int ->
+    int ->
     unit Lwt.t
 
   (* click *)

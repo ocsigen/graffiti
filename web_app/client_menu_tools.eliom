@@ -2,9 +2,6 @@
 
   open Lwt
 
-  (* Js tools *)
-  let js_string_of_px px = Js.string (string_of_int px ^ "px")
-
   (*** Tools **)
   let hide_element dom_html = dom_html##style##display <- Js.string "none"
   let show_element dom_html = dom_html##style##display <- Js.string "inline"

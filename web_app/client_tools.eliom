@@ -37,9 +37,14 @@
     let ev = event##touches##item(idx) in
     Js.Optdef.case ev (fun () -> (0, 0)) get_coord
 
-  let get_local_event_position dom_elt ev =
+  let get_local_event_coord dom_elt ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
     let x, y =  get_coord ev in
+    x - ox, y - oy
+
+  let get_local_touch_event_coord dom_elt idx ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y =  get_touch_coord idx ev in
     x - ox, y - oy
 
   (* mobile tools *)
@@ -57,6 +62,10 @@
          lwt _ = Lwt_js.sleep elapsed_time in
          aux newv)
     in aux current
+
+  (* others *)
+
+  let js_string_of_px px = Js.string (string_of_int px ^ "px")
 
   (*** events's tools ***)
 
@@ -179,6 +188,10 @@
     | Touch_event ev    -> get_touch_coord idx ev
     | Mouse_event ev    -> get_coord ev
 
+  let get_local_slide_coord dom_elt idx = function
+    | Touch_event ev    -> get_local_touch_event_coord dom_elt idx ev
+    | Mouse_event ev    -> get_local_event_coord dom_elt ev
+
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
 
@@ -212,6 +225,71 @@
         lwt _ = starts_func ev lt in
         touch_or_mouse_without_start ev moves_func end_func)
 
+  (* languet tools *)
+
+  type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
+
+  let languet (target: #Dom_html.eventTarget Js.t)
+      (dom_elt: #Dom_html.element Js.t)
+      orientation
+      ?start_callback ?move_callback ?end_callback
+      min max =
+
+    let last_diff = ref 0 in
+    let old_coord = ref (0, 0) in
+    let save_coord ev = old_coord := get_local_slide_coord dom_elt 0 ev in
+    let launch_callback = function
+      | Some func -> Lwt.async func
+      | _         -> ()
+    in
+
+    let get_offset () = match orientation with
+      | Lg_left		-> dom_elt##offsetLeft
+      | Lg_right	-> Dom_html.document##body##offsetWidth -
+	dom_elt##offsetLeft - dom_elt##offsetWidth
+      | Lg_down		-> Dom_html.document##body##offsetHeight -
+	dom_elt##offsetTop - dom_elt##offsetHeight
+      | Lg_up		-> dom_elt##offsetTop
+    in
+    let set_v v = match orientation with
+      | Lg_left		-> dom_elt##style##left <- js_string_of_px v;
+      | Lg_right	-> dom_elt##style##right <- js_string_of_px v;
+      | Lg_down		-> dom_elt##style##bottom <- js_string_of_px v;
+      | Lg_up		-> dom_elt##style##top <- js_string_of_px v;
+    in
+
+     touch_or_mouse_slides target
+        (fun ev _ ->
+	  save_coord ev;
+	  Lwt.return (launch_callback start_callback))
+        (fun ev _ ->
+	  let new_coord = get_local_slide_coord dom_elt 0 ev in
+	  let diff_x, diff_y =
+	    (fst new_coord) - (fst !old_coord),
+	    (snd new_coord) - (snd !old_coord)
+	  in
+	  let diff = match orientation with
+	    | Lg_left	-> diff_x
+	    | Lg_right	-> diff_x
+	    | Lg_down	-> diff_y
+	    | Lg_up	-> diff_y
+	  in
+	  let old_v = get_offset () in
+	  let new_v =
+	    let tmp = old_v + diff in
+	    if tmp < min then min
+	    else if tmp > max then max
+	    else tmp
+	  in
+	  set_v new_v;
+	  last_diff := diff;
+	  save_coord ev;
+	  Lwt.return (launch_callback move_callback))
+        (fun ev ->
+	  let target = if !last_diff > 0 then max else min in
+	  let offset = get_offset () in
+	  lwt _ = progressive_apply offset target set_v in
+	  Lwt.return (launch_callback end_callback))
 
   (* click *)
 
