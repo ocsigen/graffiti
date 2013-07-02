@@ -146,7 +146,7 @@
       (fun ev _ -> set_coord (Client_tools.get_slide_coord 0 ev);
                    line (Client_tools.get_slide_coord 0 ev))
       (fun ev _ -> line (Client_tools.get_slide_coord 0 ev))
-      (fun _ -> Lwt.return ()));
+      (fun ev -> line (Client_tools.get_slide_coord 0 ev)));
 
     (* fix drag and drop to avoid to catch canvas during drawing *)
     ignore (Client_tools.disable_drag_and_drop dom_canvas);

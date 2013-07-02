@@ -131,7 +131,7 @@
     (Dom_html.document Js.t -> 'c Lwt.t) ->
     ('a -> 'b Lwt.t -> 'b Lwt.t) ->
     ('c -> 'b Lwt.t) ->
-    'b Lwt.t
+    unit Lwt.t
 
   (** First is start event
       Second is function which take move_func and end_func
