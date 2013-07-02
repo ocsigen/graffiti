@@ -39,7 +39,7 @@
 
   let get_local_event_position dom_elt ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y = get_coord ev in
+    let x, y =  get_coord ev in
     x - ox, y - oy
 
   (* mobile tools *)

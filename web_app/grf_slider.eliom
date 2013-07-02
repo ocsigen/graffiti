@@ -76,42 +76,32 @@ let start (slider, dragger, ori, value,
   (* get data *)
   let dom_slider = Eliom_content.Html5.To_dom.of_div slider in
   let dom_dragger = Eliom_content.Html5.To_dom.of_div dragger in
+
   let margin = 4 in
   let slider_width, slider_height =
     ref (dom_slider##clientWidth - margin * 2),
     ref (dom_slider##clientHeight - margin * 2)
   in
-  let dragger_width, dragger_height =
-    dom_dragger##clientWidth, dom_dragger##clientHeight
+  let dragger_width, dragger_height = Client_tools.get_size dom_dragger in
+
+  let ox_slider, oy_slider =
+    let ox, oy = Dom_html.elementClientPosition dom_slider in
+    ref ox, ref oy
   in
   let max_width = ref (float_of_int (!slider_width - dragger_width)) in
   let max_height = ref (float_of_int (!slider_height - dragger_height)) in
 
   (* tools *)
-  let last_coord = ref (0, 0) in
-  let save_coord (x, y) = last_coord := (x, y) in
-  let get_x (x, _) = x in
-  let get_y (_, y) = y in
-  let diff_coord (x, y) =
-    x - get_x !last_coord, y - get_y !last_coord
-  in
-
   let set_value v =
-    if (v < 0.) then (value := 0. ; false)
-    else if (v > 1.) then (value := 1. ; false)
-    else (value := v ; true)
+    if (v < 0.) then value := 0.
+    else if (v > 1.) then value := 1.
+    else value := v
   in
 
-  let x_value = ref 0 in
-  let x_of_value () =
-    x_value := int_of_float (!max_width *. !value); !x_value
-  in
+  let x_of_value () = int_of_float (!max_width *. !value) in
   let value_of_x x = set_value ((float_of_int x) /. !max_width) in
 
-  let y_value = ref 0 in
-  let y_of_value () =
-    y_value := int_of_float (!max_height *. !value); !y_value
-  in
+  let y_of_value () = int_of_float (!max_height *. !value) in
   let value_of_y y = set_value ((float_of_int y) /. !max_height) in
 
   let set_dragger_position () = match ori with
@@ -122,13 +112,10 @@ let start (slider, dragger, ori, value,
   in
 
   let set_coord coord =
-    let diff_x, diff_y = diff_coord coord in
-    let accepted = match ori with
-      | Vertical        -> value_of_y (!y_value + diff_y)
-      | Horizontal      -> value_of_x (!x_value + diff_x)
-    in
-    set_dragger_position ();
-    if accepted then save_coord coord
+    let _ = match ori with
+      | Vertical        -> value_of_y ((snd coord) - (dragger_height / 2))
+      | Horizontal      -> value_of_x ((fst coord) - (dragger_width / 2))
+    in set_dragger_position ()
   in
 
   let launch_callback = function
@@ -143,24 +130,31 @@ let start (slider, dragger, ori, value,
   in
 
   (* move actions *)
-  let handle_one_event action_func callback ev =
-    let coord = Client_tools.get_slide_coord 0 ev in
-    action_func coord;
+  let handle_one_event callback ev =
+    let coord =
+      let x, y =  Client_tools.get_slide_coord 0 ev in
+      let x', y' = x - !ox_slider, y - !oy_slider in
+      x' - margin, y' - margin
+    in
+    set_coord coord;
     Lwt.return (launch_callback callback)
   in
 
   Lwt.async (fun () -> Client_tools.touch_or_mouse_slides dom_dragger
-    (fun ev _ -> handle_one_event save_coord !start_slide ev)
-    (fun ev _ -> handle_one_event set_coord !move_slide ev)
-    (handle_one_event set_coord !end_slide));
+    (fun ev _ -> handle_one_event !start_slide ev)
+    (fun ev _ -> handle_one_event !move_slide ev)
+    (handle_one_event !end_slide));
 
   (* click action *)
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->
-    let x, y = Client_tools.get_local_event_position dom_slider ev in
-    let x', y' = x - margin, y - margin in
+    let x, y =
+      let x, y = Client_tools.get_coord ev in
+      let x', y' = x - !ox_slider, y - !oy_slider in
+      x' - margin, y' - margin
+    in
     let _ = match ori with
-      | Vertical        -> value_of_y (y' - (dragger_height / 2))
-      | Horizontal      -> value_of_x (x' - (dragger_width / 2))
+      | Vertical        -> value_of_y (y - (dragger_height / 2))
+      | Horizontal      -> value_of_x (x - (dragger_width / 2))
     in
     set_dragger_position ();
     Lwt.return (launch_callback !click) ));
@@ -172,6 +166,9 @@ let start (slider, dragger, ori, value,
       slider_height := (dom_slider##clientHeight - margin * 2);
       max_width := (float_of_int (!slider_width - dragger_width));
       max_height := (float_of_int (!slider_height - dragger_height));
+      let ox, oy = Dom_html.elementClientPosition dom_slider in
+      ox_slider := ox;
+      oy_slider := oy;
       Lwt.return (set_dragger_position ()) ))
 
 }}
