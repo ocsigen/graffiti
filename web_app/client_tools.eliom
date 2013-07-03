@@ -245,9 +245,9 @@
 
     let get_offset () = match orientation with
       | Lg_left         -> dom_elt##offsetLeft
-      | Lg_right        -> Dom_html.document##body##offsetWidth -
+      | Lg_right        -> Dom_html.document##documentElement##clientWidth -
         dom_elt##offsetLeft - dom_elt##offsetWidth
-      | Lg_down         -> Dom_html.document##body##offsetHeight -
+      | Lg_down         -> Dom_html.document##documentElement##clientHeight -
         dom_elt##offsetTop - dom_elt##offsetHeight
       | Lg_up           -> dom_elt##offsetTop
     in
@@ -287,7 +287,6 @@
           Lwt.return (launch_callback move_callback))
         (fun ev ->
           let target = if !last_diff > 0 then max else min in
-          let offset = get_offset () in
           set_v target;
           Lwt.return (launch_callback end_callback))
 

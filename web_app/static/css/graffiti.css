@@ -94,8 +94,8 @@ td
     top: 25px;
     right: 0px;
     transition: 1s;
-    -webkit-transition: 1s;
-    box-shadow: 0px 0px 5px #555555;
+    /* -webkit-transition: 1s; */
+    /* box-shadow: 0px 0px 5px #555555; */
 }
 
 .save_link
@@ -189,8 +189,8 @@ canvas
     margin: 0px;
     height: 100%;
     width: 275px;
-    transition: 1s;
-    -webkit-transition: 1s;
+    /* transition: 1s; */
+    /* -webkit-transition: 1s; */
 }
 
 .palette_table_button
