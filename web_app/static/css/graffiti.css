@@ -189,6 +189,8 @@ canvas
     margin: 0px;
     height: 100%;
     width: 275px;
+    transition: 1s;
+    -webkit-transition: 1s;
 }
 
 .palette_table_button

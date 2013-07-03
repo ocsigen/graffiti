@@ -288,7 +288,7 @@
         (fun ev ->
           let target = if !last_diff > 0 then max else min in
           let offset = get_offset () in
-          lwt _ = progressive_apply offset target set_v in
+          set_v target;
           Lwt.return (launch_callback end_callback))
 
   (* click *)

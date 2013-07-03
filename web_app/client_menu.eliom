@@ -80,7 +80,7 @@
           dom_save_div##style##width <- Js.string "26px";
           Lwt.return (disable := true))
         ~end_callback:(fun () ->
-          let right =  Dom_html.document##body##offsetWidth -
+          let right =  Dom_html.document##documentElement##clientWidth -
             dom_save##offsetLeft - dom_save##offsetWidth
           in
           dom_save##style##right <- Js.string "0px";
