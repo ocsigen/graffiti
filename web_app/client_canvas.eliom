@@ -10,12 +10,11 @@
     ctx##stroke()
 
   (** Calcul and set size of canvas **)
-  let init body_elt header_elt canvas_elt angle_elt =
+  let init body_elt header_elt canvas_elt =
 
     (*** Init data ***)
     let size = Client_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
-    let dom_angle = Eliom_content.Html5.To_dom.of_div angle_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 35
         else 230
@@ -49,24 +48,11 @@
     dom_canvas##height <- height';
 
     (* vertical center calcul *)
-    let lineHeight = (snd size) -
-      if Client_mobile.has_small_screen () then 0
-      else (Client_header.get_height body_elt header_elt)
-    in
+    let lineHeight = snd size - Client_header.get_height body_elt header_elt in
 
     (* set vertical center *)
     Dom_html.document##body##style##lineHeight <-
       Client_tools.js_string_of_px lineHeight;
-
-    (* set angle position *)
-    let angle_width = dom_angle##clientWidth - 1 in
-    let _ =
-      let css_margin = 2 in
-      let ox, oy = Dom_html.elementClientPosition dom_canvas in
-      dom_angle##style##top <- Client_tools.js_string_of_px oy;
-      dom_angle##style##left <- Client_tools.js_string_of_px
-        (ox + width' + (css_margin * 2) - angle_width)
-    in
 
     (* return result *)
     (width', height')

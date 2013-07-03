@@ -8,10 +8,10 @@
   type resized = Noresize | Startresize | Finishresize
 
   (** Start and handle draw's event  **)
-  let rec start body_elt header_elt canvas_elt angle_elt slider color_picker =
+  let rec start body_elt header_elt canvas_elt slider color_picker =
 
     (*** Init data***)
-    let size = Client_canvas.init body_elt header_elt canvas_elt angle_elt in
+    let size = Client_canvas.init body_elt header_elt canvas_elt in
     let width = ref (float_of_int (fst size)) in
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
@@ -132,7 +132,7 @@
       Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         resize := Startresize;
         let rc_width, rc_height =
-          Client_canvas.init body_elt header_elt canvas_elt angle_elt
+          Client_canvas.init body_elt header_elt canvas_elt
         in
         get_origine_canvas ();
         width := float_of_int rc_width;

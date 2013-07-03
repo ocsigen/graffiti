@@ -155,13 +155,17 @@ td
 canvas
 {
     margin-left: 220px;
-    margin-top: auto;
-    margin-bottom: auto;
     border-style:solid;
     border-width:2px;
     border-color:#F2F2F2;
     background-color:white;
     vertical-align: middle;
+}
+
+div#canvas {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
 }
 
 .angle_div
@@ -170,6 +174,8 @@ canvas
     height: 43px;
     background-image: url('/img/angle.png');
     position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .about_point

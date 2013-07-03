@@ -91,6 +91,6 @@ let header_elt =
   D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; canvas_elt; angle_elt;
+  ([header_elt; div ~a:[a_id "canvas"] [canvas_elt; angle_elt];
     save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
     starting_logo_elt])
