@@ -11,10 +11,7 @@
   let rec start body_elt header_elt canvas_elt angle_elt slider color_picker =
 
     (*** Init data***)
-    let (window_orientation, size) =
-      Client_canvas.init body_elt header_elt canvas_elt angle_elt
-    in
-    let win_orientation = ref window_orientation in
+    let size = Client_canvas.init body_elt header_elt canvas_elt angle_elt in
     let width = ref (float_of_int (fst size)) in
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
@@ -38,26 +35,13 @@
 
     (*** The initial image ***)
 
-    let copy_image dom_img =
-      let width', height' = match !win_orientation with
-        | Client_tools.Portrait         ->
-          ctx##save(); (* Essential to restore context after it *)
-          ctx##translate(!width, 0.);
-          ctx##rotate(1.57079633); (* 90 degree *)
-          !height, !width
-        | _                             -> !width, !height
-      in
-      ctx##drawImage_withSize(dom_img, 0., 0., width', height');
-      match !win_orientation with
-        | Client_tools.Portrait         ->
-          (* It is very important to restore context *)
-          (* Else nothing work any more *)
-          ctx##restore()
-        | _                             -> ()
-    in
-
     (** Handle set and reset image after window resize **)
     let reset_image () =
+
+      let copy_image dom_img =
+        ctx##drawImage_withSize(dom_img, 0., 0., !width, !height);
+      in
+
       let dom_img =
         (* allow to avoid cach image *)
         let attr = Client_tools.get_timestamp () in
@@ -98,18 +82,12 @@
           | Noresize           -> (oldx, oldy)
       in
 
-      let x1, y1, x2, y2 = match !win_orientation with
-        | Client_tools.Portrait -> oldy', 1. -. oldx', !y, 1. -. !x
-        | _                     -> oldx', oldy', !x, !y
-      in
-
       let color = Grf_color_picker.get_color color_picker in
       let brush_size = Client_ext_mod_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
-      (* It is differente when you are in Portrait view *)
       ((color, brush_size, (oldx', oldy'), (!x, !y)),
-       (color, brush_size, (x1, y1), (x2, y2)))
+       (color, brush_size, (oldx', oldy'), (!x, !y)))
 
     in
 
@@ -128,12 +106,8 @@
     in
 
     let bus_draw (color, brush_size, (x1, y1), (x2, y2)) =
-      let x1', y1', x2', y2'  = match !win_orientation with
-        | Client_tools.Portrait -> 1. -. y1, x1, 1. -. y2, x2
-        | _                     -> x1, y1, x2, y2
-      in
       Client_canvas.draw ctx !base_size !float_size
-        (color, brush_size, (x1', y1'), (x2', y2'))
+        (color, brush_size, (x1, y1), (x2, y2))
     in
 
     (*** Catch events ***)
@@ -158,11 +132,10 @@
     Lwt.async (fun () ->
       Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         resize := Startresize;
-        let (rc_win_o, (rc_width, rc_height)) =
+        let rc_width, rc_height =
           Client_canvas.init body_elt header_elt canvas_elt angle_elt
         in
         get_origine_canvas ();
-        win_orientation := rc_win_o;
         width := float_of_int rc_width;
         height := float_of_int rc_height;
         float_size := (!width, !height);

@@ -21,55 +21,40 @@
         else 230
     in
     let margin = 6 in
-    let width = (fst size) - (margin * 2) - width_canvas_margin in
-    let height = (snd size) - (margin * 2) -
+    let min_width = 100 in
+    let min_height = Shared_tools.get_min_resolution min_width in
+    let max_width = (fst size) - (margin * 2) - width_canvas_margin in
+    let max_height = (snd size) - (margin * 2) -
       (Client_header.get_height body_elt header_elt)
     in
 
-    (*** Tool ***)
-    (** if max = true, set max size, else, set min size **)
-    let set_size max value =
-      if ((width <= height && max) ||
-             width > height && not max)
-      then width, value
-      else value, height
+    (* limit size *)
+    let max_width', max_height' =
+      (if (max_width < min_width) then min_width else max_width),
+      (if (max_height < min_height) then min_height else max_height)
     in
 
-    (*** First calcul ***)
-    let window_orientation = Client_tools.get_window_orientation () in
-    let min = if (width <= height) then width else height in
-    let max = Shared_tools.get_max_resolution min in
+    (* calcul canvas' size *)
+    let width = max_width' in
+    let height = Shared_tools.get_min_resolution width in
 
-    (*** Check result ***)
-    (* If max value is out of window, it is wrong *)
-    let good_result = if (width <= height)
-      then (height >= max)
-      else (width >= max)
-    in
-
-    (* Try the other way if result is not a good_result *)
-    let width', height' = if (not good_result)
-      then (
-        let max = if (width > height) then width else height in
-        let min = Shared_tools.get_min_resolution max in
-
-        (* Second way set *)
-        set_size false min)
-
-      (* First way set *)
-      else (set_size true max)
+    let height', width' =
+      if height > max_height'
+      then max_height', Shared_tools.get_max_resolution max_height'
+      else height, width
     in
 
     (* Init canvas *)
     dom_canvas##width <- width';
     dom_canvas##height <- height';
 
-    let lineHeight = Dom_html.document##body##clientHeight -
-      if Client_mobile.has_small_screen ()
-      then 0
-      else ((Client_header.get_height body_elt header_elt) - 6)
+    (* vertical center calcul *)
+    let lineHeight = (snd size) -
+      if Client_mobile.has_small_screen () then 0
+      else (Client_header.get_height body_elt header_elt)
     in
 
+    (* set vertical center *)
     Dom_html.document##body##style##lineHeight <-
       Client_tools.js_string_of_px lineHeight;
 
@@ -84,6 +69,6 @@
     in
 
     (* return result *)
-    (window_orientation, (width', height'))
+    (width', height')
 
 }}
