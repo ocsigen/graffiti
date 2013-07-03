@@ -34,8 +34,6 @@
     (** Handle set and reset image after window resize **)
     let reset_image () =
 
-      lwt () = Lwt_mutex.lock bus_mutex in
-
       let copy_image dom_img =
         ctx##drawImage_withSize(dom_img, 0., 0., !width, !height);
       in
@@ -51,22 +49,13 @@
         Eliom_content.Html5.To_dom.of_img image_elt
       in
 
-      (* We wait for the image to be loaded before drawing it on canvas *)
-      if (Js.to_bool (dom_img##complete))
-      then begin
-        copy_image dom_img;
-        Lwt_mutex.unlock bus_mutex
-      end
-      else
-        Lwt_js_events.(async (fun () ->
-          lwt _ = load dom_img in
-          copy_image dom_img;
-          Lwt_mutex.unlock bus_mutex;
-          Lwt.return ()));
-      Lwt.return ()
+      let check_load_image copy_func img =
+        if (Js.to_bool (img##complete))
+        then copy_func img
+        else img##onload <- Dom_html.handler (fun _ -> copy_func img; Js._true)
+      in check_load_image copy_image dom_img;
 
-    in
-    Lwt.async reset_image;
+    in reset_image ();
 
     (*** Tools ***)
     let set_coord (x2, y2) =
@@ -100,16 +89,13 @@
     in
 
     let bus_draw (color, brush_size, (x1, y1), (x2, y2)) =
-      lwt () = Lwt_mutex.lock bus_mutex in
       Client_canvas.draw ctx !base_size !float_size
-        (color, brush_size, (x1, y1), (x2, y2));
-      Lwt_mutex.unlock bus_mutex;
-      Lwt.return ()
+        (color, brush_size, (x1, y1), (x2, y2))
     in
 
     (*** Catch events ***)
     Lwt.async (fun () ->
-      Lwt_stream.iter_s bus_draw (Eliom_bus.stream %Server_image.bus));
+      Lwt_stream.iter bus_draw (Eliom_bus.stream %Server_image.bus));
 
     (** drawing events **)
     Lwt.async (fun () -> Client_tools.touch_or_mouse_slides dom_canvas
@@ -137,7 +123,8 @@
         float_size := (!width, !height);
         base_size := !height;
         ctx##lineCap <- Js.string "round";
-        reset_image ()));
+        reset_image ();
+        Lwt.return ()));
 
     (* return value *)
     Lwt.return ()
