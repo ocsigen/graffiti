@@ -244,52 +244,52 @@
     in
 
     let get_offset () = match orientation with
-      | Lg_left		-> dom_elt##offsetLeft
-      | Lg_right	-> Dom_html.document##body##offsetWidth -
-	dom_elt##offsetLeft - dom_elt##offsetWidth
-      | Lg_down		-> Dom_html.document##body##offsetHeight -
-	dom_elt##offsetTop - dom_elt##offsetHeight
-      | Lg_up		-> dom_elt##offsetTop
+      | Lg_left         -> dom_elt##offsetLeft
+      | Lg_right        -> Dom_html.document##body##offsetWidth -
+        dom_elt##offsetLeft - dom_elt##offsetWidth
+      | Lg_down         -> Dom_html.document##body##offsetHeight -
+        dom_elt##offsetTop - dom_elt##offsetHeight
+      | Lg_up           -> dom_elt##offsetTop
     in
     let set_v v = match orientation with
-      | Lg_left		-> dom_elt##style##left <- js_string_of_px v;
-      | Lg_right	-> dom_elt##style##right <- js_string_of_px v;
-      | Lg_down		-> dom_elt##style##bottom <- js_string_of_px v;
-      | Lg_up		-> dom_elt##style##top <- js_string_of_px v;
+      | Lg_left         -> dom_elt##style##left <- js_string_of_px v;
+      | Lg_right        -> dom_elt##style##right <- js_string_of_px v;
+      | Lg_down         -> dom_elt##style##bottom <- js_string_of_px v;
+      | Lg_up           -> dom_elt##style##top <- js_string_of_px v;
     in
 
      touch_or_mouse_slides target
         (fun ev _ ->
-	  save_coord ev;
-	  Lwt.return (launch_callback start_callback))
+          save_coord ev;
+          Lwt.return (launch_callback start_callback))
         (fun ev _ ->
-	  let new_coord = get_local_slide_coord dom_elt 0 ev in
-	  let diff_x, diff_y =
-	    (fst new_coord) - (fst !old_coord),
-	    (snd new_coord) - (snd !old_coord)
-	  in
-	  let diff = match orientation with
-	    | Lg_left	-> diff_x
-	    | Lg_right	-> diff_x
-	    | Lg_down	-> diff_y
-	    | Lg_up	-> diff_y
-	  in
-	  let old_v = get_offset () in
-	  let new_v =
-	    let tmp = old_v + diff in
-	    if tmp < min then min
-	    else if tmp > max then max
-	    else tmp
-	  in
-	  set_v new_v;
-	  last_diff := diff;
-	  save_coord ev;
-	  Lwt.return (launch_callback move_callback))
+          let new_coord = get_local_slide_coord dom_elt 0 ev in
+          let diff_x, diff_y =
+            (fst new_coord) - (fst !old_coord),
+            (snd new_coord) - (snd !old_coord)
+          in
+          let diff = match orientation with
+            | Lg_left   -> diff_x
+            | Lg_right  -> diff_x
+            | Lg_down   -> diff_y
+            | Lg_up     -> diff_y
+          in
+          let old_v = get_offset () in
+          let new_v =
+            let tmp = old_v + diff in
+            if tmp < min then min
+            else if tmp > max then max
+            else tmp
+          in
+          set_v new_v;
+          last_diff := diff;
+          save_coord ev;
+          Lwt.return (launch_callback move_callback))
         (fun ev ->
-	  let target = if !last_diff > 0 then max else min in
-	  let offset = get_offset () in
-	  lwt _ = progressive_apply offset target set_v in
-	  Lwt.return (launch_callback end_callback))
+          let target = if !last_diff > 0 then max else min in
+          let offset = get_offset () in
+          lwt _ = progressive_apply offset target set_v in
+          Lwt.return (launch_callback end_callback))
 
   (* click *)
 
