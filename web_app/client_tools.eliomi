@@ -101,10 +101,14 @@
 
   (* limited *)
 
-  (** Execute handler with last event from events' queue
-      separate by the maximum time gived by execute time of limited_func
+  (** [func_limited_loop e delay_fun target handler] will behave like
+      [Lwt_js_events.async_loop e target handler] but it will run [delay_fun]
+      first, and execut [handler] only when [delay_fun] is finished and
+      no other event occurred in the meantime.
 
-      Be careful, it is a asynchrone loop, so if you give too little time,
+      This allows to limit the number of events catched.
+
+      Be careful, it is an asynchrone loop, so if you give too little time,
       several instances of your handler could be run in same time **)
   val func_limited_loop :
     (?use_capture:bool -> 'a -> 'b Lwt.t) ->

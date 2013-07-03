@@ -114,6 +114,7 @@
   (* limited *)
 
   let func_limited_loop event limited_func ?use_capture target handler =
+    (* Could probably be optimized!! Check! *)
     let count = ref 0 in
     Lwt_js_events.async_loop event ?use_capture target
       (fun ev lt -> incr count;

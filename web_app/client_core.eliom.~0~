@@ -3,6 +3,10 @@
   open Lwt
   open Eliom_content.Html5.D
 
+  (** This type allow in theory to handle drawing during resize **)
+  (** But it does not work **)
+  type resized = Noresize | Startresize | Finishresize
+
   (** Start and handle draw's event  **)
   let rec start body_elt header_elt canvas_elt slider color_picker =
 
@@ -12,7 +16,7 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
-    let base_size = ref (min !width !height) in
+    let base_size = ref !height in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
 
@@ -69,12 +73,20 @@
 
       set_coord coord;
 
+      (** Try to handle drawing during resize but it does not work **)
+      let oldx', oldy' =
+        match !resize with
+          | Finishresize       -> resize := Noresize; (!x, !y)
+          | Startresize        -> (!x, !y)
+          | Noresize           -> (oldx, oldy)
+      in
+
       let color = Grf_color_picker.get_color color_picker in
       let brush_size = Client_ext_mod_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
-      ((color, brush_size, (oldx, oldy), (!x, !y)),
-       (color, brush_size, (oldx, oldy), (!x, !y)))
+      ((color, brush_size, (oldx', oldy'), (!x, !y)),
+       (color, brush_size, (oldx', oldy'), (!x, !y)))
 
     in
 
@@ -82,9 +94,13 @@
       let vo, vb = compute_line coord in
 
       (** Try to handle drawing during resize but it does not work **)
-      ignore (Eliom_bus.write %Server_image.bus vb);
-      (* Draw in advance to avoid visual lag *)
-      Client_canvas.draw ctx !base_size !float_size vo;
+      let _ = match !resize with
+        | Startresize  -> ()
+        | _            ->
+          ignore (Eliom_bus.write %Server_image.bus vb);
+          (* Draw in advance to avoid visual lag *)
+          Client_canvas.draw ctx !base_size !float_size vo;
+      in
       Lwt.return ()
     in
 
@@ -114,6 +130,7 @@
     (* handle resize of canvas and redraw image *)
     Lwt.async (fun () ->
       Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
+        resize := Startresize;
         let rc_width, rc_height =
           Client_canvas.init body_elt header_elt canvas_elt
         in
@@ -124,6 +141,7 @@
         base_size := !height;
         ctx##lineCap <- Js.string "round";
         reset_image ();
+        resize := Finishresize;
         Lwt.return ()));
 
     (* return value *)
