@@ -16,7 +16,7 @@
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
     let resize = ref Noresize in
-    let base_size = ref (min !width !height) in
+    let base_size = ref !height in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
 
@@ -138,7 +138,7 @@
         width := float_of_int rc_width;
         height := float_of_int rc_height;
         float_size := (!width, !height);
-        base_size := min !width !height;
+        base_size := !height;
         ctx##lineCap <- Js.string "round";
         reset_image ();
         resize := Finishresize;

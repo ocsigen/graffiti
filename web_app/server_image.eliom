@@ -40,8 +40,7 @@ let small_ctx = Cairo.create small_surface
 let medium_ctx = Cairo.create medium_surface
 let ctx = Cairo.create large_surface
 
-let base_size = float_of_int
-  (min large_image_width large_image_height)
+let base_size = float_of_int large_image_height
 
 let draw_server ((color : string), size, (x1, y1), (x2, y2)) =
   (* Set thickness of brush *)

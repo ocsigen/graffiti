@@ -13,8 +13,7 @@
     let dom_button_palette = Eliom_content.Html5.To_dom.of_td palette_button in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
-    let width, height = Client_tools.get_size dom_canvas in
-    let base_size = min width height in
+    let base_size = ref (float_of_int dom_canvas##clientHeight) in
 
     (* Elarge color picker on computer *)
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
@@ -59,8 +58,8 @@
     (* calcul and resize square color to take the maximum of space *)
     let handle_color_square_resize () =
       let margin = 8 in
-      let body_height = Dom_html.document##documentElement##clientHeight in
-      let new_height = (body_height - (margin * 2)) / nb_square_row in
+      let doc_height = Dom_html.document##documentElement##clientHeight in
+      let new_height = (doc_height - (margin * 2)) / nb_square_row in
       let rec aux = function
         | []            -> ()
         | dom_div::tail ->
@@ -77,7 +76,7 @@
       let brush_size = Js.string (string_of_int
         (int_of_float (
           ((Client_ext_mod_tools.get_slider_value slider) *.
-            (float_of_int base_size)))) ^ "px")
+            !base_size))) ^ "px")
       in
       dom_color##style##width <- brush_size;
       dom_color##style##height <- brush_size;
@@ -85,6 +84,11 @@
     in
     Grf_slider.change_move_slide_callback slider handler;
     Grf_slider.change_click_callback slider handler;
+
+    (* Handle recalcul base canvas size *)
+    Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
+      (fun _ _ -> Lwt.return
+	(base_size := (float_of_int dom_canvas##clientHeight))));
 
     (* start slider script *)
     Grf_slider.start slider;
