@@ -142,9 +142,8 @@
   (* slide *)
 
   let slide_without_start move_events end_event moves_func end_func =
-    Lwt.return (Lwt.async (fun () ->
-      Lwt.pick [move_events Dom_html.document moves_func;
-                end_event Dom_html.document >>= end_func]))
+    Lwt.pick [move_events Dom_html.document moves_func;
+              end_event Dom_html.document >>= end_func]
 
   let slide_event
       (start_event: #Dom_html.eventTarget Js.t -> 'b Lwt.t)

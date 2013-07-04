@@ -118,7 +118,7 @@
       (fun ev _ -> line (Client_tools.get_slide_coord 0 ev))
       (fun ev -> line (Client_tools.get_slide_coord 0 ev)));
 
-    (* fix drag and drop to avoid to catch canvas during drawing *)
+    (* fix drag and drop to avoid to drag canvas during drawing *)
     ignore (Client_tools.disable_drag_and_drop dom_canvas);
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
