@@ -90,8 +90,8 @@ let small_image_string () =
 let large_image_string () =
   image_string large_surface
 
-let cmp_small w h = (w <= small_image_width && h <= small_image_height)
-let cmp_medium w h = (w <= medium_image_width && h <= medium_image_height)
+let cmp_small w = w <= small_image_width
+let cmp_medium w = w <= medium_image_width
 
 let download_imageservice =
   Eliom_registration.String.register_service
@@ -108,14 +108,10 @@ let large_download_imageservice =
 let imageservice =
   Eliom_registration.String.register_service
     ~path:["image"; "adaptation.png"]
-    ~get_params:Eliom_parameter.(int "width" ** int "height" ** int "time")
-    (fun (width, (height, _)) () -> Lwt.return
-      (let width', height' = if width >= height
-        then width, height
-        else height, width
-       in
-       (match width', height' with
-         | w, h when (cmp_small w h)     -> small_image_string ()
-         | w, h when (cmp_medium w h)    -> medium_image_string ()
-         | _                             -> large_image_string ()),
-       "image/png"))
+    ~get_params:Eliom_parameter.(int "width" ** int "time")
+    (fun (width, _) () -> Lwt.return
+      ((match width with
+        | w when (cmp_small w)  -> small_image_string ()
+        | w when (cmp_medium w) -> medium_image_string ()
+        | _                     -> large_image_string ()),
+      "image/png"))

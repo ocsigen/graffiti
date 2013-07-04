@@ -48,8 +48,7 @@
         let image_elt =
           img ~alt:("source image")
             ~src:(make_uri ~service:%Server_image.imageservice
-                      (int_of_float !width,
-                       (int_of_float !height, attr))) ()
+                    (int_of_float !width, attr)) ()
         in
         Eliom_content.Html5.To_dom.of_img image_elt
       in
