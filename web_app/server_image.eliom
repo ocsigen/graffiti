@@ -1,4 +1,6 @@
 
+open Lwt
+
 (* values *)
 
 let small_image_width = 480
@@ -14,6 +16,79 @@ let large_image_height = Shared_tools.get_min_resolution large_image_width
 
 let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
   ~size:500 Json.t<Shared_tools.messages>
+
+(* file *)
+
+let save_file = Lwt_unix.openfile "drawing.log"
+  [Lwt_unix.O_RDWR; Lwt_unix.O_CREAT; Lwt_unix.O_APPEND] 0o644
+
+let output_file =
+  lwt file = save_file in
+  Lwt.return
+    (Lwt_io.make
+       ~mode:Lwt_io.output
+       (Lwt_bytes.write file))
+
+let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
+  lwt output = output_file in
+  let (^^) a b = a ^ " " ^ b in
+  let date =
+    let tm = Unix.gmtime (Unix.time ()) in
+    let to_str = string_of_int in
+    "null"
+    (* (to_str tm.tm_mday) ^^ (to_str tm.tm_mon) ^^ (to_str tm.tm_year) ^^ *)
+    (* (to_str tm.tm_hour) ^ "h" ^ (to_str tm.tm_min) ^ "m" ^ *)
+    (* (to_str tm.tm_sec) ^ "s" *)
+  in
+  let to_str = string_of_float in
+  let str = date ^^ ip ^^ color ^^ (to_str brush_size) ^^
+    (to_str oldx) ^^ (to_str oldy) ^^ (to_str x) ^^ (to_str y)
+  in
+  Lwt_io.write_line output str
+
+let input_file =
+  lwt file = save_file in
+  Lwt.return
+    (Lwt_io.make
+       ~mode:Lwt_io.input
+       (Lwt_bytes.read file))
+
+let read_log () =
+  lwt input = input_file in
+  lwt str = Lwt_io.read_line input in
+
+  let lstr = Str.split (Str.regexp " ") str in
+
+  try
+
+    let date =
+      let mday = List.nth lstr 0 in
+      let mon = List.nth lstr 1 in
+      let year = List.nth lstr 2 in
+      let hms = List.nth lstr 3 in
+      let ltime = Str.split (Str.regexp "[hms]") hms in
+      let hour = List.nth ltime 0 in
+      let min = List.nth ltime 1 in
+      let sec = List.nth ltime 2 in
+      mday, mon, year, hour, min, sec
+    in
+
+    let ip = List.nth lstr 4 in
+
+    let message =
+      let color = List.nth lstr 5 in
+      let brush_size = List.nth lstr 6 in
+      let oldx = List.nth lstr 7 in
+      let oldy = List.nth lstr 8 in
+      let x = List.nth lstr 9 in
+      let y = List.nth lstr 10 in
+      let to_flt = float_of_string in
+      color, to_flt brush_size, (to_flt oldx, to_flt oldy), (to_flt x, to_flt y)
+    in
+
+    Lwt.return (date, ip, message)
+
+  with e        -> failwith "Invalide format"
 
 (* surfaces *)
 
@@ -43,6 +118,10 @@ let ctx = Cairo.create large_surface
 let base_size = float_of_int large_image_height
 
 let draw_server ((color : string), size, (x1, y1), (x2, y2)) =
+
+  (* save log *)
+  Lwt.async (fun () -> write_log "127.0.0.1" (color, size, (x1, y1), (x2, y2)));
+
   (* Set thickness of brush *)
   Cairo.set_line_width ctx (size *. base_size);
   Cairo.set_line_join ctx Cairo.JOIN_ROUND;
