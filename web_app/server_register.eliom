@@ -38,6 +38,7 @@ let _ =
                   %Server_html.body_elt
                   %Server_html.header_elt
                   %Server_html.canvas_elt
+                  %Server_html.canvas2_elt
                   %Server_html.grf_slider
                   %Server_html.color_picker);
 

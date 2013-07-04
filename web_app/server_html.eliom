@@ -42,6 +42,11 @@ let canvas_elt =
              a_class["unselectable"]]
     [pcdata "your browser doesn't support canvas"]
 
+let canvas2_elt =
+  D.canvas ~a:[a_width start_width; a_height start_height;
+               a_class["canvas2"; "unselectable"]] []
+
+
 let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
 
 (* save elements *)
@@ -91,6 +96,6 @@ let header_elt =
   D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; div ~a:[a_id "canvas"] [canvas_elt; angle_elt];
+  ([header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
     save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
     starting_logo_elt])

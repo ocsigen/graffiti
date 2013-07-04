@@ -10,11 +10,12 @@
     ctx##stroke()
 
   (** Calcul and set size of canvas **)
-  let init body_elt header_elt canvas_elt =
+  let init body_elt header_elt canvas_elt canvas2_elt =
 
     (*** Init data ***)
     let size = Client_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let dom_canvas2 = Eliom_content.Html5.To_dom.of_canvas canvas2_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
         then 35
         else 230
@@ -44,8 +45,12 @@
     in
 
     (* Init canvas *)
-    dom_canvas##width <- width';
-    dom_canvas##height <- height';
+    let init_canvas dom_canvas =
+      dom_canvas##width <- width';
+      dom_canvas##height <- height'
+    in
+    init_canvas dom_canvas;
+    init_canvas dom_canvas2;
 
     (* vertical center calcul *)
     let lineHeight = snd size - Client_header.get_height body_elt header_elt in

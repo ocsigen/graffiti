@@ -162,6 +162,16 @@ canvas
     vertical-align: middle;
 }
 
+.canvas2
+{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    border-color: transparent;
+    background-color: transparent;
+}
+
 div#canvas {
   position: relative;
   display: inline-block;
