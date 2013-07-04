@@ -11,8 +11,8 @@
     let width = ref (float_of_int (fst size)) in
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
-    let resize = ref Noresize in
-    let base_size = ref (min !width !height) in
+    let bus_mutex = Lwt_mutex.create () in
+    let base_size = ref !height in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
 
