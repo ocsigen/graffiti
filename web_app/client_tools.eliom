@@ -26,8 +26,8 @@
   (* time *)
 
   let get_timestamp () =
-    (let date = jsnew Js.date_now () in
-     int_of_float (Js.to_float (date##getTime ())))
+    let date = jsnew Js.date_now () in
+    Js.to_float (date##getTime ())
 
   (* position / coordinated *)
 

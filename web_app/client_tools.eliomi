@@ -20,7 +20,7 @@
 
   (* time *)
 
-  val get_timestamp : unit -> int
+  val get_timestamp : unit -> float
 
   (* position / coordinated *)
 
