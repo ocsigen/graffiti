@@ -28,6 +28,9 @@ let _ =
       (*** init client ***)
       ignore {unit{
 
+	(* Remove navigation bar *)
+	Client_mobile.init ();
+
         (* Random logo image *)
         Client_header.rand_logo
           %Server_html.body_elt

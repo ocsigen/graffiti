@@ -68,4 +68,6 @@
     then small_screen ()
     else normal_screen ()
 
+  let init () = Dom_html.window##scroll(0,1)
+
 }}
