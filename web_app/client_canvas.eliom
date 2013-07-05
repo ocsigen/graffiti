@@ -74,26 +74,22 @@
       let dom_img =
 	(* create js image object to avoid long time loading in webkit *)
 	let dom_img = Dom_html.createImg Dom_html.document in
-        (* allow to avoid cach image *)
-        let attr = Client_tools.get_timestamp () in
-	dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
-				     ~service:%Server_image.imageservice
-				     (int_of_float width, attr));
+	dom_img##src <- Js.string "";
 	dom_img
       in
 
       (* We wait for the image to be loaded before drawing it on canvas *)
-      if (Js.to_bool (dom_img##complete))
-      then begin
-        copy_image dom_img;
-        Lwt_mutex.unlock bus_mutex
-      end
-      else
-        Lwt_js_events.(async (fun () ->
-          lwt _ = load dom_img in
-          copy_image dom_img;
-          Lwt_mutex.unlock bus_mutex;
-          Lwt.return ()));
+      Lwt_js_events.async (fun () ->
+        lwt _ = Lwt_js_events.load dom_img in
+	copy_image dom_img;
+	Lwt_mutex.unlock bus_mutex;
+        Lwt.return ());
+
+      (* allow to avoid cach image *)
+      let attr = Client_tools.get_timestamp () in
+      dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
+				   ~service:%Server_image.imageservice
+				   (int_of_float width, attr));
 
       Lwt.return ()
 
