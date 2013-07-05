@@ -167,16 +167,8 @@ let rgb_from_string color = (* color is in format "#rrggbb" *)
 
 (* core *)
 
-let small_ctx = Cairo.create small_surface
-let medium_ctx = Cairo.create medium_surface
-let ctx = Cairo.create large_surface
-
-let base_size = float_of_int large_image_height
-
-let draw_server ((color : string), size, (x1, y1), (x2, y2)) =
-
-  (* save log *)
-  Lwt.async (fun () -> write_log "127.0.0.1" (color, size, (x1, y1), (x2, y2)));
+let draw ctx base_size (width, height)
+    ((color : string), size, (x1, y1), (x2, y2)) =
 
   (* Set thickness of brush *)
   Cairo.set_line_width ctx (size *. base_size);
@@ -200,6 +192,7 @@ let draw_server data =
     draw medium_ctx medium_base_size (medium_width, medium_height) data;
     draw large_ctx large_base_size (large_width, large_height) data;
     Lwt.async (fun () -> write_log "127.0.0.1" data)	(* save log *)
+    (* TODO: Replace 127.0.0.1 by the IP *)
   end
 
 let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
