@@ -8,7 +8,7 @@ let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
 
 (* file *)
 
-let save_file = Lwt_unix.openfile (Server_tools.logdir ^ "/drawing.log")
+let save_file = Lwt_unix.openfile (Server_tools.logdir ^ "drawing.log")
   [Lwt_unix.O_RDWR; Lwt_unix.O_CREAT; Lwt_unix.O_APPEND] 0o644
 
 let output_file =
@@ -89,9 +89,9 @@ let create file_name (width, height) =
 
 let save_time = 60. *. 1.
 
-let small_name = Server_tools.datadir ^ "/small_image.png"
-let medium_name = Server_tools.datadir ^ "/medium_image.png"
-let large_name = Server_tools.datadir ^ "/large_image.png"
+let small_name = Server_tools.datadir ^ "small_image.png"
+let medium_name = Server_tools.datadir ^ "medium_image.png"
+let large_name = Server_tools.datadir ^ "large_image.png"
 
 let small_width = 480
 let small_height = Shared_tools.get_min_resolution small_width
