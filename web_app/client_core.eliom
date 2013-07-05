@@ -8,7 +8,9 @@
   let rec start body_elt header_elt canvas_elt canvas2_elt slider color_picker =
 
     (*** Init data***)
-    let size = Client_canvas.init body_elt header_elt canvas_elt canvas2_elt in
+    let size =
+      Client_canvas.init_size body_elt header_elt canvas_elt canvas2_elt
+    in
     let width = ref (float_of_int (fst size)) in
     let height = ref (float_of_int (snd size)) in
     let float_size = ref (!width, !height) in
@@ -36,42 +38,8 @@
 
     (*** The initial image ***)
 
-    (** Handle set and reset image after window resize **)
-    let reset_image () =
-
-      lwt () = Lwt_mutex.lock bus_mutex in
-
-      let copy_image dom_img =
-        ctx##drawImage_withSize(dom_img, 0., 0., !width, !height);
-      in
-
-      let dom_img =
-        (* allow to avoid cach image *)
-        let attr = Client_tools.get_timestamp () in
-        let image_elt =
-          img ~alt:("source image")
-            ~src:(make_uri ~service:%Server_image.imageservice
-                    (int_of_float !width, attr)) ()
-        in
-        Eliom_content.Html5.To_dom.of_img image_elt
-      in
-
-      (* We wait for the image to be loaded before drawing it on canvas *)
-      if (Js.to_bool (dom_img##complete))
-      then begin
-        copy_image dom_img;
-        Lwt_mutex.unlock bus_mutex
-      end
-      else
-        Lwt_js_events.(async (fun () ->
-          lwt _ = load dom_img in
-          copy_image dom_img;
-          Lwt_mutex.unlock bus_mutex;
-          Lwt.return ()));
-      Lwt.return ()
-
-    in
-    Lwt.async reset_image;
+    Lwt.async (fun () ->
+      Client_canvas.init_image ctx bus_mutex (!width, !height));
 
     (*** Tools ***)
     let set_coord (x, y) (x2, y2) =
@@ -150,7 +118,7 @@
     Lwt.async (fun () ->
       Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         let rc_width, rc_height =
-          Client_canvas.init body_elt header_elt canvas_elt canvas2_elt
+          Client_canvas.init_size body_elt header_elt canvas_elt canvas2_elt
         in
         get_origine_canvas ();
         width := float_of_int rc_width;
@@ -160,7 +128,7 @@
         ctx##lineCap <- Js.string "round";
         ctx2##lineCap <- Js.string "round";
 	ctx2##globalCompositeOperation <- Js.string "copy";
-        reset_image ()));
+	Client_canvas.init_image ctx bus_mutex (!width, !height) ));
 
     (* return value *)
     Lwt.return ()

@@ -10,7 +10,7 @@
     ctx##stroke()
 
   (** Calcul and set size of canvas **)
-  let init body_elt header_elt canvas_elt canvas2_elt =
+  let init_size body_elt header_elt canvas_elt canvas2_elt =
 
     (*** Init data ***)
     let size = Client_tools.get_document_size () in
@@ -61,5 +61,40 @@
 
     (* return result *)
     (width', height')
+
+  (** Handle set image in canvas**)
+  let init_image ctx bus_mutex (width, height) =
+
+      lwt () = Lwt_mutex.lock bus_mutex in
+
+      let copy_image dom_img =
+        ctx##drawImage_withSize(dom_img, 0., 0., width, height);
+      in
+
+      let dom_img =
+	(* create js image object to avoid long time loading in webkit *)
+	let dom_img = Dom_html.createImg Dom_html.document in
+        (* allow to avoid cach image *)
+        let attr = Client_tools.get_timestamp () in
+	dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
+				     ~service:%Server_image.imageservice
+				     (int_of_float width, attr));
+	dom_img
+      in
+
+      (* We wait for the image to be loaded before drawing it on canvas *)
+      if (Js.to_bool (dom_img##complete))
+      then begin
+        copy_image dom_img;
+        Lwt_mutex.unlock bus_mutex
+      end
+      else
+        Lwt_js_events.(async (fun () ->
+          lwt _ = load dom_img in
+          copy_image dom_img;
+          Lwt_mutex.unlock bus_mutex;
+          Lwt.return ()));
+
+      Lwt.return ()
 
 }}
