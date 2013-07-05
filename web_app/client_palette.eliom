@@ -50,7 +50,7 @@
     let touch_slide_button () = Lwt.async (fun () ->
       Client_tools.languet dom_button_palette dom_palette
 	Client_tools.Lg_left (-196) 0)
-    in (* Client_mobile.launch_only_on_small_screen  *)touch_slide_button ();
+    in Client_mobile.launch_only_on_small_screen touch_slide_button;
 
     (* Add listenner of resize event *)
 
