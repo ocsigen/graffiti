@@ -29,7 +29,7 @@ let _ =
       ignore {unit{
 
 	(* Remove navigation bar *)
-	Client_mobile.init ();
+	ignore (Client_mobile.init ());
 
         (* Random logo image *)
         Client_header.rand_logo
