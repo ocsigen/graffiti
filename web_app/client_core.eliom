@@ -105,7 +105,7 @@
       Lwt.return ()
     in
     Lwt_js_events.async (fun () ->
-      (Lwt_js_events.mousemoves dom_canvas2 preview));
+      (Lwt_js_events.mousemoves Dom_html.document preview));
 
     (* fix drag and drop to avoid to drag canvas during drawing *)
     ignore (Client_tools.disable_drag_and_drop dom_canvas);
