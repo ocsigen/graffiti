@@ -33,12 +33,11 @@ let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
   lwt output = output_file in
   let (^^) a b = a ^ " " ^ b in
   let date =
-    let tm = Unix.gmtime (Unix.time ()) in
+    let tm = Unix.localtime (Unix.time ()) in
     let to_str = string_of_int in
-    "null"
-    (* (to_str tm.tm_mday) ^^ (to_str tm.tm_mon) ^^ (to_str tm.tm_year) ^^ *)
-    (* (to_str tm.tm_hour) ^ "h" ^ (to_str tm.tm_min) ^ "m" ^ *)
-    (* (to_str tm.tm_sec) ^ "s" *)
+    (to_str tm.Unix.tm_mday) ^ "/" ^ (to_str tm.Unix.tm_mon) ^ "/" ^
+    (to_str (tm.Unix.tm_year + 1900)) ^^ (to_str tm.Unix.tm_hour) ^ "h" ^
+    (to_str tm.Unix.tm_min) ^ "m" ^ (to_str tm.Unix.tm_sec) ^ "s"
   in
   let to_str = string_of_float in
   let str = date ^^ ip ^^ color ^^ (to_str brush_size) ^^
