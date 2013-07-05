@@ -23,6 +23,7 @@
       <static dir="%%ELIOMSTATICDIR%%" />
       <eliommodule module="%%LIBDIR%%/%%PROJECT_NAME%%.cma">
          <logdir>%%LOGDIR%%</logdir>
+         <datadir>%%DATADIR%%</datadir>
       </eliommodule>
       <eliom/>
     </host>
