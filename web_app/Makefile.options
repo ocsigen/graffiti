@@ -5,7 +5,8 @@
 
 PROJECT_NAME := graffiti
 
-FILES :=     server_service.eliom	\
+FILES :=     server_tools.eliom	\
+      	     server_service.eliom	\
 	     shared_tools.eliom		\
       	     server_image.eliom		\
 	     client_tools.eliom		\

@@ -21,7 +21,9 @@
     <host hostfilter="*">
       <static dir="%%STATICDIR%%" />
       <static dir="%%ELIOMSTATICDIR%%" />
-      <eliommodule module="%%LIBDIR%%/%%PROJECT_NAME%%.cma" />
+      <eliommodule module="%%LIBDIR%%/%%PROJECT_NAME%%.cma">
+         <logdir>%%LOGDIR%%</logdir>
+      </eliommodule>
       <eliom/>
     </host>
   </server>

@@ -19,7 +19,7 @@ let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
 
 (* file *)
 
-let save_file = Lwt_unix.openfile "drawing.log"
+let save_file = Lwt_unix.openfile (Server_tools.logdir ^ "/drawing.log")
   [Lwt_unix.O_RDWR; Lwt_unix.O_CREAT; Lwt_unix.O_APPEND] 0o644
 
 let output_file =
