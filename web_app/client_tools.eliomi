@@ -261,7 +261,9 @@
         and if you take [move_margin] at 1(px) (for example),
         move action which move less or egal at 1px will be ignored
 
-     [end] take value in parameter
+     [move] take current move value in parameter
+     [end] take final value in parameter
+
      [min] is min value
      [max] is max value
 
@@ -284,7 +286,7 @@
     ?allow_click: bool ->
     ?move_margin: int ->
     ?start_callback: (unit -> unit Lwt.t) ->
-    ?move_callback: (unit -> unit Lwt.t) ->
+    ?move_callback: (int -> unit Lwt.t) ->
     ?end_callback: (int -> unit Lwt.t) ->
     int ->
     int ->

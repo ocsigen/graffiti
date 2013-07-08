@@ -62,7 +62,8 @@
         Client_tools.languet dom_palette
           Client_tools.Lg_left ~allow_click:false ~move_margin:4
           ~start_callback:(fun () -> Lwt.return (move_languet := false))
-          ~move_callback:(fun () -> Lwt.return (move_languet := true))
+          ~move_callback:(fun v -> Lwt.return
+	    (if not (v = 0) then move_languet := true))
           (-196) 0)
     in (* Client_mobile.launch_only_on_small_screen *) touch_slide_button ();
 

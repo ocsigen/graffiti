@@ -327,7 +327,7 @@
           set_last_diff diff;
           save_coord ev;
           move := (!move + abs diff);
-          launch_callback move_callback)
+          launch_callback_with diff move_callback)
         (fun ev ->
           let v =
             if !move <= move_margin then get_inverse_of_current ()
