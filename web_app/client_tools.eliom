@@ -222,7 +222,6 @@
     Lwt_js_events.async_loop
       (fun ?use_capture () -> touch_or_mouse_start dom_elt) ()
       (fun ev lt ->
-        let _ = match ev with
         lwt _ = starts_func ev lt in
         touch_or_mouse_without_start ev moves_func end_func)
 
