@@ -10,7 +10,7 @@
     (*** Elements ***)
 
     let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
-    let dom_button_palette = Eliom_content.Html5.To_dom.of_td palette_button in
+    let dom_button_palette = Eliom_content.Html5.To_dom.of_table palette_button in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
     let base_size = ref (float_of_int dom_canvas##clientHeight) in

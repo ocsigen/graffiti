@@ -204,24 +204,23 @@ div#canvas {
     top: 0px;
     left: 0px;
     margin: 0px;
-    height: 100%;
-    width: 275px;
-    /* transition: 1s; */
-    /* -webkit-transition: 1s; */
-}
-
-.palette_table_button
-{
-    float: right;
+    background-color:#3E3E3E;
+    box-shadow: 0px 0px 5px #555555;
+    -webkit-box-shadow: 0px 0px 5px #555555;
     height: 100%;
 }
 
 .palette_button
 {
-    background-color: #3E3E3E;
-    border-radius: 0px 30px 30px 0px;
+    position: absolute;
+    top: 45%;
+    top: calc(50% - 30px);
+    left: 220px;
     width: 55px;
     height: 60px;
+    background-color: #3E3E3E;
+    border-radius: 0px 30px 30px 0px;
+    text-align: center;
 }
 
 .grf_color_picker_color_div
@@ -235,18 +234,10 @@ div#canvas {
     max-height: 52px;
     min-width: 1px;
     min-height: 1px;
+    display: inline-block;
     border-radius: 30px 30px 30px 30px;
     transition: 0.2s;
     -webkit-transition: 0.2s;
-}
-
-.palette_color_brush
-{
-    float: left;
-    background-color:#3E3E3E;
-    box-shadow: 0px 0px 5px #555555;
-    -webkit-box-shadow: 0px 0px 5px #555555;
-    height: 100%;
 }
 
 .grf_color_picker_block
