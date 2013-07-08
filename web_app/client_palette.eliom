@@ -47,10 +47,24 @@
     in Client_mobile.launch_only_on_small_screen button;
 
     (* Add touch slide listenner on small screen *)
-    let touch_slide_button () = Lwt.async (fun () ->
-      Client_tools.languet dom_button_palette dom_palette
-        Client_tools.Lg_left (-196) 0)
-    in Client_mobile.launch_only_on_small_screen touch_slide_button;
+    let touch_slide_button () =
+      let move_languet = ref false in
+      Lwt.async (fun () ->
+        Lwt_js_events.clicks dom_button_palette (fun _ _ ->
+          Lwt.return
+            (if not !move_languet then
+                match dom_palette##offsetLeft with
+                  | 0   -> dom_palette##style##left <-
+                    Client_tools.js_string_of_px (-196)
+                  | _   -> dom_palette##style##left <- Js.string "0px"
+             else () )));
+      Lwt.async (fun () ->
+        Client_tools.languet dom_palette
+          Client_tools.Lg_left ~allow_click:false ~move_margin:4
+          ~start_callback:(fun () -> Lwt.return (move_languet := false))
+          ~move_callback:(fun () -> Lwt.return (move_languet := true))
+          (-196) 0)
+    in (* Client_mobile.launch_only_on_small_screen *) touch_slide_button ();
 
     (* Add listenner of resize event *)
 

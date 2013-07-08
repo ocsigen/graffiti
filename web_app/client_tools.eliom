@@ -230,24 +230,30 @@
   type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
   type languet_mode = Lg_offset | Lg_width_height
 
-  let languet (target: #Dom_html.eventTarget Js.t)
-      (dom_elt: #Dom_html.element Js.t)
+  let languet (target: (#Dom_html.element as 'a) Js.t)
+      ?(elt:('a Js.t option)=None)
       orientation
       ?(mode=Lg_offset)
+      ?(allow_click=true)
+      ?(move_margin=0)
       ?start_callback ?move_callback ?end_callback
       min max =
 
-    let click = ref true in
+    let move = ref 0 in
+    let dom_elt = match elt with
+      | None    -> target
+      | Some e  -> e
+    in
     let last_diff = ref 0 in
     let old_coord = ref (0, 0) in
     let save_coord ev = old_coord := get_local_slide_coord dom_elt 0 ev in
     let launch_callback = function
-      | Some func       -> Lwt.async func
-      | _               -> ()
+      | Some func       -> func ()
+      | _               -> Lwt.return ()
     in
     let launch_callback_with arg = function
-      | Some func       -> Lwt.async (fun () -> func arg)
-      | _               -> ()
+      | Some func       -> func arg
+      | _               -> Lwt.return ()
     in
 
     let get_offset () = match mode with
@@ -266,9 +272,12 @@
           | Lg_up           -> dom_elt##clientHeight)
     in
 
+    (** get inverse of current position (min or max) if click is allow
+        else give current position (min or max) *)
     let get_inverse_of_current () =
       let margin = min + ((max - min) / 2) in
-      if (get_offset () < margin) then max else min
+      if allow_click then (if (get_offset () < margin) then max else min)
+      else (if (get_offset () > margin) then max else min)
     in
 
     let set_last_diff diff = if not (diff = 0) then last_diff := diff in
@@ -284,19 +293,18 @@
           | Lg_right        -> dom_elt##style##width <- js_string_of_px v
           | Lg_down         -> dom_elt##style##height <- js_string_of_px v
           | Lg_up           -> dom_elt##style##height <- js_string_of_px v)
-
     in
 
      touch_or_mouse_slides target
         (fun ev _ ->
           save_coord ev;
-          click := true;
+          move := 0;
+          last_diff := 0;
           (Js.Unsafe.coerce (dom_elt##style))##transition <- Js.string "0s";
           ignore (Js.Unsafe.set (dom_elt##style)
                     (Js.string "-webkit-transition") (Js.string "0s"));
-          Lwt.return (launch_callback start_callback))
+          launch_callback start_callback)
         (fun ev _ ->
-          click := false;
           let new_coord = get_local_slide_coord dom_elt 0 ev in
           let diff_x, diff_y =
             (fst new_coord) - (fst !old_coord),
@@ -318,16 +326,18 @@
           set_v new_v;
           set_last_diff diff;
           save_coord ev;
-          Lwt.return (launch_callback move_callback))
+          move := (!move + abs diff);
+          launch_callback move_callback)
         (fun ev ->
-          let v = if !click then get_inverse_of_current ()
+          let v =
+            if !move <= move_margin then get_inverse_of_current ()
             else if !last_diff > 0 then max else min
           in
           (Js.Unsafe.coerce (dom_elt##style))##transition <- Js.string "1s";
           ignore (Js.Unsafe.set (dom_elt##style)
                     (Js.string "-webkit-transition") (Js.string "1s"));
           set_v v;
-          Lwt.return (launch_callback_with v end_callback))
+          launch_callback_with v end_callback)
 
   (* click *)
 

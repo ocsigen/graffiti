@@ -248,13 +248,22 @@
   type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
   type languet_mode = Lg_offset | Lg_width_height
 
- (** [languet target elm orientation mode start move end min max]
+ (** [languet target ?elm orientation ?mode
+     ?allow_click ?move_sensibility
+      ?start ?move ?end min max]
 
      [target] is the target element of event
-     [elm] is the element to transform
+     [elm] is the element to transform, by default it is [target]
+     [allow_click] if it is by defaut at true:
+        allow to expand or contract when a simple click is fired
+     [move_margin] allow to look a little move at a click, default at 0(px)
+        If you already ignore click with [allow_click] at false
+        and if you take [move_margin] at 1(px) (for example),
+        move action which move less or egal at 1px will be ignored
+
+     [end] take value in parameter
      [min] is min value
      [max] is max value
-     [end] take value in parameter
 
      Default mode is Lg_offset
 
@@ -268,13 +277,15 @@
 
  *)
   val languet :
-    #Dom_html.eventTarget Js.t ->
-    #Dom_html.element Js.t ->
+    (#Dom_html.element as 'a) Js.t ->
+    ?elt: ('a Js.t option) ->
     languet_orientation ->
     ?mode: languet_mode ->
-    ?start_callback: (unit -> 'a Lwt.t) ->
-    ?move_callback: (unit -> 'b Lwt.t) ->
-    ?end_callback: (int -> 'c Lwt.t) ->
+    ?allow_click: bool ->
+    ?move_margin: int ->
+    ?start_callback: (unit -> unit Lwt.t) ->
+    ?move_callback: (unit -> unit Lwt.t) ->
+    ?end_callback: (int -> unit Lwt.t) ->
     int ->
     int ->
     unit Lwt.t

@@ -69,7 +69,7 @@
       (* action *)
 
       (* Handle touch slide *)
-      Lwt.async (fun () -> Client_tools.languet dom_save dom_save
+      Lwt.async (fun () -> Client_tools.languet dom_save
         Client_tools.Lg_right
         ~mode:Client_tools.Lg_width_height
         ~start_callback:(fun () -> disable_id ();
