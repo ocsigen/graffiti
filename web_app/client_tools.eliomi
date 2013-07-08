@@ -246,20 +246,35 @@
  (* languet tools *)
 
   type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
+  type languet_mode = Lg_offset | Lg_width_height
 
- (** Handle left languet
+ (** [languet target elm orientation mode start move end min max]
 
-     First arg is the target of event
-     Second arg is the element to move
-     First int is min value
-     Second int is max value *)
+     [target] is the target element of event
+     [elm] is the element to transform
+     [min] is min value
+     [max] is max value
+     [end] take value in parameter
+
+     Default mode is Lg_offset
+
+     Lg_offset mode take information from offsetLeft/Top property
+     (A calcul is made for right and down position)
+     and set on style.left/right/top/button
+
+     Lg_width_height mode take information from clientWidth/Height property
+     and set on style.width/height
+     Obviously with this mode, oritention left/right - up/down do the same thing
+
+ *)
   val languet :
     #Dom_html.eventTarget Js.t ->
     #Dom_html.element Js.t ->
     languet_orientation ->
+    ?mode: languet_mode ->
     ?start_callback: (unit -> 'a Lwt.t) ->
     ?move_callback: (unit -> 'b Lwt.t) ->
-    ?end_callback: (unit -> 'c Lwt.t) ->
+    ?end_callback: (int -> 'c Lwt.t) ->
     int ->
     int ->
     unit Lwt.t

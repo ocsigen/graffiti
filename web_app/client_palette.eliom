@@ -49,7 +49,7 @@
     (* Add touch slide listenner on small screen *)
     let touch_slide_button () = Lwt.async (fun () ->
       Client_tools.languet dom_button_palette dom_palette
-	Client_tools.Lg_left (-196) 0)
+        Client_tools.Lg_left (-196) 0)
     in Client_mobile.launch_only_on_small_screen touch_slide_button;
 
     (* Add listenner of resize event *)
@@ -88,7 +88,7 @@
     (* Handle recalcul base canvas size *)
     Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return
-	(base_size := (float_of_int dom_canvas##clientHeight))));
+        (base_size := (float_of_int dom_canvas##clientHeight))));
 
     (* start slider script *)
     Grf_slider.start slider;

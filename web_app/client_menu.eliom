@@ -32,27 +32,27 @@
       in
       let current_id_disable = ref true in
       let disable_id () = if (not !current_id_disable) then
-	  begin
-	    id := Client_tools.disable_event Dom_html.Event.click dom_save_link;
-	    current_id_disable := true
-	  end
+          begin
+            id := Client_tools.disable_event Dom_html.Event.click dom_save_link;
+            current_id_disable := true
+          end
       in
       let enable_id () = if (!current_id_disable) then
-	  begin
-	    Client_tools.enable_event !id;
-	    current_id_disable := false
-	  end
+          begin
+            Client_tools.enable_event !id;
+            current_id_disable := false
+          end
       in
 
       let contract () =
         dom_save##style##width <- Js.string "30px";
         dom_save_div##style##width <- Js.string "13px";
-	disable_id ()
+        enable_id ()
       and expand () =
-	one_time_disable := true;
-	dom_save##style##width <- Js.string "60px";
+        one_time_disable := true;
+        dom_save##style##width <- Js.string "60px";
         dom_save_div##style##width <- Js.string "26px";
-	enable_id ()
+        disable_id ()
       in
 
       (* avoid to let expand after return by browser arrow *)
@@ -61,7 +61,7 @@
         lwt _ = Lwt_js.sleep 2. in
         if (not !disable_contract) then
           (if (not !one_time_disable)
-           then contract ()
+           then begin contract (); disable_id () end
            else one_time_disable := false);
         aux ()
       in aux ());
@@ -71,23 +71,13 @@
       (* Handle touch slide *)
       Lwt.async (fun () -> Client_tools.languet dom_save dom_save
         Client_tools.Lg_right
-        ~start_callback:(fun () ->
-          let right = if dom_save##clientWidth > 45 then "0px" else "-30px" in
-          dom_save##style##right <- Js.string right;
-          dom_save##style##width <- Js.string "60px";
-          dom_save_div##style##width <- Js.string "26px";
-	  disable_id ();
+        ~mode:Client_tools.Lg_width_height
+        ~start_callback:(fun () -> disable_id ();
           Lwt.return (disable_contract := true))
-        ~end_callback:(fun () ->
-          let right =
-	    let str = dom_save##style##right in
-	    let reg = jsnew Js.regExp (Js.string "px") in
-	    int_of_string (Js.to_string (str##replace(reg, Js.string "")))
-	  in
-          dom_save##style##right <- Js.string "0px";
-          if right > -15 then expand () else contract ();
+        ~end_callback:(fun width ->
+          if width > 45 then expand () else contract ();
           Lwt.return (disable_contract := false))
-        (-30) 0)
+        30 60)
 
     in Client_mobile.launch_only_on_small_screen save_click
 
