@@ -223,11 +223,6 @@
       (fun ?use_capture () -> touch_or_mouse_start dom_elt) ()
       (fun ev lt ->
         let _ = match ev with
-          | Touch_event ev      -> Dom.preventDefault ev
-	  (* Avoid mouse event fired after touch event and do two time action
-	     It is not the good solution, but the better found *)
-          | _                   -> ()
-        in
         lwt _ = starts_func ev lt in
         touch_or_mouse_without_start ev moves_func end_func)
 
