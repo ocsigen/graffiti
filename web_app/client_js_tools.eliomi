@@ -20,31 +20,6 @@
 
   val get_timestamp : unit -> float
 
-  (* position / coordinated *)
-
-  val get_coord :
-    < clientX : < get : int; .. > Js.gen_prop;
-      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
-      int * int
-
-  (** First arg is the id of touch *)
-  val get_touch_coord : int -> Dom_html.touchEvent Js.t -> int * int
-
-  (** First arg is the target *)
-  val get_local_event_coord :
-    #Dom_html.element Js.t ->
-    < clientX : < get : int; .. > Js.gen_prop;
-      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
-    int * int
-
-  (** First arg is the target
-      The second is the index of touch *)
-  val get_local_touch_event_coord :
-    #Dom_html.element Js.t ->
-    int ->
-    Dom_html.touchEvent Js.t ->
-    int * int
-
   (* mobile tools *)
 
   (** Very usefull function to slide element

@@ -25,24 +25,6 @@
     let date = jsnew Js.date_now () in
     Js.to_float (date##getTime ())
 
-  (* position / coordinated *)
-
-  let get_coord ev = ev##clientX, ev##clientY
-
-  let get_touch_coord idx event =
-    let ev = event##touches##item(idx) in
-    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
-
-  let get_local_event_coord dom_elt ev =
-    let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y =  get_coord ev in
-    x - ox, y - oy
-
-  let get_local_touch_event_coord dom_elt idx ev =
-    let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y =  get_touch_coord idx ev in
-    x - ox, y - oy
-
   (* mobile tools *)
 
   let progressive_apply ?(elapsed_time=0.001) ?(step=4)

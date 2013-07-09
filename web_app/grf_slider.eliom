@@ -148,7 +148,7 @@ let start (slider, dragger, ori, value,
   (* click action *)
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->
     let x, y =
-      let x, y = Client_js_tools.get_coord ev in
+      let x, y = Client_event_tools.get_coord ev in
       let x', y' = x - !ox_slider, y - !oy_slider in
       x' - margin, y' - margin
     in

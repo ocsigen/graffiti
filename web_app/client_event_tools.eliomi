@@ -1,6 +1,34 @@
 
 {client{
 
+  (* position / coordinated *)
+
+  val get_coord :
+    < clientX : < get : int; .. > Js.gen_prop;
+      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
+      int * int
+
+  (** First arg is the id of touch *)
+  val get_touch_coord : int -> Dom_html.touchEvent Js.t -> int * int
+
+  (** First arg is the target *)
+  val get_local_event_coord :
+    #Dom_html.element Js.t ->
+    < clientX : < get : int; .. > Js.gen_prop;
+      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
+    int * int
+
+  (** First arg is the target
+      The second is the index of touch *)
+  val get_local_touch_event_coord :
+    #Dom_html.element Js.t ->
+    int ->
+    Dom_html.touchEvent Js.t ->
+    int * int
+
+  (** take two coordonne and return true if they are egal *)
+  val cmp_coord : (int * int) -> (int * int) -> bool
+
   (* Enable / disable *)
 
   (** Disable Dom_html.Event with stopping propagation during capture phase **)
@@ -17,6 +45,11 @@
     Dom_html.event_listener_id list
 
   val disable_mobile_scroll : unit -> Dom_html.event_listener_id
+
+  (** catch touchstarts on target
+      if mousedown is fired at same coord and at less then 100ms after:
+      a preventDefault and stopPropagation is made on it *)
+  val disable_ghost_mouse_event : #Dom_html.eventTarget Js.t -> unit
 
   (* orientation / resize *)
 

@@ -78,8 +78,13 @@
     in
 
     (*** Catch events ***)
+
+    (* get bus message *)
     Lwt.async (fun () ->
       Lwt_stream.iter_s bus_draw (Eliom_bus.stream %Server_image.bus));
+
+    (* To avoid double actions of drawing *)
+    Client_event_tools.disable_ghost_mouse_event dom_canvas2;
 
     (* drawing events *)
     Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_canvas2
@@ -91,7 +96,7 @@
     (* Handle preview *)
     let x, y, old_size = ref 0., ref 0., ref 0. in
     let preview ev _ =
-      let coord = Client_js_tools.get_coord ev in
+      let coord = Client_event_tools.get_coord ev in
       let (color, new_size, oldv, v) = compute_line (x, y) coord in
 
       (* remove old point with transparanse *)

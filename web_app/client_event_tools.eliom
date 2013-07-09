@@ -3,6 +3,26 @@
 
 open Lwt
 
+  (* position / coordinated *)
+
+  let get_coord ev = ev##clientX, ev##clientY
+
+  let get_touch_coord idx event =
+    let ev = event##touches##item(idx) in
+    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
+
+  let get_local_event_coord dom_elt ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y =  get_coord ev in
+    x - ox, y - oy
+
+  let get_local_touch_event_coord dom_elt idx ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y =  get_touch_coord idx ev in
+    x - ox, y - oy
+
+  let cmp_coord (x1, y1) (x2, y2) = x1 = x2 && y1 = y2
+
   (* Enable / disable *)
 
   let disable_event event html_elt =
@@ -27,6 +47,21 @@ open Lwt
   let disable_mobile_scroll () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
+  let disable_ghost_mouse_event target =
+    let last_time = ref (Client_js_tools.get_timestamp ()) in
+    let last_coord = ref (0, 0) in
+    Lwt.async (fun () ->
+      Lwt_js_events.touchstarts target (fun ev _ ->
+	last_time := Client_js_tools.get_timestamp ();
+	Lwt.return (last_coord := get_touch_coord 0 ev)));
+    Lwt.async (fun () ->
+      Lwt_js_events.mousedowns target (fun ev _ ->
+      let time = Client_js_tools.get_timestamp () in
+      let coord = get_coord ev in
+      (* check if it is at same coord and fired less than 100ms after touch *)
+      if (cmp_coord !last_coord coord && (time -. 0.1) <= !last_time)
+      then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
+      Lwt.return () ))
   (* orientation / resize *)
 
   let orientationchange = Dom_html.Event.make "orientationchange"
@@ -119,14 +154,12 @@ open Lwt
     | Mouse_event of Dom_html.mouseEvent Js.t
 
   let get_slide_coord idx = function
-    | Touch_event ev    -> Client_js_tools.get_touch_coord idx ev
-    | Mouse_event ev    -> Client_js_tools.get_coord ev
+    | Touch_event ev    -> get_touch_coord idx ev
+    | Mouse_event ev    -> get_coord ev
 
   let get_local_slide_coord dom_elt idx = function
-    | Touch_event ev    ->
-      Client_js_tools.get_local_touch_event_coord dom_elt idx ev
-    | Mouse_event ev    ->
-      Client_js_tools.get_local_event_coord dom_elt ev
+    | Touch_event ev    -> get_local_touch_event_coord dom_elt idx ev
+    | Mouse_event ev    -> get_local_event_coord dom_elt ev
 
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
@@ -177,7 +210,7 @@ open Lwt
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
       let width, height = Client_js_tools.get_document_size () in
-      let current_x, current_y = Client_js_tools.get_coord ev in
+      let current_x, current_y = get_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in
       let end_x' = get_relative_position width end_x in
