@@ -6,16 +6,30 @@
   let already_removed = ref false
 
   let has_small_screen () =
-    let width, height = Client_js_tools.get_window_size () in
-    (width <= 480 || height <= 600)
+    let width, height = Client_js_tools.get_screen_size () in
+    width <= 480
 
-  let launch_only_on_small_screen func =
+  let has_medium_screen () =
+    let width, height = Client_js_tools.get_screen_size () in
+    width <= 768
+
+  let launch_on_small func =
     if has_small_screen ()
     then func ()
     else ()
 
-  let not_launch_on_small_screen func =
+  let not_launch_on_small func =
     if has_small_screen ()
+    then ()
+    else func ()
+
+  let launch_on_small_medium func =
+    if has_medium_screen ()
+    then func ()
+    else ()
+
+  let not_launch_on_small_medium func =
+    if has_medium_screen ()
     then ()
     else func ()
 
@@ -26,17 +40,17 @@
     then true
     else (
 
-        (* Remove header *)
-      let small_screen () =
+      (* Remove header *)
+      let medium_screen () =
         Eliom_content.Html5.Manip.removeChild
           body_elt header_elt;
         already_removed := true;
         !already_removed
       in
 
-        (* Check to let or not header *)
-      if has_small_screen ()
-      then small_screen ()
+      (* Check to let or not header *)
+      if has_medium_screen ()
+      then medium_screen ()
       else false
     )
 

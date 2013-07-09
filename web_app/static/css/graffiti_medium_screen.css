@@ -4,18 +4,28 @@
 
     body
     {
-        font-size:1.8em;
+        font-size:1em;
     }
 
-    .header_div
+    canvas
     {
-        height:90px;
-        background-size:auto 90px;
+        margin-left: 25px;
     }
 
-    .menu_button
+    .save_button
     {
-        width:20%;
+        width: 30px;
+        top: 80px;
+    }
+
+    .save_div
+    {
+        width: 13px;
+    }
+
+    .palette_wrap
+    {
+        left: -196px;
     }
 
 }

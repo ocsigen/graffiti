@@ -5,12 +5,12 @@
 
   type orientation = Portrait | Landscape
 
-  let get_window_size () =
+  let get_screen_size () =
     let scr = Dom_html.window##screen in
     scr##width, scr##height
 
-  let get_window_orientation () =
-    let width, height = get_window_size () in
+  let get_screen_orientation () =
+    let width, height = get_screen_size () in
     if (width <= height) then Portrait else Landscape
 
   let get_size dom_html =

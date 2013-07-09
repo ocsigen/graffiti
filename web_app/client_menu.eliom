@@ -80,6 +80,6 @@
           Lwt.return (disable_contract := false))
         30 60)
 
-    in Client_mobile.launch_only_on_small_screen save_click
+    in Client_mobile.launch_on_small_medium save_click
 
 }}

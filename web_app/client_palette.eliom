@@ -10,7 +10,8 @@
     (*** Elements ***)
 
     let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
-    let dom_button_palette = Eliom_content.Html5.To_dom.of_table palette_button in
+    let dom_button_palette = Eliom_content.Html5.To_dom.of_table palette_button
+    in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
     let base_size = ref (float_of_int dom_canvas##clientHeight) in
@@ -49,7 +50,7 @@
           ~move_callback:(fun v -> Lwt.return
 	    (if not (v = 0) then move := true))
           (-196) 0)
-    in Client_mobile.launch_only_on_small_screen touch_slide_button;
+    in Client_mobile.launch_on_small_medium touch_slide_button;
 
     (* Add listenner of resize event *)
 
