@@ -39,12 +39,12 @@
             (if not !move_languet then
                 match dom_palette##offsetLeft with
                   | 0   -> dom_palette##style##left <-
-                    Client_tools.js_string_of_px (-196)
+                    Client_js_tools.js_string_of_px (-196)
                   | _   -> dom_palette##style##left <- Js.string "0px"
              else () )));
       Lwt.async (fun () ->
-        Client_tools.languet dom_palette
-          Client_tools.Lg_left ~allow_click:false ~move_margin:4
+        Slide_tools.languet dom_palette
+          Slide_tools.Lg_left ~allow_click:false ~move_margin:4
           ~start_callback:(fun () -> Lwt.return (move_languet := false))
           ~move_callback:(fun v -> Lwt.return
 	    (if not (v = 0) then move_languet := true))
@@ -67,14 +67,14 @@
           aux tail
       in aux dom_color_list
     in handle_color_square_resize (); (* To initialize view *)
-    Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
+    Lwt.async (fun () -> Client_event_tools.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return (handle_color_square_resize ())));
 
     (* catch slider move and click *)
     let handler () =
       let brush_size = Js.string (string_of_int
         (int_of_float (
-          ((Client_ext_mod_tools.get_slider_value slider) *.
+          ((Client_tools.get_slider_value slider) *.
             !base_size))) ^ "px")
       in
       dom_color##style##width <- brush_size;
@@ -85,7 +85,7 @@
     Grf_slider.change_click_callback slider handler;
 
     (* Handle recalcul base canvas size *)
-    Lwt.async (fun () -> Client_tools.limited_onorientationchanges_or_onresizes
+    Lwt.async (fun () -> Client_event_tools.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return
         (base_size := (float_of_int dom_canvas##clientHeight))));
 

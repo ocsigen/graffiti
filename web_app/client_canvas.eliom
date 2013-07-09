@@ -13,7 +13,7 @@
   let init_size body_elt header_elt canvas_elt canvas2_elt =
 
     (*** Init data ***)
-    let size = Client_tools.get_document_size () in
+    let size = Client_js_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_canvas2 = Eliom_content.Html5.To_dom.of_canvas canvas2_elt in
     let width_canvas_margin = if Client_mobile.has_small_screen ()
@@ -57,7 +57,7 @@
 
     (* set vertical center *)
     Dom_html.document##body##style##lineHeight <-
-      Client_tools.js_string_of_px lineHeight;
+      Client_js_tools.js_string_of_px lineHeight;
 
     (* return result *)
     (width', height')
@@ -86,7 +86,7 @@
         Lwt.return ());
 
       (* allow to avoid cach image *)
-      let attr = Client_tools.get_timestamp () in
+      let attr = Client_js_tools.get_timestamp () in
       dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
 				   ~service:%Server_image.imageservice
 				   (int_of_float width, attr));

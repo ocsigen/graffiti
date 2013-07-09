@@ -10,7 +10,7 @@
   (** Handle switching logo on each reload of page **)
   let rand_logo body_elt header_elt =
 
-    Random.init (int_of_float (Client_tools.get_timestamp ()));
+    Random.init (int_of_float (Client_js_tools.get_timestamp ()));
 
     let logo_list = ["blue"; "green"; "purple"; "yellow"] in
     let rand_img =

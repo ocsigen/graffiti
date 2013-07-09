@@ -54,7 +54,7 @@
       set_coord (x, y) coord;
 
       let color = Grf_color_picker.get_color color_picker in
-      let brush_size = Client_ext_mod_tools.get_slider_value slider in
+      let brush_size = Client_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
       (color, brush_size, (oldx, oldy), (!x, !y))
@@ -82,16 +82,16 @@
       Lwt_stream.iter_s bus_draw (Eliom_bus.stream %Server_image.bus));
 
     (* drawing events *)
-    Lwt.async (fun () -> Client_tools.touch_or_mouse_slides dom_canvas2
-      (fun ev _ -> set_coord (x, y) (Client_tools.get_slide_coord 0 ev);
-                   line (Client_tools.get_slide_coord 0 ev))
-      (fun ev _ -> line (Client_tools.get_slide_coord 0 ev))
-      (fun ev -> line (Client_tools.get_slide_coord 0 ev)));
+    Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_canvas2
+      (fun ev _ -> set_coord (x, y) (Client_event_tools.get_slide_coord 0 ev);
+                   line (Client_event_tools.get_slide_coord 0 ev))
+      (fun ev _ -> line (Client_event_tools.get_slide_coord 0 ev))
+      (fun ev -> line (Client_event_tools.get_slide_coord 0 ev)));
 
     (* Handle preview *)
     let x, y, old_size = ref 0., ref 0., ref 0. in
     let preview ev _ =
-      let coord = Client_tools.get_coord ev in
+      let coord = Client_js_tools.get_coord ev in
       let (color, new_size, oldv, v) = compute_line (x, y) coord in
 
       (* remove old point with transparanse *)
@@ -108,15 +108,15 @@
       (Lwt_js_events.mousemoves Dom_html.document preview));
 
     (* fix drag and drop to avoid to drag canvas during drawing *)
-    ignore (Client_tools.disable_drag_and_drop dom_canvas);
+    ignore (Client_event_tools.disable_drag_and_drop dom_canvas);
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    ignore (Client_tools.disable_mobile_scroll ());
+    ignore (Client_event_tools.disable_mobile_scroll ());
 
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
     Lwt.async (fun () ->
-      Client_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
+      Client_event_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
         let rc_width, rc_height =
           Client_canvas.init_size body_elt header_elt canvas_elt canvas2_elt
         in

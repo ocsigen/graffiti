@@ -28,18 +28,19 @@
       let one_time_disable = ref false in
 
       let id = ref
-        (Client_tools.disable_event Dom_html.Event.click dom_save_link)
+        (Client_event_tools.disable_event Dom_html.Event.click dom_save_link)
       in
       let current_id_disable = ref true in
       let disable_id () = if (not !current_id_disable) then
           begin
-            id := Client_tools.disable_event Dom_html.Event.click dom_save_link;
+            id := Client_event_tools.disable_event
+	      Dom_html.Event.click dom_save_link;
             current_id_disable := true
           end
       in
       let enable_id () = if (!current_id_disable) then
           begin
-            Client_tools.enable_event !id;
+            Client_event_tools.enable_event !id;
             current_id_disable := false
           end
       in
@@ -69,9 +70,9 @@
       (* action *)
 
       (* Handle touch slide *)
-      Lwt.async (fun () -> Client_tools.languet dom_save
-        Client_tools.Lg_right
-        ~mode:Client_tools.Lg_width_height
+      Lwt.async (fun () -> Slide_tools.languet dom_save
+        Slide_tools.Lg_right
+        ~mode:Slide_tools.Lg_width_height
         ~start_callback:(fun () -> disable_id ();
           Lwt.return (disable_contract := true))
         ~end_callback:(fun width ->

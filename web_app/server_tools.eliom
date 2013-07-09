@@ -14,11 +14,6 @@ let config = Eliom_config.parse_config [logdir_elt; datadir_elt]
 let logdir = !logdir_ref ^ "/"
 let datadir = !datadir_ref ^ "/"
 
-(* let get_localdate_value () = *)
-(*   let tm = Unix.localtime (Unix.time ()) in *)
-(*   tm.Unix.tm_mday, tm.Unix.tm_mon, tm.Unix.tm_year + 1900, *)
-(*   tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec *)
-
 let get_str_localdate () =
   let tm = Unix.localtime (Unix.time ()) in
   let to_str = string_of_int in

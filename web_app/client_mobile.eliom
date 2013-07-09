@@ -6,7 +6,7 @@
   let already_removed = ref false
 
   let has_small_screen () =
-    let width, height = Client_tools.get_window_size () in
+    let width, height = Client_js_tools.get_window_size () in
     (width <= 480 || height <= 600)
 
   let launch_only_on_small_screen func =
