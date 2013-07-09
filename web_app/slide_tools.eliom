@@ -1,13 +1,13 @@
 
 {client{
 
-  type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
-  type languet_mode = Lg_offset | Lg_width_height
+  type orientation = Left | Right | Up | Down
+  type mode = Offset | Width_height
 
-  let languet (target: (#Dom_html.element as 'a) Js.t)
+  let slide (target: (#Dom_html.element as 'a) Js.t)
       ?(elt:('a Js.t option)=None)
       orientation
-      ?(mode=Lg_offset)
+      ?(mode=Offset)
       ?(allow_click=true)
       ?(move_margin=0)
       ?start_callback ?move_callback ?end_callback
@@ -33,19 +33,19 @@
     in
 
     let get_offset () = match mode with
-      | Lg_offset       -> (match orientation with
-          | Lg_left         -> dom_elt##offsetLeft
-          | Lg_right        -> Dom_html.document##documentElement##clientWidth -
+      | Offset          -> (match orientation with
+          | Left        -> dom_elt##offsetLeft
+          | Right       -> Dom_html.document##documentElement##clientWidth -
             dom_elt##offsetLeft - dom_elt##offsetWidth
-          | Lg_down         -> Dom_html.document##documentElement##clientHeight -
+          | Down        -> Dom_html.document##documentElement##clientHeight -
             dom_elt##offsetTop - dom_elt##offsetHeight
-          | Lg_up           -> dom_elt##offsetTop)
+          | Up          -> dom_elt##offsetTop)
 
-      | Lg_width_height -> (match orientation with
-          | Lg_left         -> dom_elt##clientWidth
-          | Lg_right        -> dom_elt##clientWidth
-          | Lg_down         -> dom_elt##clientHeight
-          | Lg_up           -> dom_elt##clientHeight)
+      | Width_height    -> (match orientation with
+          | Left        -> dom_elt##clientWidth
+          | Right       -> dom_elt##clientWidth
+          | Down        -> dom_elt##clientHeight
+          | Up          -> dom_elt##clientHeight)
     in
 
     (** get inverse of current position (min or max) if click is allow
@@ -61,16 +61,16 @@
     let set_v value =
       let v = Client_js_tools.js_string_of_px value in
       match mode with
-      | Lg_offset       -> (match orientation with
-          | Lg_left         -> dom_elt##style##left <- v
-          | Lg_right        -> dom_elt##style##right <- v
-          | Lg_down         -> dom_elt##style##bottom <- v
-          | Lg_up           -> dom_elt##style##top <- v)
-      | Lg_width_height -> (match orientation with
-          | Lg_left         -> dom_elt##style##width <- v
-          | Lg_right        -> dom_elt##style##width <- v
-          | Lg_down         -> dom_elt##style##height <- v
-          | Lg_up           -> dom_elt##style##height <- v)
+      | Offset          -> (match orientation with
+          | Left        -> dom_elt##style##left <- v
+          | Right       -> dom_elt##style##right <- v
+          | Down        -> dom_elt##style##bottom <- v
+          | Up          -> dom_elt##style##top <- v)
+      | Width_height    -> (match orientation with
+          | Left        -> dom_elt##style##width <- v
+          | Right       -> dom_elt##style##width <- v
+          | Down        -> dom_elt##style##height <- v
+          | Up          -> dom_elt##style##height <- v)
     in
 
      Client_event_tools.touch_or_mouse_slides target
@@ -89,10 +89,10 @@
             (snd new_coord) - (snd !old_coord)
           in
           let diff = match orientation with
-            | Lg_left   -> diff_x
-            | Lg_right  -> -diff_x
-            | Lg_down   -> -diff_y
-            | Lg_up     -> diff_y
+            | Left   -> diff_x
+            | Right  -> -diff_x
+            | Down   -> -diff_y
+            | Up     -> diff_y
           in
           let old_v = get_offset () in
           let new_v =

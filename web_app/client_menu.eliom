@@ -70,9 +70,9 @@
       (* action *)
 
       (* Handle touch slide *)
-      Lwt.async (fun () -> Slide_tools.languet dom_save
-        Slide_tools.Lg_right
-        ~mode:Slide_tools.Lg_width_height
+      Lwt.async (fun () -> Slide_tools.slide dom_save
+        Slide_tools.Right
+        ~mode:Slide_tools.Width_height
         ~start_callback:(fun () -> disable_id ();
           Lwt.return (disable_contract := true))
         ~end_callback:(fun width ->

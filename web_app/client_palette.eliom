@@ -32,22 +32,22 @@
 
     (* Add touch slide listenner on small screen *)
     let touch_slide_button () =
-      let move_languet = ref false in
+      let move = ref false in
       Lwt.async (fun () ->
         Lwt_js_events.clicks dom_button_palette (fun _ _ ->
           Lwt.return
-            (if not !move_languet then
+            (if not !move then
                 match dom_palette##offsetLeft with
                   | 0   -> dom_palette##style##left <-
                     Client_js_tools.js_string_of_px (-196)
                   | _   -> dom_palette##style##left <- Js.string "0px"
              else () )));
       Lwt.async (fun () ->
-        Slide_tools.languet dom_palette
-          Slide_tools.Lg_left ~allow_click:false ~move_margin:4
-          ~start_callback:(fun () -> Lwt.return (move_languet := false))
+        Slide_tools.slide dom_palette
+          Slide_tools.Left ~allow_click:false ~move_margin:4
+          ~start_callback:(fun () -> Lwt.return (move := false))
           ~move_callback:(fun v -> Lwt.return
-	    (if not (v = 0) then move_languet := true))
+	    (if not (v = 0) then move := true))
           (-196) 0)
     in Client_mobile.launch_only_on_small_screen touch_slide_button;
 

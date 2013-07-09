@@ -9,7 +9,6 @@ FILES :=     server_tools.eliom		\
       	     server_service.eliom	\
 	     shared_tools.eliom		\
       	     server_image.eliom		\
-	     client_tools.eliom		\
 	     client_js_tools.eliom	\
 	     client_js_tools.eliomi	\
 	     client_event_tools.eliom	\
@@ -20,6 +19,7 @@ FILES :=     server_tools.eliom		\
 	     grf_color_picker.eliomi	\
 	     grf_slider.eliom		\
 	     grf_slider.eliomi		\
+	     client_tools.eliom		\
       	     server_html.eliom		\
 	     client_mobile.eliom	\
 	     client_header.eliom	\

@@ -1,10 +1,10 @@
 
 {client{
 
-  type languet_orientation = Lg_left | Lg_right | Lg_up | Lg_down
-  type languet_mode = Lg_offset | Lg_width_height
+  type orientation = Left | Right | Up | Down
+  type mode = Offset | Width_height
 
- (** [languet target ?elm orientation ?mode
+ (** [slide target ?elm orientation ?mode
      ?allow_click ?move_sensibility
       ?start ?move ?end min max]
 
@@ -34,11 +34,11 @@
      Obviously with this mode, oritention left/right - up/down do the same thing
 
  *)
-  val languet :
+  val slide :
     (#Dom_html.element as 'a) Js.t ->
     ?elt: ('a Js.t option) ->
-    languet_orientation ->
-    ?mode: languet_mode ->
+    orientation ->
+    ?mode: mode ->
     ?allow_click: bool ->
     ?move_margin: int ->
     ?start_callback: (unit -> unit Lwt.t) ->
