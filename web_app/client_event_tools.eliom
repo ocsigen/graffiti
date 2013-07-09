@@ -53,7 +53,8 @@ open Lwt
     Lwt.async (fun () ->
       Lwt_js_events.touchstarts target (fun ev _ ->
 	last_time := Client_js_tools.get_timestamp ();
-	Lwt.return (last_coord := get_touch_coord 0 ev)));
+	last_coord := get_touch_coord 0 ev;
+	Lwt.return (Dom.preventDefault ev)));
     Lwt.async (fun () ->
       Lwt_js_events.mousedowns target (fun ev _ ->
       let time = Client_js_tools.get_timestamp () in

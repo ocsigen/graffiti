@@ -47,7 +47,9 @@
   val disable_mobile_scroll : unit -> Dom_html.event_listener_id
 
   (** catch touchstarts on target
-      if mousedown is fired at same coord and at less then 100ms after:
+      and made peventDefault to avoid mouse propagation
+
+      moreover if mousedown is fired at same coord and at less then 100ms after:
       a preventDefault and stopPropagation is made on it *)
   val disable_ghost_mouse_event : #Dom_html.eventTarget Js.t -> unit
 
