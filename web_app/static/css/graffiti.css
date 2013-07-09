@@ -213,8 +213,9 @@ div#canvas {
 .palette_button
 {
     position: absolute;
-    top: 45%;
+    top: 80px;
     top: calc(50% - 30px);
+    top: -webkit-calc(50% - 30px);
     left: 220px;
     width: 55px;
     height: 60px;
