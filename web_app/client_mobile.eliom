@@ -82,8 +82,4 @@
     then small_screen ()
     else normal_screen ()
 
-  let init () =
-    lwt _ = Lwt_js_events.onload () in
-    Lwt.return (Dom_html.window##scroll(0,1))
-
 }}

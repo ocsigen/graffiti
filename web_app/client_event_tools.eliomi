@@ -44,7 +44,7 @@
   val disable_drag_and_drop : #Dom_html.eventTarget Js.t ->
     Dom_html.event_listener_id list
 
-  val disable_mobile_scroll : unit -> Dom_html.event_listener_id
+  val disable_mobile_zoom : unit -> Dom_html.event_listener_id
 
   (** catch touchstarts on target
       and made peventDefault to avoid mouse propagation

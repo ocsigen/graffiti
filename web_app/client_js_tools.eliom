@@ -1,6 +1,8 @@
 
 {client{
 
+  open Lwt
+
   (* size and orientation *)
 
   type orientation = Portrait | Landscape
@@ -40,6 +42,10 @@
          lwt _ = Lwt_js.sleep elapsed_time in
          aux newv)
     in aux current
+
+    let hide_navigation_bar () =
+      lwt _ = Lwt_js_events.onload () in
+      Lwt.return (Dom_html.window##scroll(0,1))
 
   (* others *)
 

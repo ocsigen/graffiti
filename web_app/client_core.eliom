@@ -113,10 +113,10 @@
       (Lwt_js_events.mousemoves Dom_html.document preview));
 
     (* fix drag and drop to avoid to drag canvas during drawing *)
-    ignore (Client_event_tools.disable_drag_and_drop dom_canvas);
+    (* ignore (Client_event_tools.disable_drag_and_drop dom_canvas); *)
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    ignore (Client_event_tools.disable_mobile_scroll ());
+    ignore (Client_event_tools.disable_mobile_zoom ());
 
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)

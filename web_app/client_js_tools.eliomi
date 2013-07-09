@@ -37,6 +37,8 @@
     (int -> 'a) ->
     unit Lwt.t
 
+  val hide_navigation_bar : unit -> unit Lwt.t
+
   (* others *)
 
   val js_string_of_px : int -> Js.js_string Js.t

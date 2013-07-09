@@ -44,7 +44,7 @@ open Lwt
      disable_event Dom_html.Event.dragenter html_elt;
      disable_event Dom_html.Event.drop html_elt]
 
-  let disable_mobile_scroll () =
+  let disable_mobile_zoom () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
   let disable_ghost_mouse_event target =

@@ -44,6 +44,7 @@ let canvas_elt =
 
 let canvas2_elt =
   D.canvas ~a:[a_width start_width; a_height start_height;
+	       D.Unsafe.string_attrib "draggable" "false";
                a_class["canvas2"; "unselectable"]] []
 
 
