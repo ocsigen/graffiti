@@ -77,11 +77,23 @@ open Lwt
         then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
         Lwt.return () ))
 
+  let disable_ghost_mousedown target =
+    preventEvent Lwt_js_events.mousedowns Lwt_js_events.touchstarts target
+
+  let disable_ghost_mousemove target =
+    begin
+      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchstarts target;
+      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchmoves target
+    end
+
+  let disable_ghost_mouseup target =
+    preventEvent Lwt_js_events.mouseups Lwt_js_events.touchends target
+
   let disable_ghost_mouse_event target =
     begin
-      preventEvent Lwt_js_events.mousedowns Lwt_js_events.touchstarts target;
-      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchmoves target;
-      preventEvent Lwt_js_events.mouseups Lwt_js_events.touchends target
+      disable_ghost_mousedown target;
+      disable_ghost_mousemove target;
+      disable_ghost_mouseup target
     end
 
   (* orientation / resize *)

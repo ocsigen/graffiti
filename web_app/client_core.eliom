@@ -84,6 +84,7 @@
       Lwt_stream.iter_s bus_draw (Eliom_bus.stream %Server_image.bus));
 
     (* To avoid double actions of drawing *)
+    Client_event_tools.disable_ghost_mousemove Dom_html.document;
     Client_event_tools.disable_ghost_mouse_event dom_canvas2;
 
     (* drawing events *)
