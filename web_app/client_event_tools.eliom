@@ -47,22 +47,43 @@ open Lwt
   let disable_mobile_zoom () =
     disable_event Dom_html.Event.touchmove Dom_html.document
 
-  let disable_ghost_mouse_event target =
+  let preventEvent
+      (prevented_event:
+         (?cancel_handler:bool ->
+          ?use_capture: bool ->
+          (#Dom_html.eventTarget as 'a) Js.t ->
+          (Dom_html.mouseEvent Js.t -> unit Lwt.t -> unit Lwt.t) ->
+          unit Lwt.t))
+      (source_event:
+         (?cancel_handler:bool ->
+          ?use_capture: bool ->
+          (#Dom_html.eventTarget as 'a) Js.t ->
+          (Dom_html.touchEvent Js.t -> unit Lwt.t -> unit Lwt.t) ->
+          unit Lwt.t))
+      target =
     let last_time = ref (Client_js_tools.get_timestamp ()) in
     let last_coord = ref (0, 0) in
     Lwt.async (fun () ->
-      Lwt_js_events.touchstarts target (fun ev _ ->
-	last_time := Client_js_tools.get_timestamp ();
-	last_coord := get_touch_coord 0 ev;
-	Lwt.return (Dom.preventDefault ev)));
+      source_event ?use_capture:(Some true) target (fun ev _ ->
+        last_time := Client_js_tools.get_timestamp ();
+        last_coord := get_touch_coord 0 ev;
+        Lwt.return (Dom.preventDefault ev)));
     Lwt.async (fun () ->
-      Lwt_js_events.mousedowns target (fun ev _ ->
-      let time = Client_js_tools.get_timestamp () in
-      let coord = get_coord ev in
-      (* check if it is at same coord and fired less than 100ms after touch *)
-      if (cmp_coord !last_coord coord && (time -. 0.1) <= !last_time)
-      then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
-      Lwt.return () ))
+      prevented_event ?use_capture:(Some true) target (fun ev _ ->
+        let time = Client_js_tools.get_timestamp () in
+        let coord = get_coord ev in
+        (* check if it is at same coord and fired less than 100ms after touch *)
+        if (cmp_coord !last_coord coord && (time -. 0.1) <= !last_time)
+        then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
+        Lwt.return () ))
+
+  let disable_ghost_mouse_event target =
+    begin
+      preventEvent Lwt_js_events.mousedowns Lwt_js_events.touchstarts target;
+      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchmoves target;
+      preventEvent Lwt_js_events.mouseups Lwt_js_events.touchends target
+    end
+
   (* orientation / resize *)
 
   let orientationchange = Dom_html.Event.make "orientationchange"
