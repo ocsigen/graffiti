@@ -14,6 +14,8 @@ let config = Eliom_config.parse_config [logdir_elt; datadir_elt]
 let logdir = !logdir_ref ^ "/"
 let datadir = !datadir_ref ^ "/"
 
+let get_null_date () = "1/1/1992_0h0m0s"
+
 let get_str_localdate () =
   let tm = Unix.localtime (Unix.time ()) in
   let to_str = string_of_int in
@@ -33,3 +35,18 @@ let get_date_value str_date =
     let sec = to_int (List.nth ltime 5) in
     mday, mon, year, hour, min, sec
   with e        -> failwith "Invalide format"
+
+let sec_of_date (mday, mon, year, hour, min, sec) =
+  let tm:Unix.tm =
+    { Unix.tm_sec = sec;
+      Unix.tm_min = min;
+      Unix.tm_hour = hour;
+      Unix.tm_mday = mday;
+      Unix.tm_mon = mon;
+      Unix.tm_year = year - 1900;
+      Unix.tm_wday = 0;
+      Unix.tm_yday = 0;
+      Unix.tm_isdst = true }
+  in
+  let sec, new_tm = Unix.mktime tm in
+  sec

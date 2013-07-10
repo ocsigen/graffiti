@@ -13,17 +13,13 @@ let save_file = Lwt_unix.openfile (Server_tools.logdir ^ "drawing.log")
 
 let output_file =
   lwt file = save_file in
-  Lwt.return
-    (Lwt_io.make
-       ~mode:Lwt_io.output
-       (Lwt_bytes.write file))
+  Lwt.return (Lwt_io.make ~mode:Lwt_io.output (Lwt_bytes.write file))
 
-let input_file =
+(* log tools *)
+
+let input_file () =
   lwt file = save_file in
-  Lwt.return
-    (Lwt_io.make
-       ~mode:Lwt_io.input
-       (Lwt_bytes.read file))
+  Lwt.return (Lwt_io.make ~mode:Lwt_io.input (Lwt_bytes.read file))
 
 let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
   lwt output = output_file in
@@ -35,8 +31,7 @@ let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
   in
   Lwt_io.write_line output str
 
-let read_log () =
-  lwt input = input_file in
+let read_log input =
   lwt str = Lwt_io.read_line input in
 
   let lstr = Str.split (Str.regexp " ") str in
@@ -54,6 +49,61 @@ let read_log () =
   in
   Lwt.return (date, ip, message)
 
+(** start_drawing and end_drawing is a string
+    in format of server_tools.get_str_localdate
+
+    coef_to_replay by default at 0. to replay instanment
+    at 1. replay in real time
+
+    action is function to execute at each getted message *)
+let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
+  lwt input = input_file () in
+  let s = Server_tools.sec_of_date
+    (Server_tools.get_date_value start_drawing)
+  in
+  let e = Server_tools.sec_of_date
+    (Server_tools.get_date_value end_drawing)
+  in
+
+  let map start_time end_time coef action =
+
+    let get_and_wait last_time =
+      lwt date, _, message = read_log input in
+      let current_time = Server_tools.sec_of_date date in
+      lwt () = if (last_time > 0. && coef > 0.)
+        then
+          let time_to_sleep = (current_time -. last_time) *. coef in
+          if time_to_sleep > 0.
+          then Lwt_unix.sleep time_to_sleep
+          else Lwt.return ()
+        else Lwt.return ()
+      in Lwt.return (current_time, message)
+    in
+
+    let rec check_and_do_action current_time message =
+      if (current_time < end_time)
+      then
+        lwt () = action message in
+        aux current_time
+      else Lwt.return (message)
+
+    and aux last_time =
+      try
+        lwt current_time, message = get_and_wait last_time in
+        check_and_do_action current_time message
+      with Failure "Invalide format"   -> aux last_time
+    in aux start_time
+
+  in
+
+  try
+    lwt msg = map 0. s 0. (fun _ -> Lwt.return ()) in
+    lwt () = action msg in
+    lwt _ = map s e coef_to_replay action
+    in Lwt.return ()
+  with End_of_file      -> Lwt.return ()
+
+
 (* surfaces' data *)
 
 let create file_name (width, height) =
@@ -64,9 +114,11 @@ let create file_name (width, height) =
     | e	-> Cairo.Image.create Cairo.Image.ARGB32 ~width ~height
 
 let save_step = 2000
-let current = ref 0
-let last_save = Eliom_reference.eref
-  ~scope:`Site ~persistent:"last_save" "1/1/1992_0h0m0s"
+let store = Ocsipersist.open_store "drawing"
+let nb_drawing () = Ocsipersist.make_persistent ~store
+  ~name:"nb_drawing" ~default:0
+let last_save () = Ocsipersist.make_persistent ~store
+  ~name:"last_save" ~default:(Server_tools.get_null_date ())
 
 let small_name = Server_tools.datadir ^ "small_image.png"
 let medium_name = Server_tools.datadir ^ "medium_image.png"
@@ -91,60 +143,32 @@ let small_base_size = float_of_int small_height
 let medium_base_size = float_of_int medium_height
 let large_base_size = float_of_int large_height
 
-(* initialize image with white *)
-let init_white ctx (width, height) =
-  Cairo.set_source_rgb ctx ~r:1. ~g:1. ~b:1.;
-  Cairo.rectangle ctx 0. 0. (float_of_int width) (float_of_int height);
-  Cairo.stroke_preserve ctx;
-  Cairo.fill ctx;
-
-  (* Apply the ink *)
-  Cairo.stroke ctx
-
 let save_image file_name surface =
   Cairo.PNG.write surface file_name
 
-(* save regulary images  *)
+(** save images bu step of 2000 drawing  *)
 let save_all_images () =
-  if !current >= save_step then
+  lwt nb = nb_drawing () in
+  lwt current = Ocsipersist.get nb in
+  if current >= save_step then
     begin
-      current := 0;
-      ignore (Eliom_reference.set last_save
-                (Server_tools.get_str_localdate ()));
       save_image small_name small_surface;
       save_image medium_name medium_surface;
       save_image large_name large_surface;
+
+      lwt last = last_save () in
+      lwt () = Ocsipersist.set last (Server_tools.get_str_localdate ()) in
+      Ocsipersist.set nb 0
     end
+  else Lwt.return ()
 
-let init_image file_name surface ctx (width, height) =
-  try (* check if file exist, if it okay: do nothing *)
-    Unix.access file_name [Unix.F_OK; Unix.R_OK]
-  with (* else init image with white and save file *)
-    | e	->
-      begin
-	init_white ctx (width, height);
-	save_image file_name surface
-      end
-
-let _ =
-  begin
-    init_image small_name small_surface small_ctx
-      (small_width, small_height);
-    init_image medium_name medium_surface medium_ctx
-      (medium_width, medium_height);
-    init_image large_name large_surface large_ctx
-      (large_width, large_height)
-  end
-
-(* tool *)
+(* draw tools *)
 
 let rgb_from_string color = (* color is in format "#rrggbb" *)
   let get_color i =
     (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255.
   in
   try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
-
-(* core *)
 
 let draw ctx base_size (width, height)
     ((color : string), size, (x1, y1), (x2, y2)) =
@@ -165,18 +189,67 @@ let draw ctx base_size (width, height)
   (* Apply the ink *)
   Cairo.stroke ctx
 
-let draw_server data =
+let draw_server savelog data =
   begin
     draw small_ctx small_base_size (small_width, small_height) data;
     draw medium_ctx medium_base_size (medium_width, medium_height) data;
     draw large_ctx large_base_size (large_width, large_height) data;
-    Lwt.async (fun () -> write_log "127.0.0.1" data);	(* save log *)
+
     (* TODO: Replace 127.0.0.1 by the IP *)
-    incr current;
-    save_all_images ()
+    if savelog then
+	lwt () = write_log "127.0.0.1" data in
+        lwt nb = nb_drawing () in
+        lwt current = Ocsipersist.get nb in
+        lwt () = Ocsipersist.set nb (current + 1) in
+        save_all_images ()
+    else Lwt.return ()
   end
 
-let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
+(* init images *)
+
+(* initialize image with white *)
+let init_white ctx (width, height) =
+  Cairo.set_source_rgb ctx ~r:1. ~g:1. ~b:1.;
+  Cairo.rectangle ctx 0. 0. (float_of_int width) (float_of_int height);
+  Cairo.stroke_preserve ctx;
+  Cairo.fill ctx;
+
+  (* Apply the ink *)
+  Cairo.stroke ctx
+
+let init_image file_name surface ctx (width, height) =
+  try (* check if file exist, if it okay: do nothing *)
+    Unix.access file_name [Unix.F_OK; Unix.R_OK];
+  with (* else init image with white and save file *)
+    | e	->
+      begin
+	init_white ctx (width, height);
+	save_image file_name surface
+      end
+
+let _ =
+  begin
+    (* init images *)
+    init_image small_name small_surface small_ctx
+      (small_width, small_height);
+    init_image medium_name medium_surface medium_ctx
+      (medium_width, medium_height);
+    init_image large_name large_surface large_ctx
+      (large_width, large_height);
+
+    (* redrawing not save drawing *)
+    lwt v = last_save () in
+    lwt last = Ocsipersist.get v in
+    let current = Server_tools.get_str_localdate () in
+    replay_drawing last current (draw_server false)
+  end
+
+
+(* catch drawing *)
+
+let _ = Lwt_stream.iter_s (draw_server true) (Eliom_bus.stream bus)
+
+(* get drawing tools *)
 
 let image_string surface =
   let b = Buffer.create 10000 in
