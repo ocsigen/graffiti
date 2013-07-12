@@ -9,7 +9,7 @@
     let width, height = Client_js_tools.get_screen_size () in
     width <= 480
 
-  let has_medium_screen () =
+  let has_medium_screen_or_less () =
     let width, height = Client_js_tools.get_screen_size () in
     width <= 768
 
@@ -24,12 +24,12 @@
     else func ()
 
   let launch_on_small_medium func =
-    if has_medium_screen ()
+    if has_medium_screen_or_less ()
     then func ()
     else ()
 
   let not_launch_on_small_medium func =
-    if has_medium_screen ()
+    if has_medium_screen_or_less ()
     then ()
     else func ()
 
@@ -49,7 +49,7 @@
       in
 
       (* Check to let or not header *)
-      if has_medium_screen ()
+      if has_medium_screen_or_less ()
       then medium_screen ()
       else false
     )
@@ -67,7 +67,7 @@
     in
 
     (* Set touch action *)
-    let small_screen () =
+    let medium_screen () =
       Lwt.async (fun () ->
         Lwt_js_events.click dom_statring_logo >>= (fun _ ->
           Lwt.return (remove_touch_to_start_logo ())))
@@ -78,8 +78,8 @@
     in
 
     (* Check to let or not 'touch to start' image *)
-    if has_small_screen ()
-    then small_screen ()
+    if has_medium_screen_or_less ()
+    then medium_screen ()
     else normal_screen ()
 
 }}
