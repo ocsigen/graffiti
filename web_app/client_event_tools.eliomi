@@ -8,8 +8,14 @@
       clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
       int * int
 
-  (** First arg is the id of touch *)
-  val get_touch_coord : int -> Dom_html.touchEvent Js.t -> int * int
+  type touch_type = All_touches | Target_touches | Changed_touches
+
+  (** First arg is the way to get touch with JS API
+      Second arg is the id of touch *)
+  val get_touch_coord :
+    ?typ:touch_type ->
+    int ->
+    Dom_html.touchEvent Js.t -> int * int
 
   (** First arg is the target *)
   val get_local_event_coord :
@@ -18,9 +24,11 @@
       clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
     int * int
 
-  (** First arg is the target
-      The second is the index of touch *)
+  (** First arg is the way to get touch with JS API
+      Second arg is the target
+      Third is the index of touch *)
   val get_local_touch_event_coord :
+    ?typ:touch_type ->
     #Dom_html.element Js.t ->
     int ->
     Dom_html.touchEvent Js.t ->
@@ -189,12 +197,19 @@
       Touch_event of Dom_html.touchEvent Js.t
     | Mouse_event of Dom_html.mouseEvent Js.t
 
-  (** The first arg is the id for touch event *)
-  val get_slide_coord : int -> slide_event -> int * int
+  (** First arg is the way to get touch with JS API
+      Second arg is the id for touch event *)
+  val get_slide_coord :
+    ?typ:touch_type ->
+    int ->
+    slide_event ->
+    int * int
 
-  (** The first arg is the target
-      The second arg is the id for touch event *)
+  (** First arg is the way to get touch with JS API
+      Second arg is the target
+      Third arg is the id for touch event *)
   val get_local_slide_coord :
+    ?typ:touch_type ->
     #Dom_html.element Js.t ->
     int ->
     slide_event ->

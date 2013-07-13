@@ -7,18 +7,29 @@ open Lwt
 
   let get_coord ev = ev##clientX, ev##clientY
 
-  let get_touch_coord idx event =
-    let ev = event##touches##item(idx) in
-    Js.Optdef.case ev (fun () -> (0, 0)) get_coord
+  type touch_type = All_touches | Target_touches | Changed_touches
+
+  let get_touch_coord ?(typ=All_touches) idx event =
+    let item = match typ with
+      | All_touches     -> event##touches##item(idx)
+      | Target_touches  -> event##targetTouches##item(idx)
+      | Changed_touches -> event##changedTouches##item(idx)
+    in
+    Js.Optdef.case item (fun () -> (0, 0)) get_coord
+
+  (* A little tool to call get_touch_coord with option value *)
+  let get_touch_coord_with_opt = function
+    | Some v    -> (get_touch_coord ~typ:v)
+    | None      -> (get_touch_coord ~typ:All_touches)
 
   let get_local_event_coord dom_elt ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
     let x, y =  get_coord ev in
     x - ox, y - oy
 
-  let get_local_touch_event_coord dom_elt idx ev =
+  let get_local_touch_event_coord ?typ dom_elt idx ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y =  get_touch_coord idx ev in
+    let x, y =  (get_touch_coord_with_opt typ) idx ev in
     x - ox, y - oy
 
   let cmp_coord (x1, y1) (x2, y2) = x1 = x2 && y1 = y2
@@ -187,12 +198,16 @@ open Lwt
       Touch_event of Dom_html.touchEvent Js.t
     | Mouse_event of Dom_html.mouseEvent Js.t
 
-  let get_slide_coord idx = function
-    | Touch_event ev    -> get_touch_coord idx ev
+  let get_slide_coord ?typ idx = function
+    | Touch_event ev    -> (get_touch_coord_with_opt typ) idx ev
     | Mouse_event ev    -> get_coord ev
 
-  let get_local_slide_coord dom_elt idx = function
-    | Touch_event ev    -> get_local_touch_event_coord dom_elt idx ev
+  let get_local_slide_coord ?typ dom_elt idx = function
+    | Touch_event ev    ->
+      let touch_func = match typ with
+        | Some v        -> (get_local_touch_event_coord ~typ:v)
+        | None          -> (get_local_touch_event_coord ~typ:All_touches)
+      in touch_func dom_elt idx ev
     | Mouse_event ev    -> get_local_event_coord dom_elt ev
 
   let touch_handler func ev = func (Touch_event ev)

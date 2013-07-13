@@ -4,6 +4,14 @@
   open Lwt
   open Eliom_content.Html5.D
 
+  module IntOrdered =
+  struct
+    type t = int
+    let compare = compare
+  end
+
+  module IntMap = Map.Make(IntOrdered)
+
   (** Start and handle draw's event  **)
   let rec start body_elt header_elt canvas_elt canvas2_elt slider color_picker =
 
@@ -34,8 +42,6 @@
       y0 := oy;
     in get_origine_canvas ();
 
-    let x = ref 0. and y = ref 0. in
-
     (*** The initial image ***)
 
     Lwt.async (fun () ->
@@ -61,7 +67,7 @@
 
     in
 
-    let line coord =
+    let line (x, y) coord =
       let data = compute_line (x, y) coord in
       ignore (Eliom_bus.write %Server_image.bus data);
       (* Draw in advance to avoid visual lag *)
@@ -88,11 +94,64 @@
     Client_event_tools.disable_ghost_mouse_event dom_canvas2;
 
     (* drawing events *)
+    let x = ref 0. and y = ref 0. in
+    let touch_coord = ref IntMap.empty in
+
+    let reset_coord ev =
+      touch_coord := IntMap.empty;
+      set_coord (x, y) (Client_event_tools.get_slide_coord 0 ev)
+    in
+
+    let handle_change_touch action ev =
+      let list = ev##changedTouches in
+      let length = list##length in
+
+      let get_data n list =
+        Js.Optdef.case (list##item(n))
+          (fun () -> -1, (0, 0))
+          (fun item -> item##identifier, Client_event_tools.get_coord item)
+      in
+
+      let insert id (x, y) =
+        let tmp = ref 0., ref 0. in
+        set_coord tmp (x, y);
+        touch_coord := IntMap.add id tmp !touch_coord;
+        tmp
+      in
+
+      let do_action id new_coord =
+        let old_coord =
+          if IntMap.exists (fun i _ -> i = id) !touch_coord
+          then IntMap.find id !touch_coord
+          else insert id new_coord
+        in
+        action old_coord new_coord
+      in
+
+      let rec aux = function
+        | -1    -> Lwt.return ()
+        | n     ->
+          let id, new_coord = get_data n list in
+          lwt () = if n >= 0
+            then do_action id new_coord
+            else Lwt.return ()
+          in
+          aux (n - 1)
+      in aux (length - 1)
+    in
+
+    let handler action = function
+      | Client_event_tools.Touch_event ev       ->
+        handle_change_touch action ev
+      | Client_event_tools.Mouse_event ev       ->
+        action (x, y) (Client_event_tools.get_coord ev)
+    in
+
     Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_canvas2
-      (fun ev _ -> set_coord (x, y) (Client_event_tools.get_slide_coord 0 ev);
-                   line (Client_event_tools.get_slide_coord 0 ev))
-      (fun ev _ -> line (Client_event_tools.get_slide_coord 0 ev))
-      (fun ev -> line (Client_event_tools.get_slide_coord 0 ev)));
+      (fun ev _ -> reset_coord ev; handler line ev)
+      (* handler automaticly set_coord for touch here thank to reset *)
+      (fun ev _ -> handler line ev)
+      (fun ev -> handler line ev));
 
     (* Handle preview *)
     let x, y, old_size = ref 0., ref 0., ref 0. in
@@ -102,12 +161,12 @@
 
       (* remove old point with transparanse *)
       Client_canvas.draw ctx2 !base_size !float_size
-      	("rgba(0,0,0,0)", !old_size +. 0.05, oldv, oldv);
+        ("rgba(0,0,0,0)", !old_size +. 0.05, oldv, oldv);
       old_size := new_size;
 
       (* draw new point *)
       Client_canvas.draw ctx2 !base_size !float_size
-    	(color, new_size, v, v);
+        (color, new_size, v, v);
       Lwt.return ()
     in
     Lwt_js_events.async (fun () ->
@@ -133,8 +192,8 @@
         base_size := !height;
         ctx##lineCap <- Js.string "round";
         ctx2##lineCap <- Js.string "round";
-	ctx2##globalCompositeOperation <- Js.string "copy";
-	Client_canvas.init_image ctx bus_mutex (!width, !height) ));
+        ctx2##globalCompositeOperation <- Js.string "copy";
+        Client_canvas.init_image ctx bus_mutex (!width, !height) ));
 
     (* return value *)
     Lwt.return ()
