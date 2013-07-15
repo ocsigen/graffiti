@@ -101,18 +101,13 @@ td
 
 .save_link
 {
-    float: left;
-    margin-top: 12px;
-    margin-left: 17px;
     border: 0px;
 }
 
 .save_div
 {
-    width: 26px;
-    height: 26px;
-    transition: 1s;
-    -webkit-transition: 1s;
+    width: 100%;
+    height: 100%;
 }
 
 .gray_layer

@@ -51,7 +51,6 @@ let _ =
           %Server_html.header_elt
           %Server_html.save_button_elt
           %Server_html.save_link_elt
-          %Server_html.save_div_elt
           %Server_html.about_point
           %Server_html.gray_layer_elt
           %Server_html.about_elt;
