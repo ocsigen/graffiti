@@ -23,24 +23,54 @@
     (* active contract/expand only on small screen *)
     let save_click () =
 
+      let phonegap_image_download () =
+        let uri = Js.string
+          (Eliom_content.Html5.D.make_string_uri
+             ~service:%Server_image.download_imageservice ())
+        in
+        Client_phonegap.download_file uri
+      in
+
+      let cancel_opt_value = function
+        | Some v        -> Lwt.cancel v
+        | None          -> ()
+      in
+
+      let on_phonegap = ref false in
+      let phonegap_handler_id = ref None in
+      Client_phonegap.launch_on_phonegap (fun () -> on_phonegap := true);
+
       let disable_contract = ref false in
       let one_time_disable = ref false in
 
-      let id = ref
+      (* Also disable on phonegap to stop standard behavior *)
+      let handler_id = ref
         (Client_event_tools.disable_event Dom_html.Event.click dom_save_link)
       in
-      let current_id_disable = ref true in
-      let disable_id () = if (not !current_id_disable) then
+      let currently_disable = ref true in
+
+      (* default behavior is prevented or phonegap behavior is removed *)
+      let disable_id () =
+        if (not !currently_disable) then
           begin
-            id := Client_event_tools.disable_event
-	      Dom_html.Event.click dom_save_link;
-            current_id_disable := true
+            if (not !on_phonegap)
+            then handler_id := Client_event_tools.disable_event
+              Dom_html.Event.click dom_save_link
+            else cancel_opt_value !phonegap_handler_id;
+            currently_disable := true
           end
       in
-      let enable_id () = if (!current_id_disable) then
+
+      (* default behavior is re-setted or phonegap behavior is setted *)
+      let enable_id () =
+        if !currently_disable then
           begin
-            Client_event_tools.enable_event !id;
-            current_id_disable := false
+            if (not !on_phonegap)
+            then Client_event_tools.enable_event !handler_id
+            else phonegap_handler_id := Some
+              (Lwt_js_events.click dom_save_link >>= (fun _ ->
+                phonegap_image_download ()));
+            currently_disable := false
           end
       in
 
@@ -77,6 +107,6 @@
           Lwt.return (disable_contract := false))
         30 60)
 
-    in Client_mobile.launch_on_small_medium save_click
+    in Client_mobile.launch_on_small_medium save_click;
 
 }}
