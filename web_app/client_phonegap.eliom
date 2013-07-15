@@ -16,7 +16,8 @@
     else func ()
 
   let download_file uri =
+    let js_null_func = Js.Unsafe.eval_string "function (p) {}" in
     let transfer = Js.Unsafe.eval_string "new FileTransfer()" in
     (Js.Unsafe.coerce transfer)##download(uri, "Graffiti/graffiti.png",
-                                          Js.null, Js.null, true)
+                                          js_null_func, js_null_func, true)
 }}
