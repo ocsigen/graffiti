@@ -37,7 +37,7 @@
     (int -> 'a) ->
     unit Lwt.t
 
-  val hide_navigation_bar : unit -> unit Lwt.t
+  val hide_navigation_bar : unit -> unit
 
   (* others *)
 

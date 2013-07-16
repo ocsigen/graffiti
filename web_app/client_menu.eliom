@@ -69,7 +69,7 @@
             then Client_event_tools.enable_event !handler_id
             else phonegap_handler_id := Some
               (Lwt_js_events.click dom_save_link >>= (fun _ ->
-                phonegap_image_download ()));
+                Lwt.return (phonegap_image_download ())));
             currently_disable := false
           end
       in
