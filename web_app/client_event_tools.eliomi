@@ -3,34 +3,51 @@
 
   (* position / coordinated *)
 
-  val get_coord :
-    < clientX : < get : int; .. > Js.gen_prop;
-      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
-      int * int
+  type position_type = Client | Screen | Page
+
+  (** p_type is at Client by default *)
+  val get_mouse_ev_coord :
+    ?p_type:position_type ->
+    Dom_html.mouseEvent Js.t ->
+    int * int
 
   type touch_type = All_touches | Target_touches | Changed_touches
 
-  (** First arg is the way to get touch with JS API
-      Second arg is the id of touch *)
+  (** p_type is at Client by default *)
   val get_touch_coord :
-    ?typ:touch_type ->
-    int ->
-    Dom_html.touchEvent Js.t -> int * int
-
-  (** First arg is the target *)
-  val get_local_event_coord :
-    #Dom_html.element Js.t ->
-    < clientX : < get : int; .. > Js.gen_prop;
-      clientY : < get : int; .. > Js.gen_prop; .. > Js.t ->
+    ?p_type:position_type ->
+    Dom_html.touch Js.t ->
     int * int
 
-  (** First arg is the way to get touch with JS API
+  (** Based on get_touch_coord
+
+      Int arg is the id of touch
+
+      t_type is at All_touches by default *)
+  val get_touch_ev_coord :
+    ?t_type:touch_type ->
+    int ->
+    ?p_type:position_type ->
+    Dom_html.touchEvent Js.t -> int * int
+
+  (** Based on get_mouse_ev_coord
+
+      Element arg is the target *)
+  val get_local_mouse_ev_coord :
+    #Dom_html.element Js.t ->
+    ?p_type:position_type ->
+    Dom_html.mouseEvent Js.t ->
+    int * int
+
+  (** Based on get_touch_ev_coord
+
       Second arg is the target
       Third is the index of touch *)
-  val get_local_touch_event_coord :
-    ?typ:touch_type ->
+  val get_local_touch_ev_coord :
     #Dom_html.element Js.t ->
+    ?t_type:touch_type ->
     int ->
+    ?p_type:position_type ->
     Dom_html.touchEvent Js.t ->
     int * int
 
@@ -197,21 +214,31 @@
       Touch_event of Dom_html.touchEvent Js.t
     | Mouse_event of Dom_html.mouseEvent Js.t
 
-  (** First arg is the way to get touch with JS API
-      Second arg is the id for touch event *)
+  (** Based on get_mouse_ev_coord and get_touch_ev_coord
+
+      First arg is the way to get touch with JS API
+      Second arg is the id for touch event
+
+      It get client positions *)
   val get_slide_coord :
-    ?typ:touch_type ->
+    ?t_type:touch_type ->
     int ->
+    ?p_type:position_type ->
     slide_event ->
     int * int
 
-  (** First arg is the way to get touch with JS API
+  (** Based on get_local_mouse_ev_coord and get_local_touch_ev_coord
+
+      First arg is the way to get touch with JS API
       Second arg is the target
-      Third arg is the id for touch event *)
+      Third arg is the id for touch event
+
+      It get client positions *)
   val get_local_slide_coord :
-    ?typ:touch_type ->
     #Dom_html.element Js.t ->
+    ?t_type:touch_type ->
     int ->
+    ?p_type:position_type ->
     slide_event ->
     int * int
 

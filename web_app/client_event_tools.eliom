@@ -5,31 +5,38 @@ open Lwt
 
   (* position / coordinated *)
 
-  let get_coord ev = ev##clientX, ev##clientY
+  type position_type = Client | Screen | Page
+
+  let get_mouse_ev_coord ?(p_type=Client) ev = match p_type with
+    | Client    -> ev##clientX, ev##clientY
+    | Screen    -> ev##screenX, ev##screenY
+    | Page      ->
+      Js.Optdef.case (ev##pageX) (fun () -> 0) (fun x -> x),
+      Js.Optdef.case (ev##pageY) (fun () -> 0) (fun y -> y)
 
   type touch_type = All_touches | Target_touches | Changed_touches
 
-  let get_touch_coord ?(typ=All_touches) idx event =
-    let item = match typ with
+  let get_touch_coord ?(p_type=Client) ev = match p_type with
+    | Client    -> ev##clientX, ev##clientY
+    | Screen    -> ev##screenX, ev##screenY
+    | Page      -> ev##pageX, ev##pageY
+
+  let get_touch_ev_coord ?(t_type=All_touches) idx ?p_type event =
+    let item = match t_type with
       | All_touches     -> event##touches##item(idx)
       | Target_touches  -> event##targetTouches##item(idx)
       | Changed_touches -> event##changedTouches##item(idx)
     in
-    Js.Optdef.case item (fun () -> (0, 0)) get_coord
+    Js.Optdef.case item (fun () -> (0, 0)) (get_touch_coord ?p_type)
 
-  (* A little tool to call get_touch_coord with option value *)
-  let get_touch_coord_with_opt = function
-    | Some v    -> (get_touch_coord ~typ:v)
-    | None      -> (get_touch_coord ~typ:All_touches)
-
-  let get_local_event_coord dom_elt ev =
+  let get_local_mouse_ev_coord dom_elt ?p_type ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y =  get_coord ev in
+    let x, y =  get_mouse_ev_coord ?p_type ev in
     x - ox, y - oy
 
-  let get_local_touch_event_coord ?typ dom_elt idx ev =
+  let get_local_touch_ev_coord dom_elt ?t_type idx ?p_type ev =
     let ox, oy = Dom_html.elementClientPosition dom_elt in
-    let x, y =  (get_touch_coord_with_opt typ) idx ev in
+    let x, y =  get_touch_ev_coord ?t_type idx ?p_type ev in
     x - ox, y - oy
 
   let cmp_coord (x1, y1) (x2, y2) = x1 = x2 && y1 = y2
@@ -77,12 +84,12 @@ open Lwt
     Lwt.async (fun () ->
       source_event ?use_capture:(Some true) target (fun ev _ ->
         last_time := Client_js_tools.get_timestamp ();
-        last_coord := get_touch_coord 0 ev;
+        last_coord := get_touch_ev_coord 0 ev;
         Lwt.return (Dom.preventDefault ev)));
     Lwt.async (fun () ->
       prevented_event ?use_capture:(Some true) target (fun ev _ ->
         let time = Client_js_tools.get_timestamp () in
-        let coord = get_coord ev in
+        let coord = get_mouse_ev_coord ev in
         (* check if it is at same coord and fired less than 100ms after touch *)
         if (cmp_coord !last_coord coord && (time -. 0.1) <= !last_time)
         then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
@@ -195,17 +202,15 @@ open Lwt
       Touch_event of Dom_html.touchEvent Js.t
     | Mouse_event of Dom_html.mouseEvent Js.t
 
-  let get_slide_coord ?typ idx = function
-    | Touch_event ev    -> (get_touch_coord_with_opt typ) idx ev
-    | Mouse_event ev    -> get_coord ev
+  let get_slide_coord ?t_type idx ?p_type = function
+    | Touch_event ev    -> get_touch_ev_coord ?t_type idx ?p_type ev
+    | Mouse_event ev    -> get_mouse_ev_coord ?p_type ev
 
-  let get_local_slide_coord ?typ dom_elt idx = function
+  let get_local_slide_coord dom_elt ?t_type idx ?p_type = function
     | Touch_event ev    ->
-      let touch_func = match typ with
-        | Some v        -> (get_local_touch_event_coord ~typ:v)
-        | None          -> (get_local_touch_event_coord ~typ:All_touches)
-      in touch_func dom_elt idx ev
-    | Mouse_event ev    -> get_local_event_coord dom_elt ev
+      get_local_touch_ev_coord dom_elt ?t_type idx ?p_type ev
+    | Mouse_event ev    ->
+      get_local_mouse_ev_coord dom_elt ?p_type ev
 
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
@@ -256,7 +261,7 @@ open Lwt
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
       let width, height = Client_js_tools.get_document_size () in
-      let current_x, current_y = get_coord ev in
+      let current_x, current_y = get_mouse_ev_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in
       let end_x' = get_relative_position width end_x in
