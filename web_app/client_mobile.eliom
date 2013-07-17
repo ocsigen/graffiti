@@ -5,13 +5,15 @@
 
   let already_removed = ref false
 
+  (* Handheld screen *)
   let has_small_screen () =
     let width, height = Client_js_tools.get_screen_size () in
-    width <= 480
+    width <= 768
 
+  (* Tablet screen *)
   let has_medium_screen_or_less () =
     let width, height = Client_js_tools.get_screen_size () in
-    width <= 768
+    width <= 980
 
   let launch_on_small func =
     if has_small_screen ()

@@ -9,7 +9,7 @@
   (*** images tools ***)
 
   let max_resolution = 16
-  let min_resolution = 8
+  let min_resolution = 9
 
   (** Calcul min resolution with max value, make cross product **)
   let get_min_resolution max =

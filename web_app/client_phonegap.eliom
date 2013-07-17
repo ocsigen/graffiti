@@ -3,8 +3,7 @@
   open Lwt
 
   let on_phonegap () =
-    (Js.Unsafe.eval_string "'device' in window") &&
-    (Js.Unsafe.eval_string "'cordova' in window.device")
+    (Js.to_bool (Js.Unsafe.eval_string "'device' in window"))
 
   let launch_on_phonegap func =
     if on_phonegap ()
@@ -32,7 +31,7 @@
 
   (** ifpg series mind if on phonegap do it action else directly return *)
   let ondeviceready_ifpg () =
-    if on_phonegap ()
+    if (Js.to_bool (Js.Unsafe.eval_string "'deviceready' in window"))
     then (ondeviceready () >>= fun ev -> Lwt.return (Some ev))
     else Lwt.return (None)
 

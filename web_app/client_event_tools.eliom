@@ -92,10 +92,7 @@ open Lwt
     preventEvent Lwt_js_events.mousedowns Lwt_js_events.touchstarts target
 
   let disable_ghost_mousemove target =
-    begin
-      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchstarts target;
-      preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchmoves target
-    end
+    preventEvent Lwt_js_events.mousemoves Lwt_js_events.touchmoves target
 
   let disable_ghost_mouseup target =
     preventEvent Lwt_js_events.mouseups Lwt_js_events.touchends target

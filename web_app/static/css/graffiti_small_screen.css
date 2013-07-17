@@ -1,5 +1,6 @@
 
-@media only screen and (max-device-width: 480px)
+//Handheld
+@media only screen and (max-device-width: 768px)
 {
 
     body

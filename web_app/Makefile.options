@@ -23,6 +23,7 @@ FILES :=     server_tools.eliom		\
       	     server_html.eliom		\
 	     client_mobile.eliom	\
 	     client_phonegap.eliom	\
+	     client_phonegap.eliomi	\
 	     client_header.eliom	\
 	     client_menu_tools.eliom	\
 	     client_canvas.eliom	\
