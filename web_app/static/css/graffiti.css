@@ -97,6 +97,7 @@ td
     -webkit-transition: 1s;
     box-shadow: 0px 0px 5px #555555;
     -webkit-box-shadow: 0px 0px 3px #555555;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .save_link
@@ -166,6 +167,7 @@ canvas
     margin: 0;
     border-color: transparent;
     background-color: transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
 div#canvas {
@@ -217,6 +219,7 @@ div#canvas {
     background-color: #3E3E3E;
     border-radius: 0px 30px 30px 0px;
     text-align: center;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .grf_color_picker_color_div
@@ -263,6 +266,7 @@ div#canvas {
 {
     width: 100%;
     height: 40px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* the vertical align is make direclty with image's height */
@@ -274,4 +278,5 @@ div#canvas {
     background-repeat: no-repeat, no-repeat;
     background-position: center top, center bottom;
     height: 92%;
+    -webkit-tap-highlight-color: transparent;
 }
