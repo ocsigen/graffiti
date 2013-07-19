@@ -44,7 +44,7 @@ let canvas_elt =
 
 let canvas2_elt =
   D.canvas ~a:[a_width start_width; a_height start_height;
-	       D.Unsafe.string_attrib "draggable" "false";
+               D.Unsafe.string_attrib "draggable" "false";
                a_class["canvas2"; "unselectable"]] []
 
 
@@ -74,7 +74,7 @@ let palette_button = D.table ~a:[a_class["palette_button"]]
     (tr [td ~a:[a_class["max_height"]] [color_div]]) []
 
 let palette_wrapper = D.div ~a:[a_class["palette_wrap"]]
-  [table (tr ~a:[a_class["max_height"]]	[td [slider_elt]; td [block]]) [];
+  [table (tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block]]) [];
    palette_button]
 
 (* starting logo *)
@@ -96,6 +96,40 @@ let header_elt =
   D.div ~a:[a_class["header_div"; "unselectable"]] []
 
 let body_elt = D.body ~a:[a_class["unselectable"]]
-  ([header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
-    save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
-    starting_logo_elt])
+  [header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
+   save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
+   starting_logo_elt]
+
+let main_service_html =
+  (html
+     (Eliom_tools.F.head ~title:"Graffiti"
+        ~css:[["css"; "grf_color_picker.css"];
+              ["css"; "grf_slider.css"];
+              ["css"; "graffiti.css"];
+              ["css"; "graffiti_small_screen.css"];
+              ["css"; "graffiti_medium_screen.css"];
+              ["css"; "graffiti_large_screen.css"]]
+        ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";
+                         a_content "IE=edge,chrome=1"]
+                   ();
+                meta ~a:[a_name "viewport";
+                         a_content "user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"]
+                  () ] ())
+     body_elt)
+
+
+(* body durin intialize process  *)
+let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
+                     div [pcdata "Try again in a few moment."]]
+
+let tmp_service_html =
+  (html
+     (Eliom_tools.F.head ~title:"Graffiti"
+        ~css:[["css"; "graffiti.css"]]
+        ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";
+                         a_content "IE=edge,chrome=1"]
+                   ();
+                meta ~a:[a_name "viewport";
+                         a_content "user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"]
+                  () ] ())
+     tmp_body)

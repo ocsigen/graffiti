@@ -201,7 +201,7 @@
 
   (*** init client ***)
   let initialize () =
-    lwt _ = Client_phonegap.onload_ondeviceready_ifpg () in
+    lwt _ = Client_phonegap.ondeviceready_ifpg () in
     begin
 
       (* Remove navigation bar *)

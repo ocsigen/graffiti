@@ -96,7 +96,7 @@ let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
 
   in
 
-  try
+  try_lwt
     lwt msg = map 0. s 0. (fun _ -> Lwt.return ()) in
     lwt () = action msg in
     lwt _ = map s e coef_to_replay action
@@ -111,9 +111,9 @@ let create file_name (width, height) =
     Unix.access file_name [Unix.F_OK; Unix.R_OK];
     Cairo.PNG.create file_name
   with (* else create simple surface *)
-    | e	-> Cairo.Image.create Cairo.Image.ARGB32 ~width ~height
+    | e -> Cairo.Image.create Cairo.Image.ARGB32 ~width ~height
 
-let save_step = 2000
+let save_step = 1000
 let store = Ocsipersist.open_store "drawing"
 let nb_drawing () = Ocsipersist.make_persistent ~store
   ~name:"nb_drawing" ~default:0
@@ -146,7 +146,7 @@ let large_base_size = float_of_int large_height
 let save_image file_name surface =
   Cairo.PNG.write surface file_name
 
-(** save images bu step of 2000 drawing  *)
+(** save images by step of 1000 drawing  *)
 let save_all_images () =
   lwt nb = nb_drawing () in
   lwt current = Ocsipersist.get nb in
@@ -197,7 +197,7 @@ let draw_server savelog data =
 
     (* TODO: Replace 127.0.0.1 by the IP *)
     if savelog then
-	lwt () = write_log "127.0.0.1" data in
+        lwt () = write_log "127.0.0.1" data in
         lwt nb = nb_drawing () in
         lwt current = Ocsipersist.get nb in
         lwt () = Ocsipersist.set nb (current + 1) in
@@ -221,13 +221,13 @@ let init_image file_name surface ctx (width, height) =
   try (* check if file exist, if it okay: do nothing *)
     Unix.access file_name [Unix.F_OK; Unix.R_OK];
   with (* else init image with white and save file *)
-    | e	->
+    | e ->
       begin
-	init_white ctx (width, height);
-	save_image file_name surface
+        init_white ctx (width, height);
+        save_image file_name surface
       end
 
-let _ =
+let replay_no_save_drawing =
   begin
     (* init images *)
     init_image small_name small_surface small_ctx
@@ -243,7 +243,6 @@ let _ =
     let current = Server_tools.get_str_localdate () in
     replay_drawing last current (draw_server false)
   end
-
 
 (* catch drawing *)
 

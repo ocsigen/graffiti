@@ -9,7 +9,7 @@ let logdir_elt = make_element "logdir" logdir_ref
 let datadir_ref = ref ""
 let datadir_elt = make_element "datadir" datadir_ref
 
-let config = Eliom_config.parse_config [logdir_elt; datadir_elt]
+let () = Eliom_config.parse_config [logdir_elt; datadir_elt]
 
 let logdir = !logdir_ref ^ "/"
 let datadir = !datadir_ref ^ "/"
