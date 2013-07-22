@@ -112,7 +112,8 @@ let main_service_html =
         ~css:[["css"; "grf_color_picker.css"];
               ["css"; "grf_slider.css"];
               ["css"; "graffiti.css"];
-              ["css"; "graffiti_small_screen.css"];
+              ["css"; "graffiti_small_handheld_screen.css"];
+              ["css"; "graffiti_handheld_screen.css"];
               ["css"; "graffiti_medium_screen.css"];
               ["css"; "graffiti_large_screen.css"]]
         ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";

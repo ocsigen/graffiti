@@ -1,0 +1,27 @@
+
+//Handheld
+@media only screen and (min-device-width: 481px) and (max-device-width: 768px)
+{
+
+    body
+    {
+        font-size:0.8em;
+    }
+
+    canvas
+    {
+        margin-left: 25px;
+    }
+
+    .save_button
+    {
+        width: 30px;
+        top: 80px;
+    }
+
+    .palette_wrap
+    {
+        left: -196px;
+    }
+
+}
