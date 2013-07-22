@@ -278,8 +278,8 @@ let large_download_imageservice =
 let imageservice =
   Eliom_registration.String.register_service
     ~path:["image"; "adaptation.png"]
-    ~get_params:Eliom_parameter.(int "width" ** float "time")
-    (fun (width, _) () -> Lwt.return
+    ~get_params:Eliom_parameter.(int "width")
+    (fun (width) () -> Lwt.return
       ((match width with
         | w when (cmp_small w)  -> small_image_string ()
         | w when (cmp_medium w) -> medium_image_string ()

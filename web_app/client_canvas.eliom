@@ -85,11 +85,9 @@
 	Lwt_mutex.unlock bus_mutex;
         Lwt.return ());
 
-      (* allow to avoid cach image *)
-      let attr = Client_js_tools.get_timestamp () in
       dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
 				   ~service:%Server_image.imageservice
-				   (int_of_float width, attr));
+				   (int_of_float width));
 
       Lwt.return ()
 

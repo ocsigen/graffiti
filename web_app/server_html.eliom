@@ -100,8 +100,14 @@ let body_elt = D.body ~a:[a_class["unselectable"]]
    save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
    starting_logo_elt]
 
+(* body durin intialize process  *)
+let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
+                     div [pcdata "Try again in a few moment."]]
+
+let manifest_uri = Xml.uri_of_string "graffiti.appcache"
+
 let main_service_html =
-  (html
+  (html ~a:[a_manifest manifest_uri]
      (Eliom_tools.F.head ~title:"Graffiti"
         ~css:[["css"; "grf_color_picker.css"];
               ["css"; "grf_slider.css"];
@@ -117,19 +123,10 @@ let main_service_html =
                   () ] ())
      body_elt)
 
-
-(* body durin intialize process  *)
-let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
-                     div [pcdata "Try again in a few moment."]]
-
+(* html durin intialize process  *)
 let tmp_service_html =
-  (html
+  (html ~a:[a_manifest manifest_uri]
      (Eliom_tools.F.head ~title:"Graffiti"
         ~css:[["css"; "graffiti.css"]]
-        ~other:[meta ~a:[a_http_equiv "X-UA-Compatible";
-                         a_content "IE=edge,chrome=1"]
-                   ();
-                meta ~a:[a_name "viewport";
-                         a_content "user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"]
-                  () ] ())
+	())
      tmp_body)

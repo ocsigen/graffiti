@@ -1,0 +1,39 @@
+CACHE MANIFEST
+# V1.0 22/07/2013
+
+### CACHE
+
+# CSS
+css/graffiti.css
+css/graffiti_large_screen.css
+css/graffiti_medium_screen.css
+css/graffiti_small_screen.css
+css/grf_color_picker.css
+css/grf_slider.css
+
+# IMG
+img/about.png
+img/angle.png
+img/Logo_GRAFFITIbyOcsigen_blue.png
+img/Logo_GRAFFITIbyOcsigen_green.png
+img/Logo_GRAFFITIbyOcsigen_purple.png
+img/Logo_GRAFFITIbyOcsigen_yellow.png
+img/Logo_GRAFFITIbyOcsigenTouch.png
+img/maxibrush.png
+img/minibrush.png
+img/menu.png
+img/menu_hover.png
+img/save.png
+
+# JS
+graffiti.js
+
+### Resources which need to be reload each time
+NETWORK:
+
+# canvas image
+image/adaptation.png
+
+# download images
+image/graffiti.png
+image/large_graffiti.png
