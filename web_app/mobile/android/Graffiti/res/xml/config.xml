@@ -23,19 +23,17 @@
     Domains are assumed blocked unless set otherwise
      -->
 
-    <access origin="http://127.0.0.1" /> <!-- allow local pages -->
-    <access origin="http://ocsigen.org" /> <!-- allow ocsigen pages -->
+    <access origin="http://ocsigen.org"/> <!-- allow local pages -->
 
     <!-- <access origin="https://example.com" /> allow any secure requests to example.com -->
     <!-- <access origin="https://example.com" subdomains="true" /> such as above, but including subdomains, such as www -->
 
     <!-- <content src="http://mysite.com/myapp.html" /> for external pages -->
-    <content src="index.html" />
+    <content src="http://ocsigen.org/graffiti2" />
 
     <log level="DEBUG"/>
     <preference name="useBrowserHistory" value="true" />
-    <preference name="exit-on-suspend" value="true" />
-    <preference name="fullscreen" value="true" />
+    <preference name="exit-on-suspend" value="false" />
 <plugins>
     <plugin name="App" value="org.apache.cordova.App"/>
     <plugin name="Geolocation" value="org.apache.cordova.GeoBroker"/>
