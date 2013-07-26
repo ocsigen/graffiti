@@ -124,10 +124,46 @@ let main_service_html =
                   () ] ())
      body_elt)
 
-(* html durin intialize process  *)
+(* html during intialize process  *)
 let tmp_service_html =
   (html
      (Eliom_tools.F.head ~title:"Graffiti"
         ~css:[["css"; "graffiti.css"]]
 	())
      tmp_body)
+
+let setting_form =
+  post_form ~service:Server_service.start_replay_service
+    (fun (start_d, (start_t, (end_d, end_t))) ->
+	[fieldset
+	    [label ~a:[a_for start_d] [pcdata "Date to start"];
+	     string_input ~input_type:`Date ~name:start_d ();
+	     br ();
+	     label ~a:[a_for start_t] [pcdata "Time to start"];
+	     string_input ~input_type:`Time ~name:start_t ();
+	     br ();
+	     label ~a:[a_for end_d] [pcdata "Date to finish"];
+	     string_input ~input_type:`Date ~name:end_d ();
+	     br ();
+	     label ~a:[a_for end_d] [pcdata "Time to finish"];
+	     string_input ~input_type:`Time ~name:end_t ();
+	     br ();
+	     string_input ~input_type:`Submit ~value:"Send" ();
+	]]) ()
+
+(* html for setting replay  *)
+let setting_replay_service_html =
+  (html
+     (Eliom_tools.F.head ~title:"Graffiti"
+        ~css:[["css"; "graffiti.css"]]
+	())
+     (body [setting_form]))
+
+(* html for starting replay  *)
+let starting_replay_service_html d1 t1 d2 t2 =
+  (html
+     (Eliom_tools.F.head ~title:"Graffiti"
+        ~css:[["css"; "graffiti.css"]]
+	())
+     (body [div [pcdata d1; pcdata " "; pcdata t1];
+	    div [pcdata d2; pcdata " "; pcdata t2]]))
