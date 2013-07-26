@@ -75,7 +75,7 @@
       and made peventDefault to avoid mouse propagation
 
       moreover if mousedown is fired
-      at same coord and at less then 100ms after:
+      at same coord and at less then 350ms after:
       a preventDefault and stopPropagation is made on it *)
   val disable_ghost_mousedown : #Dom_html.eventTarget Js.t -> unit
 

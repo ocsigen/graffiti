@@ -90,8 +90,8 @@ open Lwt
       prevented_event ?use_capture:(Some true) target (fun ev _ ->
         let time = Client_js_tools.get_timestamp () in
         let coord = get_mouse_ev_coord ev in
-        (* check if it is at same coord and fired less than 100ms after touch *)
-        if (cmp_coord !last_coord coord && (time -. 0.1) <= !last_time)
+        (* check if it is at same coord and fired less than 350ms after touch *)
+        if (cmp_coord !last_coord coord && (time -. 0.35) <= !last_time)
         then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
         Lwt.return () ))
 

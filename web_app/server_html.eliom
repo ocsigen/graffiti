@@ -126,7 +126,7 @@ let main_service_html =
 
 (* html durin intialize process  *)
 let tmp_service_html =
-  (html ~a:[a_manifest manifest_uri]
+  (html
      (Eliom_tools.F.head ~title:"Graffiti"
         ~css:[["css"; "graffiti.css"]]
 	())
