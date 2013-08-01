@@ -8,18 +8,19 @@ let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
 
 (* file *)
 
-let save_file = Lwt_unix.openfile (Server_tools.logdir ^ "drawing.log")
-  [Lwt_unix.O_RDWR; Lwt_unix.O_CREAT; Lwt_unix.O_APPEND] 0o644
+let save_file_name = (Server_tools.logdir ^ "drawing.log")
 
 let output_file =
-  lwt file = save_file in
-  Lwt.return (Lwt_io.make ~mode:Lwt_io.output (Lwt_bytes.write file))
+  Lwt_io.open_file
+    ~flags:[Lwt_unix.O_RDWR; Lwt_unix.O_CREAT; Lwt_unix.O_APPEND]
+    ~perm:0o644
+    ~mode:Lwt_io.output
+    save_file_name
 
 (* log tools *)
 
 let input_file () =
-  lwt file = save_file in
-  Lwt.return (Lwt_io.make ~mode:Lwt_io.input (Lwt_bytes.read file))
+  Lwt_io.open_file ~mode:Lwt_io.input save_file_name
 
 let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
   lwt output = output_file in
@@ -70,12 +71,9 @@ let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
     let get_and_wait last_time =
       lwt date, _, message = read_log input in
       let current_time = Server_tools.sec_of_date date in
-      lwt () = if (last_time > 0. && coef > 0.)
-        then
-          let time_to_sleep = (current_time -. last_time) *. coef in
-          if time_to_sleep > 0.
-          then Lwt_unix.sleep time_to_sleep
-          else Lwt.return ()
+      let time_to_sleep = (current_time -. last_time) *. coef in
+      lwt () = if (last_time > 0. && time_to_sleep > 0.)
+        then Lwt_unix.sleep time_to_sleep
         else Lwt.return ()
       in Lwt.return (current_time, message)
     in
@@ -99,9 +97,12 @@ let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
   try_lwt
     lwt msg = map 0. s 0. (fun _ -> Lwt.return ()) in
     lwt () = action msg in
-    lwt _ = map s e coef_to_replay action
-    in Lwt.return ()
-  with End_of_file      -> Lwt.return ()
+    lwt _ = map s e coef_to_replay action in
+    lwt () = Lwt_io.close input in
+    Lwt.return ()
+  with End_of_file      ->
+    lwt () = Lwt_io.close input in
+    Lwt.return ()
 
 
 (* surfaces' data *)
@@ -118,7 +119,7 @@ let store = Ocsipersist.open_store "drawing"
 let nb_drawing () = Ocsipersist.make_persistent ~store
   ~name:"nb_drawing" ~default:0
 let last_save () = Ocsipersist.make_persistent ~store
-  ~name:"last_save" ~default:(Server_tools.get_null_date ())
+  ~name:"last_save" ~default:Server_tools.null_date
 
 let small_name = Server_tools.datadir ^ "small_image.png"
 let medium_name = Server_tools.datadir ^ "medium_image.png"

@@ -21,5 +21,6 @@ let start_replay_service =
     ~name:"start_replay"
     ~fallback:setting_replay_service
     ~post_params:Eliom_parameter.(string "start_d" ** string "start_t" **
-				  string "end_d" ** string "end_t")
+				  string "end_d" ** string "end_t" **
+				  float "coef_to_replay")
     ()

@@ -12,7 +12,7 @@
   module IntMap = Map.Make(IntOrdered)
 
   (** Start and handle draw's event  **)
-  let rec start body_elt header_elt canvas_elt canvas2_elt slider color_picker =
+  let start body_elt header_elt canvas_elt canvas2_elt slider color_picker =
 
     (*** Init data***)
     let size =
@@ -201,7 +201,6 @@
 
   (*** init client ***)
   let initialize () =
-    lwt _ = Client_phonegap.ondeviceready_ifpg () in
     begin
 
       (* Remove navigation bar *)
@@ -245,6 +244,62 @@
       Client_mobile.handle_touch_to_start
          %Server_html.body_elt
          %Server_html.starting_logo_elt;
+
+      Lwt.return ()
+
+    end
+
+  (*** Start replay ***)
+  let start_replay body_elt header_elt canvas_elt canvas2_elt server_bus =
+
+    (*** Init data***)
+    let size =
+      Client_canvas.init_size body_elt header_elt canvas_elt canvas2_elt
+    in
+    let width = ref (float_of_int (fst size)) in
+    let height = ref (float_of_int (snd size)) in
+    let float_size = ref (!width, !height) in
+    let base_size = ref !height in
+
+    let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let ctx = dom_canvas##getContext (Dom_html._2d_) in
+    ctx##lineCap <- Js.string "round";
+
+    let bus_draw (color, brush_size, (x1, y1), (x2, y2)) =
+      Client_canvas.draw ctx !base_size !float_size
+        (color, brush_size, (x1, y1), (x2, y2))
+    in
+
+    (* get bus message *)
+    Lwt.async (fun () ->
+      Lwt_stream.iter bus_draw (Eliom_bus.stream server_bus))
+
+
+  (*** init client to replay ***)
+  let initialize_replay server_bus body_elt header_elt canvas_elt canvas2_elt
+	  angle_elt gray_layer_elt about_elt starting_logo_elt =
+    begin
+
+      (* Remove navigation bar *)
+      Client_js_tools.hide_navigation_bar ();
+
+      (* Random logo image *)
+      Client_header.rand_logo
+         body_elt
+         header_elt;
+
+      (* start canvas script *)
+      ignore (start_replay
+         body_elt
+         header_elt
+         canvas_elt
+         canvas2_elt
+      	 server_bus);
+
+      (* Check if 'touch to start' have to be removed (on pc) *)
+      Client_mobile.handle_touch_to_start
+         body_elt
+         starting_logo_elt;
 
       Lwt.return ()
 
