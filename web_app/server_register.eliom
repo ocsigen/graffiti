@@ -18,12 +18,12 @@ let _ =
 let _ =
   Server_service.My_app.register
     ~service:Server_service.setting_replay_service
-    (fun () () -> Lwt.return (Server_html.setting_replay_service_html))
+    (fun () () -> Lwt.return (Server_html.setting_replay_service_html ()))
 
 let _ =
   Server_service.My_app.register
     ~service:Server_service.start_replay_service
-    (fun () (d1, (t1, (d2, (t2, coef_to_replay)))) ->
+    (fun () (d1, (t1, (d2, (t2, (coef_to_replay, hts))))) ->
       try
 	let dt1 = Server_tools.datetime_of_jsdatetime d1 t1 in
 	let dt2 = Server_tools.datetime_of_jsdatetime d2 t2 in
@@ -39,8 +39,20 @@ let _ =
 	let write data =
 	  Lwt.return (Eliom_bus.write bus data)
 	in
+	let coef =
+	  if not (coef_to_replay = 0)
+	  then 1. /. (float_of_int coef_to_replay)
+	  else float_of_int coef_to_replay
+	in
+	let bool_hts = match hts with
+	  | Some _	-> true
+	  | _		-> false
+	in
 	Lwt.async (fun () ->
-	  Server_image.replay_drawing ~coef_to_replay dt1 dt2 write);
+	  Server_image.replay_drawing
+	    ~coef_to_replay:coef
+	    ~skip_hts:bool_hts
+	    dt1 dt2 write);
 
 	let html_elt, body_elt, header_elt, canvas_elt, canvas2_elt,
 	  angle_elt, gray_layer_elt, about_elt, starting_logo_elt =

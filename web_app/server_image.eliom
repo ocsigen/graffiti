@@ -56,9 +56,16 @@ let read_log input =
     coef_to_replay by default at 0. to replay instanment
     at 1. replay in real time
 
+    skip_hts = skip huge time space,
+    It is false by default
+    It is all time space greater than 5s
+
     action is function to execute at each getted message *)
-let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
+let replay_drawing
+    ?(coef_to_replay=0.) ?(skip_hts=false)
+    start_drawing end_drawing action =
   lwt input = input_file () in
+
   let s = Server_tools.sec_of_date
     (Server_tools.get_date_value start_drawing)
   in
@@ -66,13 +73,16 @@ let replay_drawing ?(coef_to_replay=0.) start_drawing end_drawing action =
     (Server_tools.get_date_value end_drawing)
   in
 
+  let max_time_space = 5. in
+
   let map start_time end_time coef action =
 
     let get_and_wait last_time =
       lwt date, _, message = read_log input in
       let current_time = Server_tools.sec_of_date date in
       let time_to_sleep = (current_time -. last_time) *. coef in
-      lwt () = if (last_time > 0. && time_to_sleep > 0.)
+      let skip = (skip_hts && time_to_sleep > max_time_space) in
+      lwt () = if (not skip && last_time > 0. && time_to_sleep > 0.)
         then Lwt_unix.sleep time_to_sleep
         else Lwt.return ()
       in Lwt.return (current_time, message)

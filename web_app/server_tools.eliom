@@ -16,18 +16,21 @@ let datadir = !datadir_ref ^ "/"
 
 let null_date = "1/1/1992_0h0m0s0"
 
-let get_str_localdate () =
-
-  let get_millisecond () =
-    int_of_float ((mod_float (Unix.gettimeofday ()) 1.) *. 1000.)
-  in
-
-  let tm = Unix.localtime (Unix.time ()) in
+let strdate_of_tm tm mls =
   let to_str = string_of_int in
   (to_str tm.Unix.tm_mday) ^ "/" ^ (to_str (tm.Unix.tm_mon + 1)) ^ "/" ^
   (to_str (tm.Unix.tm_year + 1900)) ^ "_" ^ (to_str tm.Unix.tm_hour) ^ "h" ^
   (to_str tm.Unix.tm_min) ^ "m" ^ (to_str tm.Unix.tm_sec) ^ "s" ^
-  (to_str (get_millisecond ()))
+  (to_str mls)
+
+let datevalue_of_tm tm mls =
+  tm.Unix.tm_mday, tm.Unix.tm_mon + 1, tm.Unix.tm_year + 1900,
+  tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec, mls
+
+let get_str_localdate () =
+  let tm = Unix.localtime (Unix.time ()) in
+  let mls = int_of_float ((mod_float (Unix.gettimeofday ()) 1.) *. 1000.) in
+  strdate_of_tm tm mls
 
 let get_date_value str_date =
   try
@@ -47,7 +50,7 @@ let get_date_value str_date =
     mday, mon, year, hour, min, sec, mls
   with e        -> failwith "Invalide format"
 
-let sec_of_date (mday, mon, year, hour, min, sec, mls) =
+let check_and_fix_date (mday, mon, year, hour, min, sec, _) =
   let tm:Unix.tm =
     { Unix.tm_sec = sec;
       Unix.tm_min = min;
@@ -58,8 +61,10 @@ let sec_of_date (mday, mon, year, hour, min, sec, mls) =
       Unix.tm_wday = 0;
       Unix.tm_yday = 0;
       Unix.tm_isdst = true }
-  in
-  let sec, new_tm = Unix.mktime tm in
+  in Unix.mktime tm
+
+let sec_of_date (mday, mon, year, hour, min, sec, mls) =
+  let sec, _ = check_and_fix_date (mday, mon, year, hour, min, sec, mls) in
   sec +. ((float_of_int mls) /. 1000.)
 
 let date_of_jsdate d =

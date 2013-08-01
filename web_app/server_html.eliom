@@ -90,19 +90,7 @@ let starting_logo_elt =
                 ()]])
     []
 
-(* header / body *)
-
-let header_elt =
-  D.div ~a:[a_class["header_div"; "unselectable"]] []
-
-let body_elt = D.body ~a:[a_class["unselectable"]]
-  [header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
-   save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
-   starting_logo_elt]
-
-(* body durin intialize process  *)
-let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
-                     div [pcdata "Try again in a few moment."]]
+(* General element *)
 
 let manifest_uri = Xml.uri_of_string "graffiti.appcache"
 
@@ -122,40 +110,93 @@ let header =
                      a_content "user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"]
               () ] ()
 
+(* main service *)
+
+let header_elt =
+  D.div ~a:[a_class["header_div"; "unselectable"]] []
+
+(* These bodys are sementicaly strange
+   Because html element are created at top level and give to several services
+   So it is the same element ?
+   If yes, it is very strange.
+   Else, why create it at top level ?
+
+   So, it need to be recode to create element in service calling. *)
+let body_elt = D.body ~a:[a_class["unselectable"]]
+  [header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
+   save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
+   starting_logo_elt]
+
 let main_service_html =
   html ~a:[a_manifest manifest_uri] header body_elt
 
-(* html during intialize process  *)
+(* Intialize process Elements *)
+let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
+                     div [pcdata "Try again in a few moment."]]
+
 let tmp_service_html =
   html header tmp_body
 
-let setting_form =
+(* Setting replay *)
+
+let setting_form () =
+  let to_str = Printf.sprintf "%02d" in
+  let get_time (_, _, _, hour, min, _, _) =
+    (to_str hour) ^ ":" ^ (to_str min)
+  in
+  let get_date (mday, mon, year, _, _, _, _) =
+    (to_str year) ^ "-" ^ (to_str mon) ^ "-" ^ (to_str mday)
+  in
+  let get_date_less_one_day (mday, mon, year, hour, min, sec, mls) =
+    let _, new_tm =
+      Server_tools.check_and_fix_date (mday - 1, mon, year, hour, min, sec, mls)
+    in
+    get_date (Server_tools.datevalue_of_tm new_tm mls)
+  in
+  let default_time = "00:00" in
+  let current_datetime =
+    Server_tools.get_date_value (Server_tools.get_str_localdate ())
+  in
+  let date_less_one_day = get_date_less_one_day current_datetime in
+  let current_date = get_date current_datetime in
+  let current_time = get_time current_datetime in
+  let default_coef = 5 in
+  let hts_value = 1 in
   post_form ~service:Server_service.start_replay_service
-    (fun (start_d, (start_t, (end_d, (end_t, coef_to_replay)))) ->
+    (fun (start_d, (start_t, (end_d, (end_t, (coef_to_replay, hts))))) ->
         [fieldset
-            [label ~a:[a_for start_d] [pcdata "Date to start"];
-             string_input ~input_type:`Date ~name:start_d ();
+            [label ~a:[a_for start_d]
+		[pcdata "Date and time to starting replay"];
+             string_input ~input_type:`Date ~name:start_d ()
+	       ~value:date_less_one_day;
+             string_input ~input_type:`Time ~name:start_t ()
+	       ~value:default_time;
              br ();
-             label ~a:[a_for start_t] [pcdata "Time to start"];
-             string_input ~input_type:`Time ~name:start_t ();
-             br ();
-             label ~a:[a_for end_d] [pcdata "Date to finish"];
-             string_input ~input_type:`Date ~name:end_d ();
-             br ();
-             label ~a:[a_for end_d] [pcdata "Time to finish"];
-             string_input ~input_type:`Time ~name:end_t ();
+             label ~a:[a_for end_d]
+	       [pcdata "Date and time to finishing"];
+             string_input ~input_type:`Date ~name:end_d ()
+	       ~value:current_date;
+             string_input ~input_type:`Time ~name:end_t ()
+	       ~value:current_time;
 	     br ();
-             label ~a:[a_for coef_to_replay] [pcdata "Coeficient to replay"];
-             float_input ~input_type:`Number ~name:coef_to_replay ();
+             label ~a:[a_for coef_to_replay]
+	       [pcdata "Coeficient of accelerating"];
+             int_input ~input_type:`Number ~name:coef_to_replay ()
+	       ~value:default_coef;
+	     br ();
+             label ~a:[a_for coef_to_replay]
+	       [pcdata "Skip huge time space"];
+             int_input ~a:[a_checked `Checked]
+	       ~input_type:`Checkbox ~name:hts ()
+	       ~value:hts_value;
              br ();
              string_input ~input_type:`Submit ~value:"Send" ();
         ]]) ()
 
-(* html for setting replay  *)
-let setting_replay_service_html =
-  html header (body [setting_form])
+let setting_replay_service_html () =
+  let form_div = div ~a:[a_class ["form_div"]] [setting_form ()] in
+  html header (body [form_div])
 
-(* html for starting replay  *)
 let starting_replay_service_html () =
   let body_elt = D.body
     [header_elt;
@@ -164,6 +205,8 @@ let starting_replay_service_html () =
   in
   (html header body_elt), body_elt, header_elt, canvas_elt, canvas2_elt,
   angle_elt, gray_layer_elt, about_elt, starting_logo_elt
+
+(* Starting replay *)
 
 let starting_replay_service_error_html () =
   (html header

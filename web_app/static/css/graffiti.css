@@ -280,3 +280,8 @@ div#canvas {
     height: 92%;
     -webkit-tap-highlight-color: transparent;
 }
+
+.form_div
+{
+    text-align: left;
+}
