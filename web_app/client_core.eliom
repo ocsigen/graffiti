@@ -249,6 +249,20 @@
 
     end
 
+  (*** REPLAY SIDE ***)
+  (* It is a simple copy of code...
+     It need to be recorded, 'modulariser' and 'generiser'
+
+     Some issue list:
+       - Canvas are place as main service to let space for color palette.
+         But there is not color palette.
+       - About button it is not working (?)
+         It is realy needed ?
+         Because of code which handle that which it not launch (menu)
+         But it is handle also save button, not needed here ?
+       - Maybe splite this part into another file client_replay
+  *)
+
   (*** Start replay ***)
   let start_replay body_elt header_elt canvas_elt canvas2_elt server_bus =
 
