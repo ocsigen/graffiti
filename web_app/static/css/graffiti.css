@@ -11,6 +11,11 @@ body
     color:black;
 }
 
+body.information_body
+{
+    text-align: left;
+}
+
 table
 {
     border-collapse: collapse;
@@ -62,6 +67,7 @@ td
     background-size:auto 100px;
     background-position:238px center;
     background-repeat:no-repeat;
+    line-height: 100px;
 }
 
 .logo
@@ -284,4 +290,18 @@ div#canvas {
 .form_div
 {
     text-align: left;
+}
+
+a.right_button
+{
+    margin-right: 80px;
+}
+
+a.tool_button
+{
+    width: 96px;
+    height: 96px;
+    font-size: 3.2em;
+    float: right;
+    line-height: 96px;
 }

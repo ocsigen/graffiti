@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# V1.0 23/07/2013 13h16m30s
+# V1.0 13/08/2013 12h53m00s
 
 ### CACHE
 
@@ -25,6 +25,7 @@ img/minibrush.png
 img/menu.png
 img/menu_hover.png
 img/save.png
+img/replay.png
 
 # JS
 graffiti.js
@@ -38,6 +39,3 @@ image/adaptation.png
 # download images
 image/graffiti.png
 image/large_graffiti.png
-
-# eliom things
-__eliom_comet_global__
