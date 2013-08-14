@@ -30,6 +30,7 @@ FILES :=     server_tools.eliom		\
 	     client_menu.eliom		\
 	     client_palette.eliom	\
 	     client_core.eliom		\
+	     client_replay.eliom	\
 	     server_register.eliom
 
 # Source files for the server

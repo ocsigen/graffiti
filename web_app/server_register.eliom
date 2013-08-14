@@ -66,7 +66,7 @@ let _ =
             dt1 dt2 write);
 
         let sr_record = Server_html.starting_replay_service_html () in
-        ignore {unit Lwt.t{ Client_core.initialize_replay %bus %sr_record }};
+        ignore {unit Lwt.t{ Client_replay.initialize %bus %sr_record }};
         Lwt.return (sr_record.sr_main.html)
       with e    ->
         Lwt.return (Server_html.starting_replay_service_error_html ()))

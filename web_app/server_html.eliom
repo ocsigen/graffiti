@@ -1,3 +1,44 @@
+{shared{
+
+type 'a canvas_type =
+    {canvas1 : [`Canvas of 'a] Eliom_content_core.Html5.elt;
+     canvas2 : [`Canvas of 'a] Eliom_content_core.Html5.elt;
+     angle: [Html5_types.div] Eliom_content_core.Html5.elt;
+     about_point: [Html5_types.div] Eliom_content_core.Html5.elt}
+
+type 'a save_type =
+    {save_button : [Html5_types.div] Eliom_content_core.Html5.elt;
+     save_link: ['a Html5_types.a] Eliom_content_core.Html5.elt}
+
+type palette_type =
+    {palette_wrapper: [Html5_types.div] Eliom_content_core.Html5.elt;
+     palette_button: [`Table] Eliom_content_core.Html5.elt;
+     grf_slider: Grf_slider.t;
+     color_picker: Grf_color_picker.t;
+     color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
+
+type main_type =
+    {html : [`Html] Eliom_content_core.Html5.elt;
+     body: [`Body] Eliom_content_core.Html5.elt;
+     header: [Html5_types.div] Eliom_content_core.Html5.elt}
+
+type 'a ms_type =
+    {ms_main: main_type;
+     ms_canvas: 'a canvas_type;
+     ms_save: 'a save_type;
+     ms_palette: palette_type;
+     ms_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
+     ms_about: [Html5_types.div] Eliom_content_core.Html5.elt;
+     ms_starting_logo: [`Table] Eliom_content_core.Html5.elt}
+
+type 'a sr_type =
+    {sr_main: main_type;
+     sr_canvas: 'a canvas_type;
+     sr_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
+     sr_about: [Html5_types.div] Eliom_content_core.Html5.elt;
+     sr_starting_logo: [`Table] Eliom_content_core.Html5.elt}
+
+}}
 
 open Eliom_content.Html5
 open Eliom_content.Html5.F
@@ -153,48 +194,6 @@ let main_header () =
            a_title "Information"]
        ~service:Server_service.information_service
        [pcdata "I"] ()]
-
-{shared{
-
-type canvas_type =
-    {canvas1 : [`Canvas of [`PCDATA]] Eliom_content_core.Html5.elt;
-     canvas2 : [`Canvas of [`PCDATA]] Eliom_content_core.Html5.elt;
-     angle: [Html5_types.div] Eliom_content_core.Html5.elt;
-     about_point: [Html5_types.div] Eliom_content_core.Html5.elt}
-
-type save_type =
-    {save_button : [Html5_types.div] Eliom_content_core.Html5.elt;
-     save_link: [[Html5_types.div] Html5_types.a] Eliom_content_core.Html5.elt}
-
-type palette_type =
-    {palette_wrapper: [Html5_types.div] Eliom_content_core.Html5.elt;
-     palette_button: [`Table] Eliom_content_core.Html5.elt;
-     grf_slider: Grf_slider.t;
-     color_picker: Grf_color_picker.t;
-     color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
-
-type main_type =
-    {html : [`Html] Eliom_content_core.Html5.elt;
-     body: [`Body] Eliom_content_core.Html5.elt;
-     header: [Html5_types.div] Eliom_content_core.Html5.elt}
-
-type ms_type =
-    {ms_main: main_type;
-     ms_canvas: canvas_type;
-     ms_save: save_type;
-     ms_palette: palette_type;
-     ms_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
-     ms_about: [Html5_types.div] Eliom_content_core.Html5.elt;
-     ms_starting_logo: [`Table] Eliom_content_core.Html5.elt}
-
-type sr_type =
-    {sr_main: main_type;
-     sr_canvas: canvas_type;
-     sr_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
-     sr_about: [Html5_types.div] Eliom_content_core.Html5.elt;
-     sr_starting_logo: [`Table] Eliom_content_core.Html5.elt}
-
-}}
 
 let main_service_html () =
   let header_elt = main_header () in
