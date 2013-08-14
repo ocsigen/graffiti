@@ -210,28 +210,28 @@ let main_service_html () =
   let starting_logo_elt = starting_logo () in
   let body_elt =
     D.body ~a:[a_class["unselectable"]]
-    [header_elt;
-     canvas_wrap_elt;
-     save_button_elt;
-     palette_wrapper_elt;
-     gray_layer_elt;
-     about_elt;
-     starting_logo_elt]
+      [header_elt;
+       canvas_wrap_elt;
+       save_button_elt;
+       palette_wrapper_elt;
+       gray_layer_elt;
+       about_elt;
+       starting_logo_elt]
   in
   {ms_main = {html = (html ~a:[a_manifest manifest_uri] header body_elt);
-           body = body_elt;
-           header = header_elt};
+              body = body_elt;
+              header = header_elt};
    ms_canvas = {canvas1 = canvas_elt;
-             canvas2 = canvas2_elt;
-             angle = angle_elt;
-             about_point = about_point_elt};
+		canvas2 = canvas2_elt;
+		angle = angle_elt;
+		about_point = about_point_elt};
    ms_save = {save_button = save_button_elt;
-           save_link = save_link_elt};
+              save_link = save_link_elt};
    ms_palette = {palette_wrapper = palette_wrapper_elt;
-              palette_button = palette_button_elt;
-              grf_slider = grf_slider;
-              color_picker = color_picker;
-              color_div = color_div};
+		 palette_button = palette_button_elt;
+		 grf_slider = grf_slider;
+		 color_picker = color_picker;
+		 color_div = color_div};
    ms_gray_layer = gray_layer_elt;
    ms_about = about_elt;
    ms_starting_logo = starting_logo_elt}
@@ -372,12 +372,12 @@ let starting_replay_service_html () =
                          about_elt; starting_logo_elt]
   in
   {sr_main = {html = (html header body_elt);
-           body = body_elt;
-           header = header_elt};
+              body = body_elt;
+              header = header_elt};
    sr_canvas = {canvas1 = canvas_elt;
-             canvas2 = canvas2_elt;
-             angle = angle_elt;
-             about_point = about_point_elt};
+		canvas2 = canvas2_elt;
+		angle = angle_elt;
+		about_point = about_point_elt};
    sr_gray_layer = gray_layer_elt;
    sr_about = about_elt;
    sr_starting_logo = starting_logo_elt}
