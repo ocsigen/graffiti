@@ -8,7 +8,7 @@
       about_point gray_layer_elt about_elt =
 
     (*** Elements ***)
-    let dom_about_point = Eliom_content.Html5.To_dom.of_span about_point in
+    let dom_about_point = Eliom_content.Html5.To_dom.of_div about_point in
     let dom_gray_layer = Eliom_content.Html5.To_dom.of_div gray_layer_elt in
     let dom_save = Eliom_content.Html5.To_dom.of_div save_elt in
     let dom_save_link = Eliom_content.Html5.To_dom.of_a save_link_elt in

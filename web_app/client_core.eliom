@@ -2,6 +2,7 @@
 
   open Lwt
   open Eliom_content.Html5.D
+  open Server_html
 
   module IntOrdered =
   struct
@@ -200,7 +201,7 @@
     Lwt.return ()
 
   (*** init client ***)
-  let initialize () =
+  let initialize main_record =
     begin
 
       (* Remove navigation bar *)
@@ -208,42 +209,42 @@
 
       (* Random logo image *)
       Client_header.rand_logo
-         %Server_html.body_elt
-         %Server_html.header_elt;
+         main_record.ms_main.body
+         main_record.ms_main.header;
 
       (* start canvas script *)
       ignore (start
-         %Server_html.body_elt
-         %Server_html.header_elt
-         %Server_html.canvas_elt
-         %Server_html.canvas2_elt
-         %Server_html.grf_slider
-         %Server_html.color_picker);
+         main_record.ms_main.body
+         main_record.ms_main.header
+         main_record.ms_canvas.canvas1
+         main_record.ms_canvas.canvas2
+         main_record.ms_palette.grf_slider
+         main_record.ms_palette.color_picker);
 
       (* Start menu script *)
       Client_menu.start
-         %Server_html.body_elt
-         %Server_html.header_elt
-         %Server_html.save_button_elt
-         %Server_html.save_link_elt
-         %Server_html.about_point
-         %Server_html.gray_layer_elt
-         %Server_html.about_elt;
+         main_record.ms_main.body
+         main_record.ms_main.header
+         main_record.ms_save.save_button
+         main_record.ms_save.save_link
+         main_record.ms_canvas.about_point
+         main_record.ms_gray_layer
+         main_record.ms_about;
 
       (* Start palette menu script *)
       Client_palette.start
-         %Server_html.body_elt
-         %Server_html.canvas_elt
-         %Server_html.palette_wrapper
-         %Server_html.palette_button
-         %Server_html.grf_slider
-         %Server_html.color_picker
-         %Server_html.color_div;
+         main_record.ms_main.body
+         main_record.ms_canvas.canvas1
+         main_record.ms_palette.palette_wrapper
+         main_record.ms_palette.palette_button
+         main_record.ms_palette.grf_slider
+         main_record.ms_palette.color_picker
+         main_record.ms_palette.color_div;
 
       (* Check if 'touch to start' have to be removed (on pc) *)
       Client_mobile.handle_touch_to_start
-         %Server_html.body_elt
-         %Server_html.starting_logo_elt;
+         main_record.ms_main.body
+         main_record.ms_starting_logo;
 
       Lwt.return ()
 
@@ -290,8 +291,7 @@
 
 
   (*** init client to replay ***)
-  let initialize_replay server_bus body_elt header_elt canvas_elt canvas2_elt
-	  angle_elt gray_layer_elt about_elt starting_logo_elt =
+  let initialize_replay server_bus sr_record =
     begin
 
       (* Remove navigation bar *)
@@ -299,21 +299,21 @@
 
       (* Random logo image *)
       Client_header.rand_logo
-         body_elt
-         header_elt;
+         sr_record.sr_main.body
+         sr_record.sr_main.header;
 
       (* start canvas script *)
       ignore (start_replay
-         body_elt
-         header_elt
-         canvas_elt
-         canvas2_elt
-      	 server_bus);
+         sr_record.sr_main.body
+         sr_record.sr_main.header
+         sr_record.sr_canvas.canvas1
+         sr_record.sr_canvas.canvas2
+         server_bus);
 
       (* Check if 'touch to start' have to be removed (on pc) *)
       Client_mobile.handle_touch_to_start
-         body_elt
-         starting_logo_elt;
+         sr_record.sr_main.body
+         sr_record.sr_starting_logo;
 
       Lwt.return ()
 

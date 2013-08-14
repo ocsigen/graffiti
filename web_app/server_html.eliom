@@ -7,15 +7,17 @@ let start_height = 200
 
 (* about elements *)
 
-let about_point = D.div ~a:[a_class["about_point"]] []
+let about_point () =
+  D.div ~a:[a_class["about_point"]] []
 
-let about_link_elt =
+let about_link () =
   Raw.a
     ~a:[a_href (Xml.uri_of_string "http://ocsigen.org");
         a_target "_blank"]
     [pcdata "Ocsigen"]
 
-let about_elt = D.div ~a:[a_class["about_wrapper"]]
+let about () =
+  D.div ~a:[a_class["about_wrapper"]]
   [table ~a:[a_class["inline_table"]]
       (tr [td [div ~a:[a_class["about_block"]]
                   [img ~a:[a_class["about_logo"]]
@@ -31,55 +33,77 @@ let about_elt = D.div ~a:[a_class["about_wrapper"]]
                    br ();
                    pcdata "Design by Bruno Loton";
                    br ();
-                   div [pcdata "Created with "; about_link_elt]]]]) []]
+                   div [pcdata "Created with "; about_link ()]]]]) []]
 
-let gray_layer_elt = D.div ~a:[a_class["gray_layer"]] []
+let gray_layer () =
+  D.div ~a:[a_class["gray_layer"]] []
 
 (* canvas element *)
 
-let canvas_elt =
+let canvas () =
   D.canvas ~a:[a_width start_width; a_height start_height;
              a_class["unselectable"]]
     [pcdata "your browser doesn't support canvas"]
 
-let canvas2_elt =
+let canvas2 () =
   D.canvas ~a:[a_width start_width; a_height start_height;
                D.Unsafe.string_attrib "draggable" "false";
                a_class["canvas2"; "unselectable"]] []
 
 
-let angle_elt = D.div ~a:[a_class["angle_div"]] [about_point]
+let angle () =
+  let about_point_elt = about_point () in
+  D.div ~a:[a_class["angle_div"]] [about_point_elt],
+  about_point_elt
+
+let canvas_wrap () =
+  let canvas_elt = canvas () in
+  let canvas2_elt = canvas2 () in
+  let angle_elt, about_point_elt = angle () in
+  div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt],
+  canvas_elt, canvas2_elt, angle_elt, about_point_elt
 
 (* save elements *)
 
-let save_div_elt = D.div ~a:[a_class["save_div"]] []
-
 (** change image in css with class save_button *)
-let save_link_elt = D.a
-  ~service:Server_image.download_imageservice
-  ~a:[a_class["save_link"]; D.Unsafe.string_attrib "download" "graffiti.png"]
-   [save_div_elt] ()
+let save_link () =
+  D.a
+    ~service:Server_image.download_imageservice
+    ~a:[a_class["save_link"]; D.Unsafe.string_attrib "download" "graffiti.png"]
+    [div ~a:[a_class["save_div"]] []] ()
 
-let save_button_elt = D.div ~a:[a_class["save_button"]] [save_link_elt]
+let save_button () =
+  let save_link_elt = save_link () in
+  D.div ~a:[a_class["save_button"]] [save_link_elt],
+  save_link_elt
 
 (* palette *)
 
-let color_picker, color_div, block = Grf_color_picker.create
-  ~initial_color:(0, 3, 0) ~lll_color:Grf_color_picker.lll_color_10 ()
-
-let grf_slider, slider_elt = Grf_slider.create
-  ~orientation:Grf_slider.Vertical ?initial_value:(Some 0.8) ()
-
-let palette_button = D.table ~a:[a_class["palette_button"]]
-    (tr [td ~a:[a_class["max_height"]] [color_div]]) []
-
-let palette_wrapper = D.div ~a:[a_class["palette_wrap"]]
-  [table (tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block]]) [];
-   palette_button]
+let palette () =
+  let color_picker, color_div, block_elt = Grf_color_picker.create
+    ~initial_color:(0, 3, 0) ~lll_color:Grf_color_picker.lll_color_10 ()
+  in
+  let grf_slider, slider_elt = Grf_slider.create
+    ~orientation:Grf_slider.Vertical ?initial_value:(Some 0.8) ()
+  in
+  let palette_button_elt =
+    D.table ~a:[a_class["palette_button"]]
+      (tr [td ~a:[a_class["max_height"]] [color_div]]) []
+  in
+  let palette_wrapper_elt =
+    D.div ~a:[a_class["palette_wrap"]]
+      [table (tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block_elt]]) [];
+       palette_button_elt]
+  in
+  palette_wrapper_elt,
+  palette_button_elt,
+  grf_slider,
+  color_picker,
+  color_div
 
 (* starting logo *)
 
-let starting_logo_elt =
+let starting_logo () =
   D.table ~a:[a_class["logo"]]
     (tr [td
             [img ~a:[a_class["logo_img"]]
@@ -92,7 +116,8 @@ let starting_logo_elt =
 
 (* General element *)
 
-let manifest_uri = Xml.uri_of_string "graffiti.appcache"
+let manifest_uri =
+  Xml.uri_of_string "graffiti.appcache"
 
 let header =
   Eliom_tools.F.head ~title:"Graffiti"
@@ -112,11 +137,11 @@ let header =
 
 (* main service *)
 
-let header_elt =
+let main_header () =
   D.div ~a:[a_class["header_div"; "unselectable"]]
     [a ~a:[a_class["tool_button"; "right_button"];
-	   a_target "_blank";
-	   a_title "Replay"]
+           a_target "_blank";
+           a_title "Replay"]
        ~service:Server_service.setting_replay_service
        [img ~alt:("Replay Logo")
            ~src:(make_uri
@@ -124,57 +149,127 @@ let header_elt =
                    ["img"; "replay.png"])
            ()] ();
      a ~a:[a_class["tool_button"];
-	   a_target "_blank";
-	   a_title "Information"]
+           a_target "_blank";
+           a_title "Information"]
        ~service:Server_service.information_service
        [pcdata "I"] ()]
 
-(* These bodys are sementicaly strange
-   Because html element are created at top level and give to several services
-   So it is the same element ?
-   If yes, it is very strange.
-   Else, why create it at top level ?
+{shared{
 
-   So, it need to be recode to create element in service calling. *)
-let body_elt = D.body ~a:[a_class["unselectable"]]
-  [header_elt; div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
-   save_button_elt; palette_wrapper; gray_layer_elt; about_elt;
-   starting_logo_elt]
+type canvas_type =
+    {canvas1 : [`Canvas of [`PCDATA]] Eliom_content_core.Html5.elt;
+     canvas2 : [`Canvas of [`PCDATA]] Eliom_content_core.Html5.elt;
+     angle: [Html5_types.div] Eliom_content_core.Html5.elt;
+     about_point: [Html5_types.div] Eliom_content_core.Html5.elt}
 
-let main_service_html =
-  html ~a:[a_manifest manifest_uri] header body_elt
+type save_type =
+    {save_button : [Html5_types.div] Eliom_content_core.Html5.elt;
+     save_link: [[Html5_types.div] Html5_types.a] Eliom_content_core.Html5.elt}
+
+type palette_type =
+    {palette_wrapper: [Html5_types.div] Eliom_content_core.Html5.elt;
+     palette_button: [`Table] Eliom_content_core.Html5.elt;
+     grf_slider: Grf_slider.t;
+     color_picker: Grf_color_picker.t;
+     color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
+
+type main_type =
+    {html : [`Html] Eliom_content_core.Html5.elt;
+     body: [`Body] Eliom_content_core.Html5.elt;
+     header: [Html5_types.div] Eliom_content_core.Html5.elt}
+
+type ms_type =
+    {ms_main: main_type;
+     ms_canvas: canvas_type;
+     ms_save: save_type;
+     ms_palette: palette_type;
+     ms_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
+     ms_about: [Html5_types.div] Eliom_content_core.Html5.elt;
+     ms_starting_logo: [`Table] Eliom_content_core.Html5.elt}
+
+type sr_type =
+    {sr_main: main_type;
+     sr_canvas: canvas_type;
+     sr_gray_layer: [Html5_types.div] Eliom_content_core.Html5.elt;
+     sr_about: [Html5_types.div] Eliom_content_core.Html5.elt;
+     sr_starting_logo: [`Table] Eliom_content_core.Html5.elt}
+
+}}
+
+let main_service_html () =
+  let header_elt = main_header () in
+  let canvas_wrap_elt, canvas_elt, canvas2_elt, angle_elt, about_point_elt =
+    canvas_wrap ()
+  in
+  let save_button_elt, save_link_elt = save_button () in
+  let palette_wrapper_elt, palette_button_elt,
+    grf_slider, color_picker, color_div =
+    palette ()
+  in
+  let gray_layer_elt = gray_layer () in
+  let about_elt = about () in
+  let starting_logo_elt = starting_logo () in
+  let body_elt =
+    D.body ~a:[a_class["unselectable"]]
+    [header_elt;
+     canvas_wrap_elt;
+     save_button_elt;
+     palette_wrapper_elt;
+     gray_layer_elt;
+     about_elt;
+     starting_logo_elt]
+  in
+  {ms_main = {html = (html ~a:[a_manifest manifest_uri] header body_elt);
+           body = body_elt;
+           header = header_elt};
+   ms_canvas = {canvas1 = canvas_elt;
+             canvas2 = canvas2_elt;
+             angle = angle_elt;
+             about_point = about_point_elt};
+   ms_save = {save_button = save_button_elt;
+           save_link = save_link_elt};
+   ms_palette = {palette_wrapper = palette_wrapper_elt;
+              palette_button = palette_button_elt;
+              grf_slider = grf_slider;
+              color_picker = color_picker;
+              color_div = color_div};
+   ms_gray_layer = gray_layer_elt;
+   ms_about = about_elt;
+   ms_starting_logo = starting_logo_elt}
+
 
 (* Intialize process Elements *)
-let tmp_body = body [div [pcdata "Graffiti is in initialize process."];
-                     div [pcdata "Try again in a few moment."];
-		     br ();
-		     a ~service:Server_service.main_service
-		       [pcdata "Try again"] ()]
+let tmp_body () =
+  body [div [pcdata "Graffiti is in initialize process."];
+        div [pcdata "Try again in a few moment."];
+        br ();
+        a ~service:Server_service.main_service
+          [pcdata "Try again"] ()]
 
-let tmp_service_html =
-  html header tmp_body
+let tmp_service_html () =
+  html header (tmp_body ())
 
 (* Information service *)
-let info_body = body ~a:[a_class["information_body"]]
-  [a ~service:Server_service.main_service
-      [pcdata "Come back to main service"] ();
-   br ();
-   div [pcdata "You could easily send data in bus."];
-                      (* Have to change this hard link by getting function link *)
-   div [pcdata "It is at: http://ocsigen.org/graffiti2/drawing"];
-   div [pcdata "Information have to format as:"];
-   div [pcdata "(color, size, (x1, y1), (x2, y2))"];
-   br ();
-   div [pcdata "color: string as #0198DD"];
-   div [pcdata "size: float, relative to canvas' height, less or equal than 1, more or equal than 0"];
-   div [pcdata "x1: float, x origin, relative to width, less or equal than 1, more or equal than 0"];
-   div [pcdata "y1: float, y origin, relative to height, less or equal than 1, more or equal than 0"];
-   div [pcdata "x2: float, x destination, relative to width, less or equal than 1, more or equal than 0"];
-   div [pcdata "y2: float, y destination, relative to height, less or equal than 1, more or equal than 0"];
-  ]
+let info_body () =
+  body ~a:[a_class["information_body"]]
+    [a ~service:Server_service.main_service
+        [pcdata "Come back to main service"] ();
+     br ();
+     div [pcdata "You could easily send data in bus."];
+   (* Have to change this hard link by getting function link *)
+     div [pcdata "It is at: http://ocsigen.org/graffiti2/drawing"];
+     div [pcdata "Information have to format as:"];
+     div [pcdata "(color, size, (x1, y1), (x2, y2))"];
+     br ();
+     div [pcdata "color: string as #0198DD"];
+     div [pcdata "size: float, relative to canvas' height, less or equal than 1, more or equal than 0"];
+     div [pcdata "x1: float, x origin, relative to width, less or equal than 1, more or equal than 0"];
+     div [pcdata "y1: float, y origin, relative to height, less or equal than 1, more or equal than 0"];
+     div [pcdata "x2: float, x destination, relative to width, less or equal than 1, more or equal than 0"];
+     div [pcdata "y2: float, y destination, relative to height, less or equal than 1, more or equal than 0"]]
 
-let info_service_html =
-  html header info_body
+let info_service_html () =
+  html header (info_body ())
 
 
 (* Setting replay *)
@@ -238,17 +333,17 @@ let setting_replay_service_html () =
   html header
     (body
        [a ~service:Server_service.main_service
-	   [pcdata "Come back to main service"] ();
-	br ();
-	form_div])
+           [pcdata "Come back to main service"] ();
+        br ();
+        form_div])
 
 (* Starting replay *)
 
-let replay_header_elt =
+let replay_header () =
   D.div ~a:[a_class["header_div"; "unselectable"]]
     [a ~a:[a_class["tool_button"; "right_button"];
-	   a_target "_blank";
-	   a_title "Replay again"]
+           a_target "_blank";
+           a_title "Replay again"]
        ~service:Server_service.setting_replay_service
        [img ~alt:("Replay Logo")
            ~src:(make_uri
@@ -256,24 +351,37 @@ let replay_header_elt =
                    ["img"; "replay.png"])
            ()] ();
      a ~a:[a_class["tool_button"];
-	   a_target "_blank";
-	   a_title "Information"]
+           a_target "_blank";
+           a_title "Information"]
        ~service:Server_service.information_service
        [pcdata "I"] ();
      a ~a:[a_class["tool_button"];
-	   a_target "_blank";
-	   a_title "Come back to Graffiti"]
+           a_target "_blank";
+           a_title "Come back to Graffiti"]
        ~service:Server_service.main_service
        [pcdata "G"] ()]
 
 let starting_replay_service_html () =
-  let body_elt = D.body
-    [replay_header_elt;
-     div ~a:[a_id "canvas"] [canvas_elt; canvas2_elt; angle_elt];
-     gray_layer_elt; about_elt; starting_logo_elt]
+  let header_elt = replay_header () in
+  let canvas_wrap_elt, canvas_elt, canvas2_elt, angle_elt, about_point_elt =
+    canvas_wrap ()
   in
-  (html header body_elt), body_elt, header_elt, canvas_elt, canvas2_elt,
-  angle_elt, gray_layer_elt, about_elt, starting_logo_elt
+  let gray_layer_elt = gray_layer () in
+  let about_elt = about () in
+  let starting_logo_elt = starting_logo () in
+  let body_elt = D.body [header_elt; canvas_wrap_elt; gray_layer_elt;
+                         about_elt; starting_logo_elt]
+  in
+  {sr_main = {html = (html header body_elt);
+           body = body_elt;
+           header = header_elt};
+   sr_canvas = {canvas1 = canvas_elt;
+             canvas2 = canvas2_elt;
+             angle = angle_elt;
+             about_point = about_point_elt};
+   sr_gray_layer = gray_layer_elt;
+   sr_about = about_elt;
+   sr_starting_logo = starting_logo_elt}
 
 let starting_replay_service_error_html () =
   (html header
