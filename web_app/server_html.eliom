@@ -18,8 +18,7 @@ type palette_type =
      color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
 
 type main_type =
-    {html : [`Html] Eliom_content_core.Html5.elt;
-     body: [`Body] Eliom_content_core.Html5.elt;
+    {body: [`Body] Eliom_content_core.Html5.elt;
      header: [Html5_types.div] Eliom_content_core.Html5.elt}
 
 type 'a ms_type =
@@ -218,8 +217,8 @@ let main_service_html () =
        about_elt;
        starting_logo_elt]
   in
-  {ms_main = {html = (html ~a:[a_manifest manifest_uri] header body_elt);
-              body = body_elt;
+  (html ~a:[a_manifest manifest_uri] header body_elt),
+  {ms_main = {body = body_elt;
               header = header_elt};
    ms_canvas = {canvas1 = canvas_elt;
 		canvas2 = canvas2_elt;
@@ -371,8 +370,8 @@ let starting_replay_service_html () =
   let body_elt = D.body [header_elt; canvas_wrap_elt; gray_layer_elt;
                          about_elt; starting_logo_elt]
   in
-  {sr_main = {html = (html header body_elt);
-              body = body_elt;
+  (html header body_elt),
+  {sr_main = {body = body_elt;
               header = header_elt};
    sr_canvas = {canvas1 = canvas_elt;
 		canvas2 = canvas2_elt;

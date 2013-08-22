@@ -4,7 +4,7 @@ open Lwt
 (* bus *)
 
 let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
-  ~size:500 Json.t<Shared_tools.messages>
+  Json.t<Shared_tools.messages>
 
 (* file *)
 
@@ -58,7 +58,7 @@ let read_log input =
 
     skip_hts = skip huge time space,
     It is false by default
-    It is all time space greater than 5s
+    It is all time space greater than 3s
 
     action is function to execute at each getted message *)
 let replay_drawing
@@ -73,7 +73,7 @@ let replay_drawing
     (Server_tools.get_date_value end_drawing)
   in
 
-  let max_time_space = 5. in
+  let max_time_space = 3. in
 
   let map start_time end_time coef action =
 

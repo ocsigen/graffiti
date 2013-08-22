@@ -6,10 +6,10 @@ open Server_html
 let get_main_html_service () =
   match (Lwt.state Server_image.replay_no_save_drawing) with
     | Lwt.Return ()     -> (* In normal case *)
-      let main_record = Server_html.main_service_html () in
+      let html_elt, main_record = Server_html.main_service_html () in
       (* init client *)
       ignore {unit Lwt.t{ Client_core.initialize %main_record }};
-      main_record.ms_main.html
+      html_elt
     | _                 -> (* During initialize process *)
       Server_html.tmp_service_html ()
 
@@ -43,12 +43,11 @@ let _ =
         then failwith "Starting datetime have to be smaller than ending datetime";
 
         (* Have to change by channel *)
-        let bus = Eliom_bus.create ~scope:`Site
-          ~size:500 Json.t<Shared_tools.messages>
-        in
+	let s, s_push_function = Lwt_stream.create () in
+        let channel = Eliom_comet.Channel.create s in
 
         let write data =
-          Lwt.return (Eliom_bus.write bus data)
+          Lwt.return (s_push_function (Some data))
         in
         let coef =
           if not (coef_to_replay = 0)
@@ -65,8 +64,8 @@ let _ =
             ~skip_hts:bool_hts
             dt1 dt2 write);
 
-        let sr_record = Server_html.starting_replay_service_html () in
-        ignore {unit Lwt.t{ Client_replay.initialize %bus %sr_record }};
-        Lwt.return (sr_record.sr_main.html)
+        let html_elt, sr_record = Server_html.starting_replay_service_html () in
+        ignore {unit Lwt.t{ Client_replay.initialize %channel %sr_record }};
+        Lwt.return (html_elt)
       with e    ->
         Lwt.return (Server_html.starting_replay_service_error_html ()))
