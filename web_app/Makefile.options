@@ -15,8 +15,6 @@ FILES :=     server_tools.eliom		\
 	     client_event_tools.eliomi	\
 	     slide_tools.eliom		\
 	     slide_tools.eliomi		\
-	     grf_color_picker.eliom	\
-	     grf_color_picker.eliomi	\
 	     grf_slider.eliom		\
 	     grf_slider.eliomi		\
 	     client_tools.eliom		\
@@ -40,9 +38,9 @@ SERVER_FILES := $(wildcard $(FILES))
 CLIENT_FILES := $(wildcard $(FILES)) \
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := cairo2
+SERVER_PACKAGES := cairo2 eliom-widgets.server
 # OCamlfind packages for the client
-CLIENT_PACKAGES :=
+CLIENT_PACKAGES := eliom-widgets.client
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

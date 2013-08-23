@@ -34,7 +34,7 @@ type palette_type =
     {palette_wrapper: [Html5_types.div] Eliom_content_core.Html5.elt;
      palette_button: [`Table] Eliom_content_core.Html5.elt;
      grf_slider: Grf_slider.t;
-     color_picker: Grf_color_picker.t;
+     color_picker: Ew_table_color_picker.t;
      color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
 
 type main_type =
@@ -140,8 +140,8 @@ let save_button () =
 (* palette *)
 
 let palette () =
-  let color_picker, color_div, block_elt = Grf_color_picker.create
-    ~initial_color:(0, 3, 0) ~lll_color:Grf_color_picker.lll_color_10 ()
+  let color_picker, color_div, block_elt = Ew_table_color_picker.create
+    ~initial_color:(0, 3, 0) ~lll_color:Ew_table_color_picker.lll_color_10 ()
   in
   let grf_slider, slider_elt = Grf_slider.create
     ~orientation:Grf_slider.Vertical ?initial_value:(Some 0.8) ()
@@ -181,7 +181,7 @@ let manifest_uri =
 
 let header =
   Eliom_tools.F.head ~title:"Graffiti"
-    ~css:[["css"; "grf_color_picker.css"];
+    ~css:[["css"; "ew_table_color_picker.css"];
           ["css"; "grf_slider.css"];
           ["css"; "graffiti.css"];
           ["css"; "graffiti_large_screen.css"];

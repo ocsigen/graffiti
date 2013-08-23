@@ -37,13 +37,13 @@
 
     (* Elarge color picker on computer *)
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
-      then Grf_color_picker.add_square_color color_picker
-        Grf_color_picker.lll_color_6
+      then Ew_table_color_picker.add_square_color color_picker
+        Ew_table_color_picker.lll_color_6
       else color_picker
     in
 
     let color_square_list =
-      Grf_color_picker.get_square_color_div_list color_picker'
+      Ew_table_color_picker.get_square_color_div_list color_picker'
     in
     let dom_color_list = List.map
       (fun elt -> Eliom_content.Html5.To_dom.of_div elt) color_square_list
@@ -113,6 +113,6 @@
     Grf_slider.start slider;
 
     (* Start color picker stript *)
-    Grf_color_picker.start color_picker'
+    Ew_table_color_picker.start color_picker'
 
 }}

@@ -79,7 +79,7 @@
 
       set_coord (x, y) coord;
 
-      let color = Grf_color_picker.get_color color_picker in
+      let color = Ew_table_color_picker.get_color color_picker in
       let brush_size = Client_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
