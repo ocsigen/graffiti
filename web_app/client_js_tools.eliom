@@ -20,26 +20,6 @@
 
 {client{
 
-  open Lwt
-
-  (* size and orientation *)
-
-  type orientation = Portrait | Landscape
-
-  let get_screen_size () =
-    let scr = Dom_html.window##screen in
-    scr##width, scr##height
-
-  let get_screen_orientation () =
-    let width, height = get_screen_size () in
-    if (width <= height) then Portrait else Landscape
-
-  let get_size dom_html =
-    dom_html##clientWidth, dom_html##clientHeight
-
-  let get_document_size () =
-    get_size Dom_html.document##documentElement
-
   (* time *)
 
   let get_timestamp () =
@@ -61,9 +41,6 @@
          lwt _ = Lwt_js.sleep elapsed_time in
          aux newv)
     in aux current
-
-    let hide_navigation_bar () =
-      Dom_html.window##scroll(0,1)
 
   (* others *)
 

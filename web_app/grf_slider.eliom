@@ -101,7 +101,7 @@ let start (slider, dragger, ori, value,
     ref (dom_slider##clientWidth - margin * 2),
     ref (dom_slider##clientHeight - margin * 2)
   in
-  let dragger_width, dragger_height = Client_js_tools.get_size dom_dragger in
+  let dragger_width, dragger_height = Ojw_tools.get_size dom_dragger in
 
   let ox_slider, oy_slider =
     let ox, oy = Dom_html.elementClientPosition dom_slider in
@@ -167,7 +167,7 @@ let start (slider, dragger, ori, value,
   (* click action *)
   Lwt.async (fun () -> Lwt_js_events.clicks dom_slider (fun ev _ ->
     let x, y =
-      let x, y = Client_event_tools.get_mouse_ev_coord ev in
+      let x, y = Ojw_event_tools.get_mouse_ev_coord ev in
       let x', y' = x - !ox_slider, y - !oy_slider in
       x' - margin, y' - margin
     in

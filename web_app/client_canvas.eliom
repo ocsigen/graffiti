@@ -32,7 +32,7 @@
   let init_size body_elt header_elt canvas_elt canvas2_elt =
 
     (*** Init data ***)
-    let size = Client_js_tools.get_document_size () in
+    let size = Ojw_tools.get_document_size () in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_canvas2 = Eliom_content.Html5.To_dom.of_canvas canvas2_elt in
     let width_canvas_margin = if Client_mobile.has_medium_screen_or_less ()

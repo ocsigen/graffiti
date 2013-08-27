@@ -130,8 +130,8 @@
         Js.Optdef.case (list##item(n))
           (fun () -> -1, (0, 0))
           (fun item -> item##identifier,
-            Client_event_tools.get_touch_coord
-              ~p_type:Client_event_tools.Page item)
+            Ojw_event_tools.get_touch_coord
+              ~p_type:Ojw_event_tools.Page item)
       in
 
       let insert id (x, y) =
@@ -166,7 +166,7 @@
       | Client_event_tools.Touch_event ev       ->
         handle_change_touch action ev
       | Client_event_tools.Mouse_event ev       ->
-        action (x, y) (Client_event_tools.get_mouse_ev_coord ev)
+        action (x, y) (Ojw_event_tools.get_mouse_ev_coord ev)
     in
 
     Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_canvas2
@@ -178,7 +178,7 @@
     (* Handle preview *)
     let x, y, old_size = ref 0., ref 0., ref 0. in
     let preview ev _ =
-      let coord = Client_event_tools.get_mouse_ev_coord ev in
+      let coord = Ojw_event_tools.get_mouse_ev_coord ev in
       let (color, new_size, oldv, v) = compute_line (x, y) coord in
 
       (* remove old point with transparanse *)
@@ -198,7 +198,7 @@
     (* ignore (Client_event_tools.disable_drag_and_drop dom_canvas); *)
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    ignore (Client_event_tools.disable_mobile_zoom ());
+    ignore (Ojw_mobile_tools.disable_zoom ());
 
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
@@ -225,7 +225,7 @@
     begin
 
       (* Remove navigation bar *)
-      Client_js_tools.hide_navigation_bar ();
+      Ojw_mobile_tools.hide_navigation_bar ();
 
       (* Random logo image *)
       Client_header.rand_logo

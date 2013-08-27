@@ -37,7 +37,7 @@
       | _             -> ()
 
   let set_position body_elt header_elt dom_html margin =
-    let width, height = Client_js_tools.get_document_size () in
+    let width, height = Ojw_tools.get_document_size () in
     let header_height = Client_header.get_height body_elt header_elt in
     dom_html##style##height <- Js.string
       ((string_of_int (height - header_height - (margin * 2))) ^ "px");

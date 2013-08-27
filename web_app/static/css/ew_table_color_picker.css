@@ -1,4 +1,4 @@
-(* Graffiti
+/* Graffiti
  * http://www.ocsigen.org/graffiti
  * Copyright (C) 2013 Arnaud Parant
  * Laboratoire PPS - CNRS Université Paris Diderot
@@ -16,34 +16,40 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
+ */
 
-{client{
+.grf_color_picker_square
+{
+    height:28px;
+    width:28px;
+    display:inline-block;
+}
 
-  (* mobile tools *)
+.grf_color_picker_td
+{
 
-  (** Very usefull function to slide element
+}
 
-      elapsed_time is the time between each call
-      step is the value between each call
-      current is the start value
-      target is the end value
-      func is the function to apply at each call *)
-  val progressive_apply :
-    ?elapsed_time:float ->
-    ?step:int ->
-    int ->
-    int ->
-    (int -> 'a) ->
-    unit Lwt.t
+.grf_color_picker_tr
+{
 
-  (* others *)
+}
 
-  val js_string_of_px : int -> Js.js_string Js.t
+.grf_color_picker_table
+{
+    margin:0px;
+    padding:0px;
+}
 
-  (* css tools *)
+.grf_color_picker_color_div
+{
+    display:inline-block;
+    width:32px;
+    height:32px;
+}
 
-  (** Allow to set transition and -webkit-transition property *)
-  val set_transition : #Dom_html.element Js.t -> string -> unit
-
-}}
+.grf_color_picker_block
+{
+    margin:0px;
+    padding:0px;
+}
