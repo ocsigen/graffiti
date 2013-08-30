@@ -1,27 +1,75 @@
-(* Graffiti
- * http://www.ocsigen.org/graffiti
- * Copyright (C) 2013 Arnaud Parant
- * Laboratoire PPS - CNRS Université Paris Diderot
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, with linking exception;
- * either version 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
 
 {client{
 
+  (* position / coordinated *)
+
+  type position_type = Client | Screen | Page
+
+  (** p_type is at Client by default *)
+  val get_mouse_ev_coord :
+    ?p_type:position_type ->
+    Dom_html.mouseEvent Js.t ->
+    int * int
+
+  type touch_type = All_touches | Target_touches | Changed_touches
+
+  (** p_type is at Client by default *)
+  val get_touch_coord :
+    ?p_type:position_type ->
+    Dom_html.touch Js.t ->
+    int * int
+
+  (** Based on get_touch_coord
+
+      Int arg is the id of touch
+
+      t_type is at All_touches by default *)
+  val get_touch_ev_coord :
+    ?t_type:touch_type ->
+    int ->
+    ?p_type:position_type ->
+    Dom_html.touchEvent Js.t -> int * int
+
+  (** Based on get_mouse_ev_coord
+
+      Element arg is the target *)
+  val get_local_mouse_ev_coord :
+    #Dom_html.element Js.t ->
+    ?p_type:position_type ->
+    Dom_html.mouseEvent Js.t ->
+    int * int
+
+  (** Based on get_touch_ev_coord
+
+      Second arg is the target
+      Third is the index of touch *)
+  val get_local_touch_ev_coord :
+    #Dom_html.element Js.t ->
+    ?t_type:touch_type ->
+    int ->
+    ?p_type:position_type ->
+    Dom_html.touchEvent Js.t ->
+    int * int
+
+  (** take two coordonne and return true if they are egal *)
+  val cmp_coord : (int * int) -> (int * int) -> bool
 
   (* Enable / disable *)
+
+  (** Disable Dom_html.Event with stopping propagation during capture phase **)
+  val disable_event :  'a #Dom.event Js.t Dom_html.Event.typ ->
+    #Dom_html.eventTarget Js.t ->
+    Dom_html.event_listener_id
+
+  (** Enable Dom_html.Event with id gived by disable_event **)
+  val enable_event : Dom_html.event_listener_id -> unit
+
+  val enable_events : Dom_html.event_listener_id list -> unit
+
+  val disable_drag_and_drop : #Dom_html.eventTarget Js.t ->
+    Dom_html.event_listener_id list
+
+  val disable_mobile_zoom : unit -> Dom_html.event_listener_id
 
   (** catch touchstarts on target
       and made peventDefault to avoid mouse propagation
@@ -173,9 +221,9 @@
 
       It get client positions *)
   val get_slide_coord :
-    ?t_type:Ojw_event_tools.touch_type ->
+    ?t_type:touch_type ->
     int ->
-    ?p_type:Ojw_event_tools.position_type ->
+    ?p_type:position_type ->
     slide_event ->
     int * int
 
@@ -188,9 +236,9 @@
       It get client positions *)
   val get_local_slide_coord :
     #Dom_html.element Js.t ->
-    ?t_type:Ojw_event_tools.touch_type ->
+    ?t_type:touch_type ->
     int ->
-    ?p_type:Ojw_event_tools.position_type ->
+    ?p_type:position_type ->
     slide_event ->
     int * int
 

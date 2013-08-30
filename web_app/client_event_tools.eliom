@@ -1,28 +1,69 @@
-(* Graffiti
- * http://www.ocsigen.org/graffiti
- * Copyright (C) 2013 Arnaud Parant
- * Laboratoire PPS - CNRS Université Paris Diderot
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, with linking exception;
- * either version 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
 
 {client{
 
 open Lwt
 
+  (* position / coordinated *)
+
+  type position_type = Client | Screen | Page
+
+  let get_mouse_ev_coord ?(p_type=Client) ev = match p_type with
+    | Client    -> ev##clientX, ev##clientY
+    | Screen    -> ev##screenX, ev##screenY
+    | Page      ->
+      Js.Optdef.case (ev##pageX) (fun () -> 0) (fun x -> x),
+      Js.Optdef.case (ev##pageY) (fun () -> 0) (fun y -> y)
+
+  type touch_type = All_touches | Target_touches | Changed_touches
+
+  let get_touch_coord ?(p_type=Client) ev = match p_type with
+    | Client    -> ev##clientX, ev##clientY
+    | Screen    -> ev##screenX, ev##screenY
+    | Page      -> ev##pageX, ev##pageY
+
+  let get_touch_ev_coord ?(t_type=All_touches) idx ?p_type event =
+    let item = match t_type with
+      | All_touches     -> event##touches##item(idx)
+      | Target_touches  -> event##targetTouches##item(idx)
+      | Changed_touches -> event##changedTouches##item(idx)
+    in
+    Js.Optdef.case item (fun () -> (0, 0)) (get_touch_coord ?p_type)
+
+  let get_local_mouse_ev_coord dom_elt ?p_type ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y =  get_mouse_ev_coord ?p_type ev in
+    x - ox, y - oy
+
+  let get_local_touch_ev_coord dom_elt ?t_type idx ?p_type ev =
+    let ox, oy = Dom_html.elementClientPosition dom_elt in
+    let x, y =  get_touch_ev_coord ?t_type idx ?p_type ev in
+    x - ox, y - oy
+
+  let cmp_coord (x1, y1) (x2, y2) = x1 = x2 && y1 = y2
+
   (* Enable / disable *)
+
+  let disable_event event html_elt =
+    Dom_html.addEventListener html_elt event
+      (Dom.handler (fun _ -> Js._false)) Js._true
+
+  let enable_event id =
+    Dom_html.removeEventListener id
+
+  let enable_events ids =
+    let rec enable = function
+      | id::t   -> enable_event id; enable t
+      | []      -> ()
+    in enable ids
+
+  let disable_drag_and_drop html_elt =
+    [disable_event Dom_html.Event.drag html_elt;
+     disable_event Dom_html.Event.dragstart html_elt;
+     disable_event Dom_html.Event.dragenter html_elt;
+     disable_event Dom_html.Event.drop html_elt]
+
+  let disable_mobile_zoom () =
+    disable_event Dom_html.Event.touchmove Dom_html.document
 
   let preventEvent
       (prevented_event:
@@ -38,20 +79,19 @@ open Lwt
           (Dom_html.touchEvent Js.t -> unit Lwt.t -> unit Lwt.t) ->
           unit Lwt.t))
       target =
-    let last_time = ref (Ojw_tools.get_timestamp ()) in
+    let last_time = ref (Client_js_tools.get_timestamp ()) in
     let last_coord = ref (0, 0) in
     Lwt.async (fun () ->
       source_event ?use_capture:(Some true) target (fun ev _ ->
-        last_time := Ojw_tools.get_timestamp ();
-        last_coord := Ojw_event_tools.get_touch_ev_coord 0 ev;
+        last_time := Client_js_tools.get_timestamp ();
+        last_coord := get_touch_ev_coord 0 ev;
         Lwt.return (Dom.preventDefault ev)));
     Lwt.async (fun () ->
       prevented_event ?use_capture:(Some true) target (fun ev _ ->
-        let time = Ojw_tools.get_timestamp () in
-        let coord = Ojw_event_tools.get_mouse_ev_coord ev in
+        let time = Client_js_tools.get_timestamp () in
+        let coord = get_mouse_ev_coord ev in
         (* check if it is at same coord and fired less than 350ms after touch *)
-        if (Ojw_event_tools.cmp_coord !last_coord coord &&
-	      (time -. 0.35) <= !last_time)
+        if (cmp_coord !last_coord coord && (time -. 0.35) <= !last_time)
         then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
         Lwt.return () ))
 
@@ -163,16 +203,14 @@ open Lwt
     | Mouse_event of Dom_html.mouseEvent Js.t
 
   let get_slide_coord ?t_type idx ?p_type = function
-    | Touch_event ev    ->
-      Ojw_event_tools.get_touch_ev_coord ?t_type idx ?p_type ev
-    | Mouse_event ev    ->
-      Ojw_event_tools.get_mouse_ev_coord ?p_type ev
+    | Touch_event ev    -> get_touch_ev_coord ?t_type idx ?p_type ev
+    | Mouse_event ev    -> get_mouse_ev_coord ?p_type ev
 
   let get_local_slide_coord dom_elt ?t_type idx ?p_type = function
     | Touch_event ev    ->
-      Ojw_event_tools.get_local_touch_ev_coord dom_elt ?t_type idx ?p_type ev
+      get_local_touch_ev_coord dom_elt ?t_type idx ?p_type ev
     | Mouse_event ev    ->
-      Ojw_event_tools.get_local_mouse_ev_coord dom_elt ?p_type ev
+      get_local_mouse_ev_coord dom_elt ?p_type ev
 
   let touch_handler func ev = func (Touch_event ev)
   let mouse_handler func ev = func (Mouse_event ev)
@@ -222,8 +260,8 @@ open Lwt
 
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
-      let width, height = Ojw_tools.get_document_size () in
-      let current_x, current_y = Ojw_event_tools.get_mouse_ev_coord ev in
+      let width, height = Client_js_tools.get_document_size () in
+      let current_x, current_y = get_mouse_ev_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in
       let end_x' = get_relative_position width end_x in

@@ -45,6 +45,9 @@
     let bus_mutex = Lwt_mutex.create () in
     let base_size = ref !height in
 
+    Eliom_bus.set_queue_size %Server_image.bus 5;
+    Eliom_bus.set_time_before_flush %Server_image.bus 0.01;
+
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_canvas2 = Eliom_content.Html5.To_dom.of_canvas canvas2_elt in
 

@@ -22,7 +22,8 @@ open Lwt
 
 (* bus *)
 
-let bus = Eliom_bus.create ~scope:`Site ~name:"drawing"
+let bus = Eliom_bus.create
+  ~size:5000 ~scope:`Site ~name:"drawing"
   Json.t<Shared_tools.messages>
 
 (* file *)
@@ -225,9 +226,14 @@ let draw_server savelog data =
     draw medium_ctx medium_base_size (medium_width, medium_height) data;
     draw large_ctx large_base_size (large_width, large_height) data;
 
-    (* TODO: Replace 127.0.0.1 by the IP *)
     if savelog then
-        lwt () = write_log "127.0.0.1" data in
+        let ip =
+	  try
+	    Eliom_request_info.get_remote_ip ()
+	  with | e -> Printexc.to_string e
+	in
+        (* let ip = "127.0.0.1" in *)
+        lwt () = write_log ip data in
         lwt nb = nb_drawing () in
         lwt current = Ocsipersist.get nb in
         lwt () = Ocsipersist.set nb (current + 1) in

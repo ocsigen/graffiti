@@ -63,7 +63,7 @@ let _ =
 
         (* Have to change by channel *)
 	let s, s_push_function = Lwt_stream.create () in
-        let channel = Eliom_comet.Channel.create s in
+        let channel = Eliom_comet.Channel.create ~size:5000 s in
 
         let write data =
           Lwt.return (s_push_function (Some data))
