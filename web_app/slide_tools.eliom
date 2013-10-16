@@ -40,7 +40,7 @@
     let last_diff = ref 0 in
     let old_coord = ref (0, 0) in
     let save_coord ev =
-      old_coord := Client_event_tools.get_local_slide_coord dom_elt 0 ev
+      old_coord := Ojw_slide_event.get_local_slide_coord dom_elt 0 ev
     in
     let launch_callback = function
       | Some func       -> func ()
@@ -92,7 +92,7 @@
           | Up          -> dom_elt##style##height <- v)
     in
 
-     Client_event_tools.touch_or_mouse_slides target
+     Ojw_slide_event.touch_or_mouse_slides target
         (fun ev _ ->
           save_coord ev;
           move := 0;
@@ -101,7 +101,7 @@
           launch_callback start_callback)
         (fun ev _ ->
           let new_coord =
-	    Client_event_tools.get_local_slide_coord dom_elt 0 ev
+	    Ojw_slide_event.get_local_slide_coord dom_elt 0 ev
 	  in
           let diff_x, diff_y =
             (fst new_coord) - (fst !old_coord),

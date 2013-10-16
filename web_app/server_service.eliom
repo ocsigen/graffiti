@@ -24,25 +24,25 @@ module My_app =
   end)
 
 let main_service =
-  Eliom_service.service
+  Eliom_service.App.service
     ~path:[""]
     ~get_params:Eliom_parameter.unit
     ()
 
 let information_service =
-  Eliom_service.service
+  Eliom_service.App.service
     ~path:["information"]
     ~get_params:Eliom_parameter.unit
     ()
 
 let setting_replay_service =
-  Eliom_service.service
+  Eliom_service.App.service
     ~path:["replay"]
     ~get_params:Eliom_parameter.unit
     ()
 
 let start_replay_service =
-  Eliom_service.post_coservice
+  Eliom_service.App.post_coservice
     ~name:"start_replay"
     ~fallback:setting_replay_service
     ~post_params:Eliom_parameter.(string "start_d" ** string "start_t" **

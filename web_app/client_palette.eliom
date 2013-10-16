@@ -87,7 +87,7 @@
           aux tail
       in aux dom_color_list
     in handle_color_square_resize (); (* To initialize view *)
-    Lwt.async (fun () -> Client_event_tools.limited_onorientationchanges_or_onresizes
+    Lwt.async (fun () -> Lwt_js_events.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return (handle_color_square_resize ())));
 
     (* catch slider move and click *)
@@ -105,7 +105,7 @@
     Grf_slider.change_click_callback slider handler;
 
     (* Handle recalcul base canvas size *)
-    Lwt.async (fun () -> Client_event_tools.limited_onorientationchanges_or_onresizes
+    Lwt.async (fun () -> Lwt_js_events.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return
         (base_size := (float_of_int dom_canvas##clientHeight))));
 

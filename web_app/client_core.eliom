@@ -122,7 +122,7 @@
 
     let reset_coord ev =
       touch_coord := IntMap.empty;
-      set_coord (x, y) (Client_event_tools.get_slide_coord 0 ev)
+      set_coord (x, y) (Ojw_slide_event.get_slide_coord 0 ev)
     in
 
     let handle_change_touch action ev =
@@ -166,13 +166,13 @@
     in
 
     let handler action = function
-      | Client_event_tools.Touch_event ev       ->
+      | Ojw_slide_event.Touch_event ev       ->
         handle_change_touch action ev
-      | Client_event_tools.Mouse_event ev       ->
+      | Ojw_slide_event.Mouse_event ev       ->
         action (x, y) (Ojw_event_tools.get_mouse_ev_coord ev)
     in
 
-    Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_canvas2
+    Lwt.async (fun () -> Ojw_slide_event.touch_or_mouse_slides dom_canvas2
       (fun ev _ -> reset_coord ev; handler line ev)
       (* handler automaticly set_coord for touch here thank to reset *)
       (fun ev _ -> handler line ev)
@@ -206,7 +206,7 @@
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
     Lwt.async (fun () ->
-      Client_event_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
+      Lwt_js_events.limited_onorientationchanges_or_onresizes (fun _ _ ->
         let rc_width, rc_height =
           Client_canvas.init_size body_elt header_elt canvas_elt canvas2_elt
         in

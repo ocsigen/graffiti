@@ -151,7 +151,7 @@ let start (slider, dragger, ori, value,
   (* move actions *)
   let handle_one_event callback ev =
     let coord =
-      let x, y =  Client_event_tools.get_slide_coord 0 ev in
+      let x, y =  Ojw_slide_event.get_slide_coord 0 ev in
       let x', y' = x - !ox_slider, y - !oy_slider in
       x' - margin, y' - margin
     in
@@ -159,7 +159,7 @@ let start (slider, dragger, ori, value,
     Lwt.return (launch_callback callback)
   in
 
-  Lwt.async (fun () -> Client_event_tools.touch_or_mouse_slides dom_dragger
+  Lwt.async (fun () -> Ojw_slide_event.touch_or_mouse_slides dom_dragger
     (fun ev _ -> handle_one_event !start_slide ev)
     (fun ev _ -> handle_one_event !move_slide ev)
     (handle_one_event !end_slide));
@@ -180,7 +180,7 @@ let start (slider, dragger, ori, value,
 
   (* resize event *)
   Lwt.async (fun () ->
-    Client_event_tools.limited_onorientationchanges_or_onresizes (fun _ _ ->
+    Lwt_js_events.limited_onorientationchanges_or_onresizes (fun _ _ ->
       slider_width := (dom_slider##clientWidth - margin * 2);
       slider_height := (dom_slider##clientHeight - margin * 2);
       max_width := (float_of_int (!slider_width - dragger_width));
