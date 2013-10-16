@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# V1.0 28/08/2013 18h53m00s
+# V1.0 15/10/2013 19h37m00s
 
 # Graffiti
 # http://www.ocsigen.org/graffiti
@@ -29,7 +29,7 @@ css/graffiti_medium_screen.css
 css/graffiti_handheld_screen.css
 css/graffiti_small_handheld_screen.css
 css/ew_table_color_picker.css
-css/grf_slider.css
+css/ew_slider.css
 
 # IMG
 img/about.png

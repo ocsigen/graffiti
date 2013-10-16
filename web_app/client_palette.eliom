@@ -101,8 +101,8 @@
       dom_color##style##height <- brush_size;
       Lwt.return ()
     in
-    Grf_slider.change_move_slide_callback slider handler;
-    Grf_slider.change_click_callback slider handler;
+    Ew_slider.change_move_slide_callback slider handler;
+    Ew_slider.change_click_callback slider handler;
 
     (* Handle recalcul base canvas size *)
     Lwt.async (fun () -> Lwt_js_events.limited_onorientationchanges_or_onresizes
@@ -110,7 +110,7 @@
         (base_size := (float_of_int dom_canvas##clientHeight))));
 
     (* start slider script *)
-    Grf_slider.start slider;
+    Ew_slider.start slider;
 
     (* Start color picker stript *)
     Ew_table_color_picker.start color_picker'

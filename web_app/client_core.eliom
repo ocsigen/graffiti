@@ -241,7 +241,7 @@
          main_record.ms_main.header
          main_record.ms_canvas.canvas1
          main_record.ms_canvas.canvas2
-         main_record.ms_palette.grf_slider
+         main_record.ms_palette.ew_slider
          main_record.ms_palette.color_picker);
 
       (* Start menu script *)
@@ -260,7 +260,7 @@
          main_record.ms_canvas.canvas1
          main_record.ms_palette.palette_wrapper
          main_record.ms_palette.palette_button
-         main_record.ms_palette.grf_slider
+         main_record.ms_palette.ew_slider
          main_record.ms_palette.color_picker
          main_record.ms_palette.color_div;
 

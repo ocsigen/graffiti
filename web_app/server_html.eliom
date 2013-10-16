@@ -33,7 +33,7 @@ type 'a save_type =
 type palette_type =
     {palette_wrapper: [Html5_types.div] Eliom_content_core.Html5.elt;
      palette_button: [`Table] Eliom_content_core.Html5.elt;
-     grf_slider: Grf_slider.t;
+     ew_slider: Ew_slider.t;
      color_picker: Ew_table_color_picker.t;
      color_div: [Html5_types.div] Eliom_content_core.Html5.elt}
 
@@ -143,8 +143,8 @@ let palette () =
   let color_picker, color_div, block_elt = Ew_table_color_picker.create
     ~initial_color:(0, 3, 0) ~lll_color:Ew_table_color_picker.lll_color_10 ()
   in
-  let grf_slider, slider_elt = Grf_slider.create
-    ~orientation:Grf_slider.Vertical ?initial_value:(Some 0.8) ()
+  let ew_slider, slider_elt = Ew_slider.create
+    ~orientation:Ew_slider.Vertical ?initial_value:(Some 0.8) ()
   in
   let palette_button_elt =
     D.table ~a:[a_class["palette_button"]]
@@ -157,7 +157,7 @@ let palette () =
   in
   palette_wrapper_elt,
   palette_button_elt,
-  grf_slider,
+  ew_slider,
   color_picker,
   color_div
 
@@ -182,7 +182,7 @@ let manifest_uri =
 let header =
   Eliom_tools.F.head ~title:"Graffiti"
     ~css:[["css"; "ew_table_color_picker.css"];
-          ["css"; "grf_slider.css"];
+          ["css"; "ew_slider.css"];
           ["css"; "graffiti.css"];
           ["css"; "graffiti_large_screen.css"];
           ["css"; "graffiti_medium_screen.css"];
@@ -221,7 +221,7 @@ let main_service_html () =
   in
   let save_button_elt, save_link_elt = save_button () in
   let palette_wrapper_elt, palette_button_elt,
-    grf_slider, color_picker, color_div =
+    ew_slider, color_picker, color_div =
     palette ()
   in
   let gray_layer_elt = gray_layer () in
@@ -248,7 +248,7 @@ let main_service_html () =
               save_link = save_link_elt};
    ms_palette = {palette_wrapper = palette_wrapper_elt;
 		 palette_button = palette_button_elt;
-		 grf_slider = grf_slider;
+		 ew_slider = ew_slider;
 		 color_picker = color_picker;
 		 color_div = color_div};
    ms_gray_layer = gray_layer_elt;
