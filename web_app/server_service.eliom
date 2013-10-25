@@ -30,19 +30,19 @@ let main_service =
     ()
 
 let information_service =
-  Eliom_service.App.service
+  Eliom_service.Http.service
     ~path:["information"]
     ~get_params:Eliom_parameter.unit
     ()
 
 let setting_replay_service =
-  Eliom_service.App.service
+  Eliom_service.Http.service
     ~path:["replay"]
     ~get_params:Eliom_parameter.unit
     ()
 
 let start_replay_service =
-  Eliom_service.App.post_coservice
+  Eliom_service.Http.post_coservice
     ~name:"start_replay"
     ~fallback:setting_replay_service
     ~post_params:Eliom_parameter.(string "start_d" ** string "start_t" **
