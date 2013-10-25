@@ -1,6 +1,6 @@
 (* Graffiti
  * http://www.ocsigen.org/graffiti
- * Copyright (C) 2013 Vincent Balat
+ * Copyright (C) 2013 Arnaud Parant
  * Laboratoire PPS - CNRS Université Paris Diderot
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-type messages = (string * int * (int * int) * (int * int)) deriving (Json)
+{client{
 
-let width = 700
-let height = 400
+  (* get and convert slider value *)
+  let get_slider_value slider = ((Ew_slider.get_value slider) /. 5.) +. 0.01
+
+}}

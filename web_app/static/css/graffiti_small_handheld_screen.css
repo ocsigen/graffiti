@@ -1,6 +1,6 @@
-(* Graffiti
+/* Graffiti
  * http://www.ocsigen.org/graffiti
- * Copyright (C) 2013 Vincent Balat
+ * Copyright (C) 2013 Arnaud Parant
  * Laboratoire PPS - CNRS Université Paris Diderot
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
+ */
 
-type messages = (string * int * (int * int) * (int * int)) deriving (Json)
+@media only screen and (max-device-width: 480px)
+{
 
-let width = 700
-let height = 400
+    body
+    {
+        font-size:0.8em;
+    }
+
+    canvas
+    {
+        margin-left: 25px;
+    }
+
+    .save_button
+    {
+        width: 30px;
+        top: 80px;
+    }
+
+    .palette_wrap
+    {
+        left: -196px;
+    }
+
+}

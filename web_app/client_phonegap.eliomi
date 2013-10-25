@@ -1,6 +1,6 @@
 (* Graffiti
  * http://www.ocsigen.org/graffiti
- * Copyright (C) 2013 Vincent Balat
+ * Copyright (C) 2013 Arnaud Parant
  * Laboratoire PPS - CNRS Université Paris Diderot
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-type messages = (string * int * (int * int) * (int * int)) deriving (Json)
+{client{
 
-let width = 700
-let height = 400
+  val on_phonegap : unit -> bool
+
+  val launch_on_phonegap : (unit -> unit) -> unit
+
+  val not_launch_on_phonegap : (unit -> unit) -> unit
+
+  val download_file : Js.js_string Js.t -> unit
+
+  (*** Events ***)
+
+  val deviceready: Dom_html.event Js.t Dom_html.Event.typ
+
+  val ondeviceready : unit -> Dom_html.event Js.t Lwt.t
+
+  (** ifpg series mind if on phonegap do it action else directly return *)
+  val ondeviceready_ifpg : unit -> Dom_html.event Js.t option Lwt.t
+
+  (** if not on phonegap, only what onload *)
+  val onload_ondeviceready_ifpg : unit -> Dom_html.event Js.t option Lwt.t
+
+}}

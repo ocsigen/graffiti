@@ -1,0 +1,60 @@
+CACHE MANIFEST
+# V1.0 15/10/2013 19h37m00s
+
+# Graffiti
+# http://www.ocsigen.org/graffiti
+# Copyright (C) 2013 Arnaud Parant
+# Laboratoire PPS - CNRS Université Paris Diderot
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, with linking exception;
+# either version 2.1 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+### CACHE
+
+# CSS
+css/graffiti.css
+css/graffiti_large_screen.css
+css/graffiti_medium_screen.css
+css/graffiti_handheld_screen.css
+css/graffiti_small_handheld_screen.css
+css/ew_table_color_picker.css
+css/ew_slider.css
+
+# IMG
+img/about.png
+img/angle.png
+img/Logo_GRAFFITIbyOcsigen_blue.png
+img/Logo_GRAFFITIbyOcsigen_green.png
+img/Logo_GRAFFITIbyOcsigen_purple.png
+img/Logo_GRAFFITIbyOcsigen_yellow.png
+img/Logo_GRAFFITIbyOcsigenTouch.png
+img/maxibrush.png
+img/minibrush.png
+img/menu.png
+img/menu_hover.png
+img/save.png
+img/replay.png
+
+# JS
+graffiti.js
+
+### Resources which need to be reload each time
+NETWORK:
+
+# canvas image
+image/adaptation.png
+
+# download images
+image/graffiti.png
+image/large_graffiti.png
