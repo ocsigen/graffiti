@@ -39,11 +39,6 @@ let _ =
 
 let _ =
   Server_service.My_app.register
-    ~service:Server_service.information_service
-    (fun () () -> Lwt.return (Server_html.info_service_html ()))
-
-let _ =
-  Server_service.My_app.register
     ~service:Server_service.setting_replay_service
     (fun () () -> Lwt.return (Server_html.setting_replay_service_html ()))
 

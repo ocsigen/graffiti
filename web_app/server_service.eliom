@@ -29,12 +29,6 @@ let main_service =
     ~get_params:Eliom_parameter.unit
     ()
 
-let information_service =
-  Eliom_service.Http.service
-    ~path:["information"]
-    ~get_params:Eliom_parameter.unit
-    ()
-
 let setting_replay_service =
   Eliom_service.Http.service
     ~path:["replay"]

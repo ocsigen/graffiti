@@ -207,12 +207,7 @@ let main_header () =
            ~src:(make_uri
                    ~service:(Eliom_service.static_dir ())
                    ["img"; "replay.png"])
-           ()] ();
-     a ~a:[a_class["tool_button"];
-           a_target "_blank";
-           a_title "Information"]
-       ~service:Server_service.information_service
-       [pcdata "I"] ()]
+           ()] ()]
 
 let main_service_html () =
   let header_elt = main_header () in
@@ -266,28 +261,6 @@ let tmp_body () =
 
 let tmp_service_html () =
   html header (tmp_body ())
-
-(* Information service *)
-let info_body () =
-  body ~a:[a_class["information_body"]]
-    [a ~service:Server_service.main_service
-        [pcdata "Come back to main service"] ();
-     br ();
-     div [pcdata "You could easily send data in bus."];
-   (* Have to change this hard link by getting function link *)
-     div [pcdata "It is at: http://ocsigen.org/graffiti2/drawing"];
-     div [pcdata "Information have to format as:"];
-     div [pcdata "(color, size, (x1, y1), (x2, y2))"];
-     br ();
-     div [pcdata "color: string as #0198DD"];
-     div [pcdata "size: float, relative to canvas' height, less or equal than 1, more or equal than 0"];
-     div [pcdata "x1: float, x origin, relative to width, less or equal than 1, more or equal than 0"];
-     div [pcdata "y1: float, y origin, relative to height, less or equal than 1, more or equal than 0"];
-     div [pcdata "x2: float, x destination, relative to width, less or equal than 1, more or equal than 0"];
-     div [pcdata "y2: float, y destination, relative to height, less or equal than 1, more or equal than 0"]]
-
-let info_service_html () =
-  html header (info_body ())
 
 
 (* Setting replay *)
@@ -368,11 +341,6 @@ let replay_header () =
                    ~service:(Eliom_service.static_dir ())
                    ["img"; "replay.png"])
            ()] ();
-     a ~a:[a_class["tool_button"];
-           a_target "_blank";
-           a_title "Information"]
-       ~service:Server_service.information_service
-       [pcdata "I"] ();
      a ~a:[a_class["tool_button"];
            a_target "_blank";
            a_title "Come back to Graffiti"]
