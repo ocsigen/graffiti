@@ -230,7 +230,7 @@ let draw_server savelog data =
         let ip =
 	  try
 	    Eliom_request_info.get_remote_ip ()
-	  with | e -> Printexc.to_string e
+	  with | e -> "0.0.0.0"
 	in
         (* let ip = "127.0.0.1" in *)
         lwt () = write_log ip data in
