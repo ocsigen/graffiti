@@ -36,8 +36,10 @@ module My_appl =
 
 {client{
 
-  let draw ctx (color, size, (x1, y1), (x2, y2)) =
-    ctx##strokeStyle <- (Js.string color);
+  let draw ?(visible = true) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
+    let alpha = if visible then 1. else 0. in
+    let color = CSS.Color.string_of_t (CSS.Color.rgb r g b ~a:alpha) in
+    ctx##strokeStyle <- Js.string color;
     ctx##lineWidth <- float size;
     ctx##beginPath();
     ctx##moveTo(float x1, float y1);
@@ -55,27 +57,24 @@ module My_appl =
 }}
 
 {shared{
-  type messages = (string * int * (int * int) * (int * int)) deriving (Json)
+  type messages = ((int * int *int) * int * (int * int) * (int * int)) deriving (Json)
+  type canvas = Html5_types.flow5 Html5_types.canvas Eliom_content.Html5.elt
 }}
 
-let bus = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 Json.t<messages>
-
-let rgb_from_string color = (* color is in format "#rrggbb" *)
-  let get_color i =
-    (float_of_string ("0x"^(String.sub color (1+2*i) 2))) /. 255.
-  in
-  try get_color 0, get_color 1, get_color 2 with | _ -> 0.,0.,0.
+let bus : (messages, messages) Eliom_bus.t = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 Json.t<messages>
 
 let draw_server, image_string =
+  let rgb_ints_to_floats (r, g, b) =
+    float r /. 255., float g /. 255., float b /. 255. in (* needed by cairo *)
   let surface = Cairo.Image.create Cairo.Image.ARGB32 ~width ~height in
   let ctx = Cairo.create surface in
-  ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
+  ((fun (rgb, size, (x1, y1), (x2, y2)) ->
 
     (* Set thickness of brush *)
+    let r, g, b = rgb_ints_to_floats rgb in
     Cairo.set_line_width ctx (float size) ;
     Cairo.set_line_join ctx Cairo.JOIN_ROUND ;
     Cairo.set_line_cap ctx Cairo.ROUND ;
-    let r, g, b =  rgb_from_string color in
     Cairo.set_source_rgb ctx ~r ~g ~b ;
 
     Cairo.move_to ctx (float x1) (float y1) ;
@@ -104,13 +103,17 @@ let image_elt =
   Html5.D.img ~alt:"canvas"
     ~src:(Html5.D.make_uri ~service:imageservice ())
     ()
-let canvas_elt =
+
+let canvas_elt : canvas =
   Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ]
            [Html5.D.pcdata "your browser doesn't support canvas";
             Html5.D.br ();
             image_elt]
-let canvas2_elt =
+
+let canvas2_elt : canvas =
   Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ] []
+
+let slider = Html5.D.int_input ~a:[Html5.D.a_id "slider"] ~input_type:`Range ()
 
 let page =
   Html5.D.html
@@ -118,25 +121,21 @@ let page =
        (Html5.D.title (Html5.D.pcdata "Graffiti"))
        [ Html5.D.css_link
 	   ~uri:(Html5.D.make_uri
-		   (Eliom_service.static_dir ()) ["css";"closure";"common.css"]) ();
-	 Html5.D.css_link
-	   ~uri:(Html5.D.make_uri
-		   (Eliom_service.static_dir ()) ["css";"closure";"hsvpalette.css"]) ();
-	 Html5.D.css_link
-	   ~uri:(Html5.D.make_uri
-		   (Eliom_service.static_dir ()) ["css";"slider.css"]) ();
-	 Html5.D.css_link
-	   ~uri:(Html5.D.make_uri
 		   (Eliom_service.static_dir ()) ["css";"graffiti.css"]) ();
-	 Html5.D.js_script
-	   ~uri:(Html5.D.make_uri
-		   (Eliom_service.static_dir ()) ["graffiti_oclosure.js"]) ();
-       ])
-    (Html5.D.body [canvas_elt; canvas2_elt])
+	])
+    (Html5.D.body [
+       Html5.D.div ~a:[] [canvas_elt; canvas2_elt];
+       Html5.D.div ~a:[] [slider]])
 
 {client{
+let get_element id = Js.Opt.get (Dom_html.document##getElementById
+                                   (Js.string id)) (fun () -> assert false)
+
 let init_client () =
 
+  let colorpicker = Ojw_color_picker.create ~width:150 () in
+  Ojw_color_picker.append_at (Dom_html.document##body) colorpicker;
+  Ojw_color_picker.init_handler colorpicker;
   let canvas = Html5.To_dom.of_canvas %canvas_elt in
   let st = canvas##style in
   st##position <- Js.string "absolute";
@@ -158,26 +157,6 @@ let init_client () =
   else img##onload <- Dom_html.handler
     (fun ev -> copy_image (); Js._false);
 
-  (* Size of the brush *)
-  let slider = jsnew Goog.Ui.slider(Js.null) in
-  slider##setOrientation(Goog.Ui.SliderBase.Orientation._VERTICAL);
-  slider##setMinimum(1.);
-  slider##setMaximum(80.);
-  slider##setValue(10.);
-  slider##setMoveToPointEnabled(Js._true);
-  slider##render(Js.some Dom_html.document##body);
-
-  (* The color palette: *)
-  let pSmall =
-    (*VVV Problems with HSVA:
-      - the widget gives #rrggbbaa and the canvas expects rgba(rrr, ggg, bbb, a)
-      - the point between two lines is displayed twice (=> darker)
-    *)
-    jsnew Goog.Ui.hsvPalette(Js.null, Js.null,
-                             Js.some (Js.string "goog-hsv-palette-sm"))
-  in
-  pSmall##render(Js.some Dom_html.document##body);
-
   let x = ref 0 and y = ref 0 in
   let set_coord ev =
     let x0, y0 = Dom_html.elementClientPosition canvas in
@@ -185,11 +164,12 @@ let init_client () =
   let compute_line set_coord x y ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let color = Js.to_string (pSmall##getColor()) in
-    let size = int_of_float (Js.to_float (slider##getValue())) in
-    (color, size, (oldx, oldy), (!x, !y))
+    let rgb = Ojw_color_picker.get_rgb colorpicker in
+    let size_slider = get_element "slider" in
+    let size = int_of_string (Js.to_string (Js.Unsafe.coerce size_slider)##value) in
+    (rgb, size, (oldx, oldy), (!x, !y))
   in
-  let (bus:messages Eliom_bus.t) = %bus in
+  let bus = %bus in
   let line ev =
     let v = compute_line set_coord x y ev in
     let _ = Eliom_bus.write bus v in
@@ -216,8 +196,6 @@ let init_client () =
 
 
   (* The brush *)
-  (*VVV bof document.
-    Mieux : canvas2 mais il faut gérer la sortie du canvas... *)
   ctx2##globalCompositeOperation <- Js.string "copy";
   let x, y, size = ref 0, ref 0, ref 0 in
   let set_coord ev =
@@ -225,7 +203,7 @@ let init_client () =
     x := ev##clientX - x0; y := ev##clientY - y0 in
   let brush ev _ =
     let (color, newsize, oldv, v) = compute_line set_coord x y ev in
-    draw ctx2 ("rgba(0,0,0,0)", !size+3, oldv, oldv);
+    draw  ~visible:false ctx2 ((0, 0, 0), !size+3, oldv, oldv);
     size := newsize;
     draw ctx2 (color, newsize, v, v);
     Lwt.return ()
