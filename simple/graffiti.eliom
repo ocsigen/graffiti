@@ -127,8 +127,6 @@ let page =
        Html5.D.div ~a:[] [slider]])
 
 {client{
-let get_element id = Js.Opt.get (Dom_html.document##getElementById
-                                   (Js.string id)) (fun () -> assert false)
 
 let init_client () =
 
@@ -164,7 +162,7 @@ let init_client () =
     let oldx = !x and oldy = !y in
     set_coord ev;
     let rgb = Ojw_color_picker.get_rgb colorpicker in
-    let size_slider = get_element "slider" in
+    let size_slider = Html5.To_dom.of_input %slider in
     let size = int_of_string (Js.to_string (Js.Unsafe.coerce size_slider)##value) in
     (rgb, size, (oldx, oldy), (!x, !y))
   in
