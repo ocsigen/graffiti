@@ -26,15 +26,14 @@ canvas {
   border: solid 1px #aaaaaa;
 }
 
-div.goog-slider-vertical {
+div.ojw_colorpicker {
   position: absolute;
   top: 8px;
   left: 740px;
 }
 
-DIV.goog-hsv-palette-sm {
+input {
   position: absolute;
-  top: 58px;
-  left: 780px;
+  width: 400px;
 }
 
