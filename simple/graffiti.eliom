@@ -163,7 +163,7 @@ let init_client () =
     set_coord ev;
     let rgb = Ojw_color_picker.get_rgb colorpicker in
     let size_slider = Html5.To_dom.of_input %slider in
-    let size = int_of_string (Js.to_string (Js.Unsafe.coerce size_slider)##value) in
+    let size = int_of_string (Js.to_string size_slider##value) in
     (rgb, size, (oldx, oldy), (!x, !y))
   in
   let bus = %bus in
