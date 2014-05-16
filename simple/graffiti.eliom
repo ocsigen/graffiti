@@ -36,8 +36,7 @@ module My_appl =
 
 {client{
 
-  let draw ?(visible = true) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
-    let alpha = if visible then 1. else 0. in
+  let draw ?(alpha = 1.) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
     let color = CSS.Color.string_of_t (CSS.Color.rgb r g b ~a:alpha) in
     ctx##strokeStyle <- Js.string color;
     ctx##lineWidth <- float size;
@@ -203,7 +202,7 @@ let init_client () =
     x := ev##clientX - x0; y := ev##clientY - y0 in
   let brush ev _ =
     let (color, newsize, oldv, v) = compute_line set_coord x y ev in
-    draw  ~visible:false ctx2 ((0, 0, 0), !size+3, oldv, oldv);
+    draw  ~alpha:0. ctx2 ((0, 0, 0), !size+3, oldv, oldv);
     size := newsize;
     draw ctx2 (color, newsize, v, v);
     Lwt.return ()
