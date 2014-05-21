@@ -11,9 +11,9 @@ SERVER_FILES := $(wildcard *.eliomi *.eliom) server.ml common.ml feed.ml
 CLIENT_FILES := $(wildcard *.eliomi *.eliom) client.ml common.ml
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := cairo2 unix
+SERVER_PACKAGES := deriving.syntax cairo2 unix
 # OCamlfind packages for the client
-CLIENT_PACKAGES := oclosure
+CLIENT_PACKAGES := deriving.syntax ojwidgets
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

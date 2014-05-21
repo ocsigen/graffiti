@@ -20,9 +20,9 @@
 
 open Common
 open Eliom_content
-open Event_arrows
 
-let draw ctx (color, size, (x1, y1), (x2, y2)) =
+let draw ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
+  let color = CSS.Color.string_of_t (CSS.Color.rgb r g b) in
   ctx##strokeStyle <- (Js.string color);
   ctx##lineWidth <- float size;
   ctx##beginPath();
@@ -44,7 +44,7 @@ let stop_drawing { message_thread; drawing_thread } =
   (* cancelling this thread also close the bus *)
   Lwt.cancel drawing_thread
 
-let launch_client_canvas bus image_elt canvas_elt =
+let launch_client_canvas bus image_elt canvas_elt slider =
   let canvas = Html5.To_dom.of_canvas canvas_elt in
   let ctx = canvas##getContext (Dom_html._2d_) in
   ctx##lineCap <- Js.string "round";
@@ -56,20 +56,11 @@ let launch_client_canvas bus image_elt canvas_elt =
   else img##onload <- Dom_html.handler
     (fun ev -> copy_image (); Js._false);
 
-  (* Size of the brush *)
-  let slider = jsnew Goog.Ui.slider(Js.null) in
-  slider##setMinimum(1.);
-  slider##setMaximum(80.);
-  slider##setValue(10.);
-  slider##setMoveToPointEnabled(Js._true);
-  slider##render(Js.some Dom_html.document##body);
 
   (* The color palette: *)
-  let pSmall =
-    jsnew Goog.Ui.hsvPalette(Js.null, Js.null,
-                             Js.some (Js.string "goog-hsv-palette-sm"))
-  in
-  pSmall##render(Js.some Dom_html.document##body);
+  let colorpicker = Ojw_color_picker.create ~width:150 () in
+  Ojw_color_picker.append_at (Dom_html.document##body) colorpicker;
+  Ojw_color_picker.init_handler colorpicker;
 
   let x = ref 0 and y = ref 0 in
   let set_coord ev =
@@ -78,9 +69,10 @@ let launch_client_canvas bus image_elt canvas_elt =
   let compute_line ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let color = Js.to_string (pSmall##getColor()) in
-    let size = int_of_float (Js.to_float (slider##getValue())) in
-    (color, size, (oldx, oldy), (!x, !y))
+    let rgb = Ojw_color_picker.get_rgb colorpicker in
+    let size_slider = Html5.To_dom.of_input slider in
+    let size = int_of_string (Js.to_string size_slider##value) in
+    (rgb, size, (oldx, oldy), (!x, !y))
   in
   let line ev =
     let v = compute_line ev in

@@ -37,15 +37,17 @@ let launch_server_canvas () =
   let bus = Eliom_bus.create Json.t<messages> in
 
   let draw_server, image_string =
+    let rgb_ints_to_floats (r, g, b) =
+      float r /. 255., float g /. 255., float b /. 255. in
     let surface = Cairo.Image.create Cairo.Image.ARGB32 ~width ~height in
     let ctx = Cairo.create surface in
-    ((fun ((color : string), size, (x1, y1), (x2, y2)) ->
+    ((fun (rgb, size, (x1, y1), (x2, y2)) ->
 
       (* Set thickness of brush *)
+      let r, g, b = rgb_ints_to_floats rgb in
       Cairo.set_line_width ctx (float size) ;
       Cairo.set_line_join ctx Cairo.JOIN_ROUND ;
       Cairo.set_line_cap ctx Cairo.ROUND ;
-      let r, g, b =  rgb_from_string color in
       Cairo.set_source_rgb ctx ~r ~g ~b ;
 
       Cairo.move_to ctx (float x1) (float y1) ;
@@ -92,9 +94,9 @@ let get_bus (name:string) =
       Hashtbl.add graffiti_info name (bus, image_string);
       bus
 
-let main_service = Eliom_service.service ~path:[""]
+let main_service = Eliom_service.App.service ~path:[""]
   ~get_params:(Eliom_parameter.unit) ()
-let multigraffiti_service = Eliom_service.service ~path:[""]
+let multigraffiti_service = Eliom_service.App.service ~path:[""]
   ~get_params:(Eliom_parameter.suffix (Eliom_parameter.string "name")) ()
 
 let choose_drawing_form () =
@@ -107,15 +109,15 @@ let choose_drawing_form () =
          ]])
 
 let connection_service =
-  Eliom_service.post_coservice'
+  Eliom_service.Http.post_coservice'
     ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()
 
 let disconnection_service =
-  Eliom_service.post_coservice' ~post_params:Eliom_parameter.unit ()
+  Eliom_service.Http.post_coservice' ~post_params:Eliom_parameter.unit ()
 
 let create_account_service =
-  Eliom_service.post_coservice
+  Eliom_service.Http.post_coservice
     ~fallback:main_service
     ~post_params:Eliom_parameter.(string "name" ** string "password")
     ()

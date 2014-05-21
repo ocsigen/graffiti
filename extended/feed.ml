@@ -83,7 +83,7 @@ let save_image_box =
 	[p [Html5.D.string_input
                ~input_type:`Submit ~value:"save" ()]]) ())
 
-let feed_service = Eliom_service.service ~path:["feed"]
+let feed_service = Eliom_service.Http.service ~path:["feed"]
   ~get_params:(Eliom_parameter.string "name") ()
 
 let local_filename name number =
