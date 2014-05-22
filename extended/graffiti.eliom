@@ -46,7 +46,8 @@ let () = Connected.register ~service:multigraffiti_service
       Html5.D.img ~alt:name ~src:(Html5.D.make_uri
 				    ~service:imageservice (name, !counter)) ()
     in
-    let slider = Html5.D.int_input ~a:[Html5.D.a_id "slider"]
+    let slider = Html5.D.int_input
+        ~a:[Html5.D.a_id "slider"; Html5.D.a_input_min 1.; Html5.D.a_input_max 80.]
         ~input_type:`Range () in
     let canvas =
       Html5.D.canvas

@@ -112,7 +112,9 @@ let canvas_elt : canvas =
 let canvas2_elt : canvas =
   Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ] []
 
-let slider = Html5.D.int_input ~a:[Html5.D.a_id "slider"] ~input_type:`Range ()
+let slider = Html5.D.int_input
+    ~a:[Html5.D.a_id "slider"; Html5.D.a_input_min 1.; Html5.D.a_input_max 80.]
+    ~input_type:`Range ()
 
 let page =
   Html5.D.html
