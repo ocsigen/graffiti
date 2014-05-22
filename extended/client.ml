@@ -84,6 +84,7 @@ let launch_client_canvas bus image_elt canvas_elt slider =
   let drawing_thread =
     Lwt_js_events.(
       mousedowns canvas (fun ev elt ->
+        Dom.preventDefault ev;
         set_coord ev;
         lwt () = line ev in
         Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
