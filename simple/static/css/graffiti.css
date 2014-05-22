@@ -20,6 +20,7 @@
 
 body {
   width: 750px;
+  -webkit-user-select: none;
 }
 
 canvas {
