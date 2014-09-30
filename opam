@@ -1,7 +1,7 @@
 opam-version: "1"
 maintainer: "gregoire.henry@ocamlpro.com"
 build: [
-  [ make "PREFIX=%{prefix}%" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" "-C" "simple" ]
+  [ make "-C" "simple" "PREFIX=%{prefix}%" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" ]
   [ make "-C" "simple" "install" ]
 ]
 remove: [
