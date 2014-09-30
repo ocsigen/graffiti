@@ -1,8 +1,8 @@
 opam-version: "1"
 maintainer: "gregoire.henry@ocamlpro.com"
 build: [
-  [ make "-C" "simple" "PREFIX=%{prefix}%" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" ]
-  [ make "-C" "simple" "install" ]
+  [ make "PREFIX=%{prefix}%" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" "-C" "simple" ]
+  [ make "PREFIX=%{prefix}%" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" "-C" "simple" "install" ]
 ]
 remove: [
   [ "ocamlfind" "remove" "graffiti" ]
