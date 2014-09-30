@@ -26,12 +26,12 @@
 
   (* Handheld screen *)
   let has_small_screen () =
-    let width, height = Ojw_tools.get_screen_size () in
+    let width, height = Ow_size.get_screen_size () in
     width <= 768
 
   (* Tablet screen *)
   let has_medium_screen_or_less () =
-    let width, height = Ojw_tools.get_screen_size () in
+    let width, height = Ow_size.get_screen_size () in
     width <= 980
 
   let launch_on_small func =

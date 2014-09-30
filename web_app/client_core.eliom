@@ -82,7 +82,7 @@
 
       set_coord (x, y) coord;
 
-      let color = Ew_table_color_picker.get_color color_picker in
+      let color = Ow_table_color_picker.get_color color_picker in
       let brush_size = Client_tools.get_slider_value slider in
 
       (* Format for canvas and bus *)
@@ -122,7 +122,7 @@
 
     let reset_coord ev =
       touch_coord := IntMap.empty;
-      set_coord (x, y) (Ojw_slide_event.get_slide_coord 0 ev)
+      set_coord (x, y) (Ow_slide_event.get_slide_coord 0 ev)
     in
 
     let handle_change_touch action ev =
@@ -133,8 +133,8 @@
         Js.Optdef.case (list##item(n))
           (fun () -> -1, (0, 0))
           (fun item -> item##identifier,
-            Ojw_event_tools.get_touch_coord
-              ~p_type:Ojw_event_tools.Page item)
+            Ow_event_tools.get_touch_coord
+              ~p_type:Ow_event_tools.Page item)
       in
 
       let insert id (x, y) =
@@ -166,13 +166,13 @@
     in
 
     let handler action = function
-      | Ojw_slide_event.Touch_event ev       ->
+      | Ow_slide_event.Touch_event ev       ->
         handle_change_touch action ev
-      | Ojw_slide_event.Mouse_event ev       ->
-        action (x, y) (Ojw_event_tools.get_mouse_ev_coord ev)
+      | Ow_slide_event.Mouse_event ev       ->
+        action (x, y) (Ow_event_tools.get_mouse_ev_coord ev)
     in
 
-    Lwt.async (fun () -> Ojw_slide_event.touch_or_mouse_slides dom_canvas2
+    Lwt.async (fun () -> Ow_slide_event.touch_or_mouse_slides dom_canvas2
       (fun ev _ -> reset_coord ev; handler line ev)
       (* handler automaticly set_coord for touch here thank to reset *)
       (fun ev _ -> handler line ev)
@@ -181,7 +181,7 @@
     (* Handle preview *)
     let x, y, old_size = ref 0., ref 0., ref 0. in
     let preview ev _ =
-      let coord = Ojw_event_tools.get_mouse_ev_coord ev in
+      let coord = Ow_event_tools.get_mouse_ev_coord ev in
       let (color, new_size, oldv, v) = compute_line (x, y) coord in
 
       (* remove old point with transparanse *)
@@ -201,7 +201,7 @@
     (* ignore (Client_event_tools.disable_drag_and_drop dom_canvas); *)
 
     (* fix scroll on smartphone to avoid moving up and down on browsers *)
-    ignore (Ojw_mobile_tools.disable_zoom ());
+    ignore (Ow_mobile_tools.disable_zoom ());
 
     (* resize and orientationchange listenner *)
     (* handle resize of canvas and redraw image *)
@@ -228,7 +228,7 @@
     begin
 
       (* Remove navigation bar *)
-      Ojw_mobile_tools.hide_navigation_bar ();
+      Ow_mobile_tools.hide_navigation_bar ();
 
       (* Random logo image *)
       Client_header.rand_logo

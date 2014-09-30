@@ -13,7 +13,7 @@ CLIENT_FILES := $(wildcard *.eliomi *.eliom)
 # OCamlfind packages for the server
 SERVER_PACKAGES := deriving.syntax cairo2 unix
 # OCamlfind packages for the client
-CLIENT_PACKAGES := deriving.syntax ojwidgets
+CLIENT_PACKAGES := deriving.syntax ocsigen-widgets.client
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

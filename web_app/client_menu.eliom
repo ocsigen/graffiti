@@ -64,7 +64,7 @@
 
       (* Also disable on phonegap to stop standard behavior *)
       let handler_id = ref
-        (Ojw_event_tools.disable_event Dom_html.Event.click dom_save_link)
+        (Ow_event_tools.disable_event Dom_html.Event.click dom_save_link)
       in
       let currently_disable = ref true in
 
@@ -73,7 +73,7 @@
         if (not !currently_disable) then
           begin
             if (not !on_phonegap)
-            then handler_id := Ojw_event_tools.disable_event
+            then handler_id := Ow_event_tools.disable_event
               Dom_html.Event.click dom_save_link
             else cancel_opt_value !phonegap_handler_id;
             currently_disable := true
@@ -85,7 +85,7 @@
         if !currently_disable then
           begin
             if (not !on_phonegap)
-            then Ojw_event_tools.enable_event !handler_id
+            then Ow_event_tools.enable_event !handler_id
             else phonegap_handler_id := Some
               (Lwt_js_events.click dom_save_link >>= (fun _ ->
                 Lwt.return (phonegap_image_download ())));

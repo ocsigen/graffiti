@@ -132,9 +132,9 @@ let page =
 
 let init_client () =
 
-  let colorpicker = Ojw_color_picker.create ~width:150 () in
-  Ojw_color_picker.append_at (Dom_html.document##body) colorpicker;
-  Ojw_color_picker.init_handler colorpicker;
+  let colorpicker = Ow_color_picker.create ~width:150 () in
+  Ow_color_picker.append_at (Dom_html.document##body) colorpicker;
+  Ow_color_picker.init_handler colorpicker;
   let canvas = Html5.To_dom.of_canvas %canvas_elt in
   let st = canvas##style in
   st##position <- Js.string "absolute";
@@ -163,7 +163,7 @@ let init_client () =
   let compute_line set_coord x y ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let rgb = Ojw_color_picker.get_rgb colorpicker in
+    let rgb = Ow_color_picker.get_rgb colorpicker in
     let size_slider = Html5.To_dom.of_input %slider in
     let size = int_of_string (Js.to_string size_slider##value) in
     (rgb, size, (oldx, oldy), (!x, !y))

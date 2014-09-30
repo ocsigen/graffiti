@@ -37,13 +37,13 @@
 
     (* Elarge color picker on computer *)
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
-      then Ew_table_color_picker.add_square_color color_picker
-        Ew_table_color_picker.lll_color_6
+      then Ow_table_color_picker.add_square_color color_picker
+        Ow_table_color_picker.lll_color_6
       else color_picker
     in
 
     let color_square_list =
-      Ew_table_color_picker.get_square_color_div_list color_picker'
+      Ow_table_color_picker.get_square_color_div_list color_picker'
     in
     let dom_color_list = List.map
       (fun elt -> Eliom_content.Html5.To_dom.of_div elt) color_square_list
@@ -101,8 +101,8 @@
       dom_color##style##height <- brush_size;
       Lwt.return ()
     in
-    Ew_slider.change_move_slide_callback slider handler;
-    Ew_slider.change_click_callback slider handler;
+    Ow_slider.change_move_slide_callback slider handler;
+    Ow_slider.change_click_callback slider handler;
 
     (* Handle recalcul base canvas size *)
     Lwt.async (fun () -> Lwt_js_events.limited_onorientationchanges_or_onresizes
@@ -110,9 +110,9 @@
         (base_size := (float_of_int dom_canvas##clientHeight))));
 
     (* start slider script *)
-    Ew_slider.start slider;
+    Ow_slider.start slider;
 
     (* Start color picker stript *)
-    Ew_table_color_picker.start color_picker'
+    Ow_table_color_picker.start color_picker'
 
 }}

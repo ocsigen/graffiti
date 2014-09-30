@@ -58,9 +58,9 @@ let launch_client_canvas bus image_elt canvas_elt slider =
 
 
   (* The color palette: *)
-  let colorpicker = Ojw_color_picker.create ~width:150 () in
-  Ojw_color_picker.append_at (Dom_html.document##body) colorpicker;
-  Ojw_color_picker.init_handler colorpicker;
+  let colorpicker = Ow_color_picker.create ~width:150 () in
+  Ow_color_picker.append_at (Dom_html.document##body) colorpicker;
+  Ow_color_picker.init_handler colorpicker;
 
   let x = ref 0 and y = ref 0 in
   let set_coord ev =
@@ -69,7 +69,7 @@ let launch_client_canvas bus image_elt canvas_elt slider =
   let compute_line ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let rgb = Ojw_color_picker.get_rgb colorpicker in
+    let rgb = Ow_color_picker.get_rgb colorpicker in
     let size_slider = Html5.To_dom.of_input slider in
     let size = int_of_string (Js.to_string size_slider##value) in
     (rgb, size, (oldx, oldy), (!x, !y))

@@ -21,6 +21,6 @@
 {client{
 
   (* get and convert slider value *)
-  let get_slider_value slider = ((Ew_slider.get_value slider) /. 5.) +. 0.01
+  let get_slider_value slider = ((Ow_slider.get_value slider) /. 5.) +. 0.01
 
 }}

@@ -104,7 +104,7 @@ let rec entries name list = function
 	in
 	let entry =
 	  Atom_feed.entry ~title ~id:(Xml.string_of_uri uri) ~updated:saved
-            [Atom_feed.xhtmlC [ Xhtml.M.img ~src:(Xml.string_of_uri uri) ~alt:"image" ()]] in
+     [Atom_feed.html5C [ Html5.F.img ~src:uri ~alt:"image" ()]] in
 	entry::(entries name q (len - 1))
 
 let feed name () =

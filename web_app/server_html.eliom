@@ -33,8 +33,8 @@ type 'a save_type =
 type palette_type =
     {palette_wrapper: [Html5_types.div] Eliom_content.Html5.elt;
      palette_button: [`Table] Eliom_content.Html5.elt;
-     ew_slider: Ew_slider.t;
-     color_picker: Ew_table_color_picker.t;
+     ew_slider: Ow_slider.t;
+     color_picker: Ow_table_color_picker.t;
      color_div: [Html5_types.div] Eliom_content.Html5.elt}
 
 type main_type =
@@ -140,11 +140,11 @@ let save_button () =
 (* palette *)
 
 let palette () =
-  let color_picker, color_div, block_elt = Ew_table_color_picker.create
-    ~initial_color:(0, 3, 0) ~lll_color:Ew_table_color_picker.lll_color_10 ()
+  let color_picker, color_div, block_elt = Ow_table_color_picker.create
+    ~initial_color:(0, 3, 0) ~lll_color:Ow_table_color_picker.lll_color_10 ()
   in
-  let ew_slider, slider_elt = Ew_slider.create
-    ~orientation:Ew_slider.Vertical ?initial_value:(Some 0.8) ()
+  let ew_slider, slider_elt = Ow_slider.create
+    ~orientation:Ow_slider.Vertical ?initial_value:(Some 0.8) ()
   in
   let palette_button_elt =
     D.table ~a:[a_class["palette_button"]]

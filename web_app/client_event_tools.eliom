@@ -25,7 +25,7 @@ open Lwt
   (* Enable / disable *)
 
   let disable_mobile_zoom () =
-    Ojw_event_tools.disable_event Dom_html.Event.touchmove Dom_html.document
+    Ow_event_tools.disable_event Dom_html.Event.touchmove Dom_html.document
 
   let preventEvent
       (prevented_event:
@@ -41,19 +41,19 @@ open Lwt
           (Dom_html.touchEvent Js.t -> unit Lwt.t -> unit Lwt.t) ->
           unit Lwt.t))
       target =
-    let last_time = ref (Ojw_tools.get_timestamp ()) in
+    let last_time = ref (Ow_tools.get_timestamp ()) in
     let last_coord = ref (0, 0) in
     Lwt.async (fun () ->
       source_event ?use_capture:(Some true) target (fun ev _ ->
-        last_time := Ojw_tools.get_timestamp ();
-        last_coord := Ojw_event_tools.get_touch_ev_coord 0 ev;
+        last_time := Ow_tools.get_timestamp ();
+        last_coord := Ow_event_tools.get_touch_ev_coord 0 ev;
         Lwt.return (Dom.preventDefault ev)));
     Lwt.async (fun () ->
       prevented_event ?use_capture:(Some true) target (fun ev _ ->
-        let time = Ojw_tools.get_timestamp () in
-        let coord = Ojw_event_tools.get_mouse_ev_coord ev in
+        let time = Ow_tools.get_timestamp () in
+        let coord = Ow_event_tools.get_mouse_ev_coord ev in
         (* check if it is at same coord and fired less than 350ms after touch *)
-        if (Ojw_event_tools.cmp_coord !last_coord coord &&
+        if (Ow_event_tools.cmp_coord !last_coord coord &&
               (time -. 0.35) <= !last_time)
         then begin Dom.preventDefault ev; Dom_html.stopPropagation ev end;
         Lwt.return () ))
@@ -89,8 +89,8 @@ open Lwt
 
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
-      let width, height = Ojw_tools.get_document_size () in
-      let current_x, current_y = Ojw_event_tools.get_mouse_ev_coord ev in
+      let width, height = Ow_size.get_document_size () in
+      let current_x, current_y = Ow_event_tools.get_mouse_ev_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in
       let end_x' = get_relative_position width end_x in

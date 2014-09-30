@@ -63,7 +63,7 @@
     begin
 
       (* Remove navigation bar *)
-      Ojw_mobile_tools.hide_navigation_bar ();
+      Ow_mobile_tools.hide_navigation_bar ();
 
       (* Random logo image *)
       Client_header.rand_logo

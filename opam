@@ -10,5 +10,5 @@ remove: [
 depends: [
   "eliom"
   "cairo2"
-  "ojwidgets"
+  "ocsigen-widgets"
 ]
