@@ -79,7 +79,7 @@ let about_link () =
 let about () =
   D.div ~a:[a_class["about_wrapper"]]
   [table ~a:[a_class["inline_table"]]
-      (tr [td [div ~a:[a_class["about_block"]]
+      [tr [td [div ~a:[a_class["about_block"]]
                   [img ~a:[a_class["about_logo"]]
                       ~alt:("Graffiti Logo")
                       ~src:(make_uri
@@ -93,7 +93,7 @@ let about () =
                    br ();
                    pcdata "Design by Bruno Loton";
                    br ();
-                   div [pcdata "Created with "; about_link ()]]]]) []]
+                   div [pcdata "Created with "; about_link ()]]]]]]
 
 let gray_layer () =
   D.div ~a:[a_class["gray_layer"]] []
@@ -148,11 +148,11 @@ let palette () =
   in
   let palette_button_elt =
     D.table ~a:[a_class["palette_button"]]
-      (tr [td ~a:[a_class["max_height"]] [color_div]]) []
+      [tr [td ~a:[a_class["max_height"]] [color_div]]]
   in
   let palette_wrapper_elt =
     D.div ~a:[a_class["palette_wrap"]]
-      [table (tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block_elt]]) [];
+      [table [tr ~a:[a_class["max_height"]] [td [slider_elt]; td [block_elt]]];
        palette_button_elt]
   in
   palette_wrapper_elt,
@@ -165,14 +165,13 @@ let palette () =
 
 let starting_logo () =
   D.table ~a:[a_class["logo"]]
-    (tr [td
+    [tr [td
             [img ~a:[a_class["logo_img"]]
                 ~alt:("Graffiti Logo")
                 ~src:(make_uri
                         ~service:(Eliom_service.static_dir ())
                         ["img"; "Logo_GRAFFITIbyOcsigenTouch.png"])
-                ()]])
-    []
+                ()]]]
 
 (* General element *)
 
