@@ -18,7 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-type messages = ((int * int * int) * int * (int * int) * (int * int)) deriving (Json)
+type messages =
+  ((int * int * int) * int * (int * int) * (int * int)) [@@deriving json]
 
 let width = 700
 let height = 400

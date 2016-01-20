@@ -23,12 +23,12 @@ open Eliom_content
 
 let draw ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
   let color = CSS.Color.string_of_t (CSS.Color.rgb r g b) in
-  ctx##strokeStyle <- (Js.string color);
-  ctx##lineWidth <- float size;
-  ctx##beginPath();
-  ctx##moveTo(float x1, float y1);
-  ctx##lineTo(float x2, float y2);
-  ctx##stroke()
+  ctx##.strokeStyle := (Js.string color);
+  ctx##.lineWidth := float size;
+  ctx##beginPath;
+  ctx##(moveTo (float x1) (float y1));
+  ctx##(lineTo (float x2) (float y2));
+  ctx##stroke
 
 (* type containing all informations we need to stop interaction
    inside the page *)
@@ -46,32 +46,32 @@ let stop_drawing { message_thread; drawing_thread } =
 
 let launch_client_canvas bus image_elt canvas_elt slider =
   let canvas = Html5.To_dom.of_canvas canvas_elt in
-  let ctx = canvas##getContext (Dom_html._2d_) in
-  ctx##lineCap <- Js.string "round";
+  let ctx = canvas##(getContext (Dom_html._2d_)) in
+  ctx##.lineCap := Js.string "round";
 
   let img = Html5.To_dom.of_img image_elt in
-  let copy_image () = ctx##drawImage(img, 0., 0.) in
-  if Js.to_bool (img##complete)
+  let copy_image () = ctx##(drawImage img (0.) (0.)) in
+  if Js.to_bool (img##.complete)
   then copy_image ()
-  else img##onload <- Dom_html.handler
+  else img##.onload := Dom_html.handler
     (fun ev -> copy_image (); Js._false);
 
 
   (* The color palette: *)
   let colorpicker = Ow_color_picker.create ~width:150 () in
-  Ow_color_picker.append_at (Dom_html.document##body) colorpicker;
+  Ow_color_picker.append_at (Dom_html.document##.body) colorpicker;
   Ow_color_picker.init_handler colorpicker;
 
   let x = ref 0 and y = ref 0 in
   let set_coord ev =
     let x0, y0 = Dom_html.elementClientPosition canvas in
-    x := ev##clientX - x0; y := ev##clientY - y0 in
+    x := ev##.clientX - x0; y := ev##.clientY - y0 in
   let compute_line ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
     let rgb = Ow_color_picker.get_rgb colorpicker in
     let size_slider = Html5.To_dom.of_input slider in
-    let size = int_of_string (Js.to_string size_slider##value) in
+    let size = int_of_string (Js.to_string size_slider##.value) in
     (rgb, size, (oldx, oldy), (!x, !y))
   in
   let line ev =
@@ -86,9 +86,9 @@ let launch_client_canvas bus image_elt canvas_elt slider =
       mousedowns canvas (fun ev elt ->
         Dom.preventDefault ev;
         set_coord ev;
-        lwt () = line ev in
+        let%lwt () = line ev in
         Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
-	          lwt ev = mouseup Dom_html.document in line ev]))
+	          let%lwt ev = mouseup Dom_html.document in line ev]))
   in
   { message_thread = t;
     drawing_thread = drawing_thread }

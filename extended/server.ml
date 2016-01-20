@@ -28,7 +28,7 @@ module My_app =
   end)
 
 let launch_server_canvas () =
-  let bus = Eliom_bus.create Json.t<messages> in
+  let bus = Eliom_bus.create [%derive.json: messages] in
 
   let draw_server, image_string =
     let rgb_ints_to_floats (r, g, b) =
@@ -72,11 +72,11 @@ let imageservice =
        for chrome, there is no way to force the browser to reload the
        image without leaving the application *)
     (fun (name,_) () ->
-      try_lwt
+      try%lwt
         let _ ,image_string = Hashtbl.find graffiti_info name in
 	Lwt.return (image_string (), "image/png")
       with
-	| Not_found -> raise_lwt Eliom_common.Eliom_404)
+	| Not_found -> [%lwt raise Eliom_common.Eliom_404])
 
 let get_bus (name:string) =
   (* create a new bus and image_string function only if it did not exists *)
@@ -94,12 +94,15 @@ let multigraffiti_service = Eliom_service.App.service ~path:[""]
   ~get_params:(Eliom_parameter.suffix (Eliom_parameter.string "name")) ()
 
 let choose_drawing_form () =
-  Html5.D.get_form ~service:multigraffiti_service
+  Html5.D.Form.get_form ~service:multigraffiti_service
     (fun (name) ->
-      [Html5.D.p [Html5.D.pcdata "drawing name: ";
-          Html5.D.string_input ~input_type:`Text ~name ();
-          Html5.D.br ();
-          Html5.D.string_input ~input_type:`Submit ~value:"Go" ()
+       [Html5.D.p [
+           Html5.D.pcdata "drawing name: ";
+           Html5.D.Form.input ~input_type:`Text ~name
+             Html5.D.Form.string;
+           Html5.D.br ();
+           Html5.D.Form.input ~input_type:`Submit ~value:"Go"
+             Html5.D.Form.string
          ]])
 
 let connection_service =
@@ -118,8 +121,8 @@ let create_account_service =
 
 let user_table = Ocsipersist.open_table "user_table"
 let check_pwd name pwd =
-  try_lwt
-    lwt saved_password = Ocsipersist.find user_table name in
+  try%lwt
+    let%lwt saved_password = Ocsipersist.find user_table name in
     Lwt.return (pwd = saved_password)
   with Not_found -> Lwt.return false
 
@@ -130,7 +133,7 @@ let () = Eliom_registration.Action.register
 let () = Eliom_registration.Action.register
   ~service:connection_service
   (fun () (name, password) ->
-    match_lwt check_pwd name password with
+    match%lwt check_pwd name password with
       | true -> Eliom_state.set_volatile_data_session_group
 	~scope:Eliom_common.default_session_scope name;
 	Lwt.return ()
@@ -143,20 +146,29 @@ let () =
       Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
 
 let disconnect_box () =
-  Html5.D.post_form disconnection_service
-    (fun _ -> [Html5.D.p [Html5.D.string_input
-                  ~input_type:`Submit ~value:"Log out" ()]]) ()
+  Html5.D.Form.post_form disconnection_service
+    (fun _ ->
+       [Html5.D.p [
+           Html5.D.Form.input
+             ~input_type:`Submit ~value:"Log out"
+             Html5.D.Form.string
+         ]
+       ]) ()
 
 let login_name_form service button_text =
-  Html5.D.post_form ~service
+  Html5.D.Form.post_form ~service
     (fun (name1, name2) ->
-      [Html5.D.p [Html5.D.pcdata "login: ";
-          Html5.D.string_input ~input_type:`Text ~name:name1 ();
-          Html5.D.br ();
-          Html5.D.pcdata "password: ";
-          Html5.D.string_input ~input_type:`Password ~name:name2 ();
-          Html5.D.br ();
-          Html5.D.string_input ~input_type:`Submit ~value:button_text ()
+       [Html5.D.p [
+           Html5.D.pcdata "login: ";
+           Html5.D.Form.input ~input_type:`Text ~name:name1
+             Html5.D.Form.string;
+           Html5.D.br ();
+           Html5.D.pcdata "password: ";
+           Html5.D.Form.input ~input_type:`Password ~name:name2
+             Html5.D.Form.string;
+           Html5.D.br ();
+           Html5.D.Form.input ~input_type:`Submit ~value:button_text
+             Html5.D.Form.string
          ]]) ()
 
 let oclosure_script =
