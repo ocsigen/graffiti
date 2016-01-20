@@ -18,46 +18,46 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{shared{
+[%%shared
 
 type 'a canvas_type =
     {canvas1 : [`Canvas of 'a] Eliom_content.Html5.elt;
      canvas2 : [`Canvas of 'a] Eliom_content.Html5.elt;
-     angle: [Html5_types.div] Eliom_content.Html5.elt;
-     about_point: [Html5_types.div] Eliom_content.Html5.elt}
+     angle: Html5_types.div Eliom_content.Html5.elt;
+     about_point: Html5_types.div Eliom_content.Html5.elt}
 
 type 'a save_type =
-    {save_button : [Html5_types.div] Eliom_content.Html5.elt;
-     save_link: ['a Html5_types.a] Eliom_content.Html5.elt}
+    {save_button : Html5_types.div Eliom_content.Html5.elt;
+     save_link: 'a Html5_types.a Eliom_content.Html5.elt}
 
 type palette_type =
-    {palette_wrapper: [Html5_types.div] Eliom_content.Html5.elt;
+    {palette_wrapper: Html5_types.div Eliom_content.Html5.elt;
      palette_button: [`Table] Eliom_content.Html5.elt;
      ew_slider: Ow_slider.t;
      color_picker: Ow_table_color_picker.t;
-     color_div: [Html5_types.div] Eliom_content.Html5.elt}
+     color_div: Html5_types.div Eliom_content.Html5.elt}
 
 type main_type =
     {body: [`Body] Eliom_content.Html5.elt;
-     header: [Html5_types.div] Eliom_content.Html5.elt}
+     header: Html5_types.div Eliom_content.Html5.elt}
 
 type 'a ms_type =
     {ms_main: main_type;
      ms_canvas: 'a canvas_type;
      ms_save: 'a save_type;
      ms_palette: palette_type;
-     ms_gray_layer: [Html5_types.div] Eliom_content.Html5.elt;
-     ms_about: [Html5_types.div] Eliom_content.Html5.elt;
+     ms_gray_layer: Html5_types.div Eliom_content.Html5.elt;
+     ms_about: Html5_types.div Eliom_content.Html5.elt;
      ms_starting_logo: [`Table] Eliom_content.Html5.elt}
 
 type 'a sr_type =
     {sr_main: main_type;
      sr_canvas: 'a canvas_type;
-     sr_gray_layer: [Html5_types.div] Eliom_content.Html5.elt;
-     sr_about: [Html5_types.div] Eliom_content.Html5.elt;
+     sr_gray_layer: Html5_types.div Eliom_content.Html5.elt;
+     sr_about: Html5_types.div Eliom_content.Html5.elt;
      sr_starting_logo: [`Table] Eliom_content.Html5.elt}
 
-}}
+]
 
 open Eliom_content.Html5
 open Eliom_content.Html5.F
@@ -287,35 +287,41 @@ let setting_form () =
   let current_time = get_time current_datetime in
   let default_coef = 5 in
   let hts_value = 1 in
-  post_form ~service:Server_service.start_replay_service
+  Form.post_form ~service:Server_service.start_replay_service
     (fun (start_d, (start_t, (end_d, (end_t, (coef_to_replay, hts))))) ->
         [fieldset
-            [label ~a:[a_for start_d]
-                [pcdata "Date and time to starting replay"];
-             string_input ~input_type:`Date ~name:start_d ()
-               ~value:date_less_one_day;
-             string_input ~input_type:`Time ~name:start_t ()
-               ~value:default_time;
-             br ();
-             label ~a:[a_for end_d]
-               [pcdata "Date and time to finishing"];
-             string_input ~input_type:`Date ~name:end_d ()
-               ~value:current_date;
-             string_input ~input_type:`Time ~name:end_t ()
-               ~value:current_time;
-             br ();
-             label ~a:[a_for coef_to_replay]
-               [pcdata "Coeficient of accelerating"];
-             int_input ~input_type:`Number ~name:coef_to_replay ()
-               ~value:default_coef;
-             br ();
-             label ~a:[a_for coef_to_replay]
-               [pcdata "Skip huge time space"];
-             int_input ~a:[a_checked `Checked]
-               ~input_type:`Checkbox ~name:hts ()
-               ~value:hts_value;
-             br ();
-             string_input ~input_type:`Submit ~value:"Send" ();
+           [label ~a:[a_for "start_d"]
+              [pcdata "Date and time to starting replay"];
+            Form.input ~a:[a_id "start_d"]
+              ~input_type:`Date ~name:start_d
+              ~value:date_less_one_day
+              Form.string;
+            Form.input
+              ~input_type:`Time ~name:start_t ~value:default_time
+              Form.string;
+            br ();
+            label ~a:[a_for "end_d"]
+              [pcdata "Date and time to finishing"];
+            Form.input ~a:[a_id "end_d"]
+              ~input_type:`Date ~name:end_d ~value:current_date
+              Form.string;
+            Form.input
+              ~input_type:`Time ~name:end_t ~value:current_time
+              Form.string;
+            br ();
+            label ~a:[a_for "coef_to_replay"]
+              [pcdata "Coeficient of accelerating"];
+            Form.input ~a:[a_id "coef_to_replay"]
+              ~input_type:`Number ~name:coef_to_replay ~value:default_coef
+              Form.int;
+            br ();
+            label ~a:[a_for "coef_to_replay"]
+              [pcdata "Skip huge time space"];
+            Form.input ~a:[a_checked `Checked]
+              ~input_type:`Checkbox ~name:hts ~value:hts_value
+              Form.int;
+            br ();
+            Form.input ~input_type:`Submit ~value:"Send" Form.string;
         ]]) ()
 
 let setting_replay_service_html () =

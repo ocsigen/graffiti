@@ -18,15 +18,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   let draw ctx base_size (width, height) (color, size, (x1, y1), (x2, y2)) =
-    ctx##strokeStyle <- (Js.string color);
-    ctx##lineWidth <- (size *. base_size);
-    ctx##beginPath();
-    ctx##moveTo(x1 *. width, y1 *. height);
-    ctx##lineTo(x2 *. width, y2 *. height +. 0.1);
-    ctx##stroke()
+    ctx##.strokeStyle := (Js.string color);
+    ctx##.lineWidth := (size *. base_size);
+    ctx##beginPath;
+    ctx##(moveTo (x1 *. width) (y1 *. height));
+    ctx##(lineTo (x2 *. width) (y2 *. height +. 0.1));
+    ctx##stroke
 
   (** Calcul and set size of canvas **)
   let init_size body_elt header_elt canvas_elt canvas2_elt =
@@ -65,8 +65,8 @@
 
     (* Init canvas *)
     let init_canvas dom_canvas =
-      dom_canvas##width <- width';
-      dom_canvas##height <- height'
+      dom_canvas##.width := width';
+      dom_canvas##.height := height'
     in
     init_canvas dom_canvas;
     init_canvas dom_canvas2;
@@ -75,7 +75,7 @@
     let lineHeight = snd size - Client_header.get_height body_elt header_elt in
 
     (* set vertical center *)
-    Dom_html.document##body##style##lineHeight <-
+    Dom_html.document##.body##.style##.lineHeight :=
       Client_js_tools.js_string_of_px lineHeight;
 
     (* return result *)
@@ -84,30 +84,31 @@
   (** Handle set image in canvas**)
   let init_image ctx bus_mutex (width, height) =
 
-      lwt () = Lwt_mutex.lock bus_mutex in
+      let%lwt () = Lwt_mutex.lock bus_mutex in
 
       let copy_image dom_img =
-        ctx##drawImage_withSize(dom_img, 0., 0., width, height);
+        ctx##(drawImage_withSize dom_img (0.) (0.) width height);
       in
 
       let dom_img =
 	(* create js image object to avoid long time loading in webkit *)
 	let dom_img = Dom_html.createImg Dom_html.document in
-	dom_img##src <- Js.string "";
+	dom_img##.src := Js.string "";
 	dom_img
       in
 
       (* We wait for the image to be loaded before drawing it on canvas *)
       Lwt_js_events.async (fun () ->
-        lwt _ = Lwt_js_events.load dom_img in
+        let%lwt _ = Lwt_js_events.load dom_img in
 	copy_image dom_img;
 	Lwt_mutex.unlock bus_mutex;
         Lwt.return ());
 
-      dom_img##src <- Js.string (Eliom_content.Html5.F.make_string_uri
-				   ~service:%Server_image.imageservice
-				   (int_of_float width));
+      dom_img##.src :=
+        Js.string (Eliom_uri.make_string_uri
+		     ~service:~%Server_image.imageservice
+                     (int_of_float width));
 
       Lwt.return ()
 
-}}
+]

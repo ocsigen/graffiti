@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   type orientation = Left | Right | Up | Down
   type mode = Offset | Width_height
@@ -53,18 +53,18 @@
 
     let get_offset () = match mode with
       | Offset          -> (match orientation with
-          | Left        -> dom_elt##offsetLeft
-          | Right       -> Dom_html.document##documentElement##clientWidth -
-            dom_elt##offsetLeft - dom_elt##offsetWidth
-          | Down        -> Dom_html.document##documentElement##clientHeight -
-            dom_elt##offsetTop - dom_elt##offsetHeight
-          | Up          -> dom_elt##offsetTop)
+          | Left        -> dom_elt##.offsetLeft
+          | Right       -> Dom_html.document##.documentElement##.clientWidth -
+            dom_elt##.offsetLeft - dom_elt##.offsetWidth
+          | Down        -> Dom_html.document##.documentElement##.clientHeight -
+            dom_elt##.offsetTop - dom_elt##.offsetHeight
+          | Up          -> dom_elt##.offsetTop)
 
       | Width_height    -> (match orientation with
-          | Left        -> dom_elt##clientWidth
-          | Right       -> dom_elt##clientWidth
-          | Down        -> dom_elt##clientHeight
-          | Up          -> dom_elt##clientHeight)
+          | Left        -> dom_elt##.clientWidth
+          | Right       -> dom_elt##.clientWidth
+          | Down        -> dom_elt##.clientHeight
+          | Up          -> dom_elt##.clientHeight)
     in
 
     (** get inverse of current position (min or max) if click is allow
@@ -81,15 +81,15 @@
       let v = Client_js_tools.js_string_of_px value in
       match mode with
       | Offset          -> (match orientation with
-          | Left        -> dom_elt##style##left <- v
-          | Right       -> dom_elt##style##right <- v
-          | Down        -> dom_elt##style##bottom <- v
-          | Up          -> dom_elt##style##top <- v)
+          | Left        -> dom_elt##.style##.left := v
+          | Right       -> dom_elt##.style##.right := v
+          | Down        -> dom_elt##.style##.bottom := v
+          | Up          -> dom_elt##.style##.top := v)
       | Width_height    -> (match orientation with
-          | Left        -> dom_elt##style##width <- v
-          | Right       -> dom_elt##style##width <- v
-          | Down        -> dom_elt##style##height <- v
-          | Up          -> dom_elt##style##height <- v)
+          | Left        -> dom_elt##.style##.width := v
+          | Right       -> dom_elt##.style##.width := v
+          | Down        -> dom_elt##.style##.height := v
+          | Up          -> dom_elt##.style##.height := v)
     in
 
      Ow_slide_event.touch_or_mouse_slides target
@@ -134,4 +134,4 @@
           set_v v;
           launch_callback_with v end_callback)
 
-}}
+]

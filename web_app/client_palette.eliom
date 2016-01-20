@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   open Lwt
 
@@ -33,7 +33,7 @@
     in
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
     let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
-    let base_size = ref (float_of_int dom_canvas##clientHeight) in
+    let base_size = ref (float_of_int dom_canvas##.clientHeight) in
 
     (* Elarge color picker on computer *)
     let color_picker' = if (not (Client_mobile.has_small_screen ()))
@@ -57,10 +57,10 @@
         Lwt_js_events.clicks dom_button_palette (fun _ _ ->
           Lwt.return
             (if not !move then
-                match dom_palette##offsetLeft with
-                  | 0   -> dom_palette##style##left <-
+                match dom_palette##.offsetLeft with
+                  | 0   -> dom_palette##.style##.left :=
                     Client_js_tools.js_string_of_px (-196)
-                  | _   -> dom_palette##style##left <- Js.string "0px"
+                  | _   -> dom_palette##.style##.left := Js.string "0px"
              else () )));
       Lwt.async (fun () ->
         Slide_tools.slide dom_palette
@@ -77,12 +77,12 @@
     (* calcul and resize square color to take the maximum of space *)
     let handle_color_square_resize () =
       let margin = 8 in
-      let doc_height = Dom_html.document##documentElement##clientHeight in
+      let doc_height = Dom_html.document##.documentElement##.clientHeight in
       let new_height = (doc_height - (margin * 2)) / nb_square_row in
       let rec aux = function
         | []            -> ()
         | dom_div::tail ->
-          dom_div##style##height <- Js.string
+          dom_div##.style##.height := Js.string
             (string_of_int (new_height) ^ "px");
           aux tail
       in aux dom_color_list
@@ -97,8 +97,8 @@
           ((Client_tools.get_slider_value slider) *.
             !base_size))) ^ "px")
       in
-      dom_color##style##width <- brush_size;
-      dom_color##style##height <- brush_size;
+      dom_color##.style##.width := brush_size;
+      dom_color##.style##.height := brush_size;
       Lwt.return ()
     in
     Ow_slider.change_move_slide_callback slider handler;
@@ -107,7 +107,7 @@
     (* Handle recalcul base canvas size *)
     Lwt.async (fun () -> Lwt_js_events.limited_onorientationchanges_or_onresizes
       (fun _ _ -> Lwt.return
-        (base_size := (float_of_int dom_canvas##clientHeight))));
+        (base_size := (float_of_int dom_canvas##.clientHeight))));
 
     (* start slider script *)
     Ow_slider.start slider;
@@ -115,4 +115,4 @@
     (* Start color picker stript *)
     Ow_table_color_picker.start color_picker'
 
-}}
+]

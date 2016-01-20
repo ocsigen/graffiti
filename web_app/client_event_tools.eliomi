@@ -16,41 +16,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
+*)
 
-{client{
+[%%client.start]
 
-  (* Enable / disable *)
+(* Enable / disable *)
 
-  val disable_mobile_zoom : unit -> Dom_html.event_listener_id
+val disable_mobile_zoom : unit -> Dom_html.event_listener_id
 
-  (** catch touchstarts on target
-      and made peventDefault to avoid mouse propagation
+(** catch touchstarts on target
+    and made peventDefault to avoid mouse propagation
 
-      moreover if mousedown is fired
-      at same coord and at less then 350ms after:
-      a preventDefault and stopPropagation is made on it *)
-  val disable_ghost_mousedown : #Dom_html.eventTarget Js.t -> unit
+    moreover if mousedown is fired
+    at same coord and at less then 350ms after:
+    a preventDefault and stopPropagation is made on it *)
+val disable_ghost_mousedown : #Dom_html.eventTarget Js.t -> unit
 
-  val disable_ghost_mousemove : #Dom_html.eventTarget Js.t -> unit
+val disable_ghost_mousemove : #Dom_html.eventTarget Js.t -> unit
 
-  val disable_ghost_mouseup : #Dom_html.eventTarget Js.t -> unit
+val disable_ghost_mouseup : #Dom_html.eventTarget Js.t -> unit
 
-  (** Regroup the over fonctionnality in one *)
-  val disable_ghost_mouse_event : #Dom_html.eventTarget Js.t -> unit
+(** Regroup the over fonctionnality in one *)
+val disable_ghost_mouse_event : #Dom_html.eventTarget Js.t -> unit
 
 
-  (* click *)
+(* click *)
 
-  (** local click position type **)
-  type lc_position = Value of int | Max_value of int
+(** local click position type **)
+type lc_position = Value of int | Max_value of int
 
-  (** Detect click beetween (start_x, end_x, start_y, end_y) and launch func
-      Use Max_value constructor to make value relative to document size
-      and Value constructor to make static position **)
-  val detect_local_clicks :
-    (lc_position * lc_position * lc_position * lc_position) ->
-    (unit -> unit Lwt.t) ->
-    unit Lwt.t
-
-}}
+(** Detect click beetween (start_x, end_x, start_y, end_y) and launch func
+    Use Max_value constructor to make value relative to document size
+    and Value constructor to make static position **)
+val detect_local_clicks :
+  (lc_position * lc_position * lc_position * lc_position) ->
+  (unit -> unit Lwt.t) ->
+  unit Lwt.t

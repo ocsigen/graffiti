@@ -24,7 +24,7 @@ open Lwt
 
 let bus = Eliom_bus.create
   ~size:5000 ~scope:`Site ~name:"drawing"
-  Json.t<Shared_tools.messages>
+  [%derive.json: Shared_tools.messages]
 
 (* file *)
 
@@ -43,7 +43,7 @@ let input_file () =
   Lwt_io.open_file ~mode:Lwt_io.input save_file_name
 
 let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
-  lwt output = output_file in
+  let%lwt output = output_file in
   let (^^) a b = a ^ " " ^ b in
   let date = Server_tools.get_str_localdate () in
   let to_str = string_of_float in
@@ -53,7 +53,7 @@ let write_log ip (color, brush_size, (oldx, oldy), (x, y)) =
   Lwt_io.write_line output str
 
 let read_log input =
-  lwt str = Lwt_io.read_line input in
+  let%lwt str = Lwt_io.read_line input in
 
   let lstr = Str.split (Str.regexp " ") str in
   let date = Server_tools.get_date_value (List.nth lstr 0) in
@@ -84,7 +84,7 @@ let read_log input =
 let replay_drawing
     ?(coef_to_replay=0.) ?(skip_hts=false)
     start_drawing end_drawing action =
-  lwt input = input_file () in
+  let%lwt input = input_file () in
 
   let s = Server_tools.sec_of_date
     (Server_tools.get_date_value start_drawing)
@@ -98,11 +98,11 @@ let replay_drawing
   let map start_time end_time coef action =
 
     let get_and_wait last_time =
-      lwt date, _, message = read_log input in
+      let%lwt date, _, message = read_log input in
       let current_time = Server_tools.sec_of_date date in
       let time_to_sleep = (current_time -. last_time) *. coef in
       let skip = (skip_hts && time_to_sleep > max_time_space) in
-      lwt () = if (not skip && last_time > 0. && time_to_sleep > 0.)
+      let%lwt () = if (not skip && last_time > 0. && time_to_sleep > 0.)
         then Lwt_unix.sleep time_to_sleep
         else Lwt.return ()
       in Lwt.return (current_time, message)
@@ -111,27 +111,27 @@ let replay_drawing
     let rec check_and_do_action current_time message =
       if (current_time < end_time)
       then
-        lwt () = action message in
+        let%lwt () = action message in
         aux current_time
       else Lwt.return (message)
 
     and aux last_time =
       try
-        lwt current_time, message = get_and_wait last_time in
+        let%lwt current_time, message = get_and_wait last_time in
         check_and_do_action current_time message
       with Failure "Invalide format"   -> aux last_time
     in aux start_time
 
   in
 
-  try_lwt
-    lwt msg = map 0. s 0. (fun _ -> Lwt.return ()) in
-    lwt () = action msg in
-    lwt _ = map s e coef_to_replay action in
-    lwt () = Lwt_io.close input in
+  try%lwt
+    let%lwt msg = map 0. s 0. (fun _ -> Lwt.return ()) in
+    let%lwt () = action msg in
+    let%lwt _ = map s e coef_to_replay action in
+    let%lwt () = Lwt_io.close input in
     Lwt.return ()
   with End_of_file      ->
-    lwt () = Lwt_io.close input in
+    let%lwt () = Lwt_io.close input in
     Lwt.return ()
 
 
@@ -179,16 +179,16 @@ let save_image file_name surface =
 
 (** save images by step of 1000 drawing  *)
 let save_all_images () =
-  lwt nb = nb_drawing () in
-  lwt current = Ocsipersist.get nb in
+  let%lwt nb = nb_drawing () in
+  let%lwt current = Ocsipersist.get nb in
   if current >= save_step then
     begin
       save_image small_name small_surface;
       save_image medium_name medium_surface;
       save_image large_name large_surface;
 
-      lwt last = last_save () in
-      lwt () = Ocsipersist.set last (Server_tools.get_str_localdate ()) in
+      let%lwt last = last_save () in
+      let%lwt () = Ocsipersist.set last (Server_tools.get_str_localdate ()) in
       Ocsipersist.set nb 0
     end
   else Lwt.return ()
@@ -233,10 +233,10 @@ let draw_server savelog data =
 	  with | e -> "0.0.0.0"
 	in
         (* let ip = "127.0.0.1" in *)
-        lwt () = write_log ip data in
-        lwt nb = nb_drawing () in
-        lwt current = Ocsipersist.get nb in
-        lwt () = Ocsipersist.set nb (current + 1) in
+        let%lwt () = write_log ip data in
+        let%lwt nb = nb_drawing () in
+        let%lwt current = Ocsipersist.get nb in
+        let%lwt () = Ocsipersist.set nb (current + 1) in
         save_all_images ()
     else Lwt.return ()
   end
@@ -274,8 +274,8 @@ let replay_no_save_drawing =
       (large_width, large_height);
 
     (* redrawing not save drawing *)
-    lwt v = last_save () in
-    lwt last = Ocsipersist.get v in
+    let%lwt v = last_save () in
+    let%lwt last = Ocsipersist.get v in
     let current = Server_tools.get_str_localdate () in
     replay_drawing last current (draw_server false)
   end

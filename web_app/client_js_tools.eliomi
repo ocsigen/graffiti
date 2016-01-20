@@ -16,36 +16,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
+*)
 
-{client{
+[%%client.start]
 
-  (* mobile tools *)
+(* mobile tools *)
 
-  (** Very usefull function to slide element
+(** Very usefull function to slide element
 
-      elapsed_time is the time between each call
-      step is the value between each call
-      current is the start value
-      target is the end value
-      func is the function to apply at each call *)
-  val progressive_apply :
-    ?elapsed_time:float ->
-    ?step:int ->
-    int ->
-    int ->
-    (int -> 'a) ->
-    unit Lwt.t
+    elapsed_time is the time between each call
+    step is the value between each call
+    current is the start value
+    target is the end value
+    func is the function to apply at each call *)
+val progressive_apply :
+  ?elapsed_time:float ->
+  ?step:int ->
+  int ->
+  int ->
+  (int -> 'a) ->
+  unit Lwt.t
 
-  val hide_navigation_bar : unit -> unit
+val hide_navigation_bar : unit -> unit
 
-  (* others *)
+(* others *)
 
-  val js_string_of_px : int -> Js.js_string Js.t
+val js_string_of_px : int -> Js.js_string Js.t
 
-  (* css tools *)
+(* css tools *)
 
-  (** Allow to set transition and -webkit-transition property *)
-  val set_transition : #Dom_html.element Js.t -> string -> unit
-
-}}
+(** Allow to set transition and -webkit-transition property *)
+val set_transition : #Dom_html.element Js.t -> string -> unit

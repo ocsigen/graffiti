@@ -18,14 +18,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   (** launch check to remove header and get it's height **)
   let get_height body_elt header_elt =
     if (Client_mobile.remove_header body_elt header_elt)
     then 0
     else let dom_header = Eliom_content.Html5.To_dom.of_div header_elt
-         in dom_header##clientHeight
+         in dom_header##.clientHeight
 
   (** Handle switching logo on each reload of page **)
   let rand_logo body_elt header_elt =
@@ -46,6 +46,6 @@
     else
       (let dom_header =
          Eliom_content.Html5.To_dom.of_div header_elt
-       in dom_header##style##backgroundImage <- (Js.string rand_img))
+       in dom_header##.style##.backgroundImage := (Js.string rand_img))
 
-}}
+]

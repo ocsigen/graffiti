@@ -27,7 +27,7 @@ let get_main_html_service () =
     | Lwt.Return ()     -> (* In normal case *)
       let html_elt, main_record = Server_html.main_service_html () in
       (* init client *)
-      ignore {unit Lwt.t{ Client_core.initialize %main_record }};
+      ignore [%client ( Client_core.initialize ~%main_record : unit Lwt.t)];
       html_elt
     | _                 -> (* During initialize process *)
       Server_html.tmp_service_html ()
@@ -79,7 +79,7 @@ let _ =
             dt1 dt2 write);
 
         let html_elt, sr_record = Server_html.starting_replay_service_html () in
-        ignore {unit Lwt.t{ Client_replay.initialize %channel %sr_record }};
+        ignore [%client ( Client_replay.initialize ~%channel ~%sr_record : unit Lwt.t)];
         Lwt.return (html_elt)
       with e    ->
         Lwt.return (Server_html.starting_replay_service_error_html ()))

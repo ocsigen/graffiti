@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
 open Lwt
 
@@ -101,4 +101,4 @@ open Lwt
       then func ()
       else Lwt.return () )
 
-}}
+]

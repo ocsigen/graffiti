@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   open Lwt
 
@@ -34,12 +34,12 @@
       else
         (let newv = old + (step * direction) in
          ignore (func newv);
-         lwt _ = Lwt_js.sleep elapsed_time in
+         let%lwt _ = Lwt_js.sleep elapsed_time in
          aux newv)
     in aux current
 
     let hide_navigation_bar () =
-      Dom_html.window##scroll(0,1)
+      Dom_html.window##(scroll (0)(1))
 
   (* others *)
 
@@ -48,9 +48,9 @@
   (* css tools *)
 
   let set_transition dom_elt v =
-    (Js.Unsafe.coerce (dom_elt##style))##transition <- Js.string v;
-    ignore (Js.Unsafe.set (dom_elt##style)
+    (Js.Unsafe.coerce (dom_elt##.style))##.transition := Js.string v;
+    ignore (Js.Unsafe.set (dom_elt##.style)
               (Js.string "-webkit-transition") (Js.string v));
 
 
-}}
+]

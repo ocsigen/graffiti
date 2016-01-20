@@ -18,9 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
-
-  (* get and convert slider value *)
-  let get_slider_value slider = ((Ow_slider.get_value slider) /. 5.) +. 0.01
-
-}}
+(* get and convert slider value *)
+let%client get_slider_value slider =
+  ((Ow_slider.get_value slider) /. 5.) +. 0.01

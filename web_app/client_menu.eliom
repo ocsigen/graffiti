@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   open Lwt
 
@@ -44,8 +44,8 @@
 
       let phonegap_image_download () =
         let uri = Js.string
-          (Eliom_content.Html5.D.make_string_uri
-             ~service:%Server_image.download_imageservice ())
+          (Eliom_uri.make_string_uri
+             ~service:~%Server_image.download_imageservice ())
         in
         Client_phonegap.download_file uri
       in
@@ -94,18 +94,18 @@
       in
 
       let contract () =
-        dom_save##style##width <- Js.string "30px";
+        dom_save##.style##.width := Js.string "30px";
         enable_id ()
       and expand () =
         one_time_disable := true;
-        dom_save##style##width <- Js.string "60px";
+        dom_save##.style##.width := Js.string "60px";
         disable_id ()
       in
 
       (* avoid to let expand after return by browser arrow *)
       Lwt.async (fun () ->
       let rec aux () =
-        lwt () = Lwt_js.sleep 3. in
+        let%lwt () = Lwt_js.sleep 3. in
         if (not !disable_contract) then
           (if (not !one_time_disable)
            then begin contract (); disable_id () end
@@ -128,4 +128,4 @@
 
     in Client_mobile.launch_on_small_medium save_click;
 
-}}
+]

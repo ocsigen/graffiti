@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-{client{
+[%%client
 
   open Lwt
 
@@ -38,8 +38,9 @@
   let download_file uri =
     let js_null_func = Js.Unsafe.eval_string "function (p) {}" in
     let transfer = Js.Unsafe.eval_string "new FileTransfer()" in
-    (Js.Unsafe.coerce transfer)##download(uri, "Graffiti/graffiti.png",
-                                          js_null_func, js_null_func, true)
+    (Js.Unsafe.coerce transfer)##(download
+                                    uri ("Graffiti/graffiti.png")
+                                    js_null_func js_null_func true)
 
   (*** Events ***)
 
@@ -56,7 +57,7 @@
     else Lwt.return (None)
 
   let onload_ondeviceready_ifpg () =
-    lwt _ = Lwt_js_events.onload () in
+    let%lwt _ = Lwt_js_events.onload () in
     ondeviceready_ifpg ()
 
-}}
+]

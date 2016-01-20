@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
-{client{
+[%%client
 
   open Server_html
 
@@ -46,8 +46,8 @@
     let base_size = ref !height in
 
     let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
-    let ctx = dom_canvas##getContext (Dom_html._2d_) in
-    ctx##lineCap <- Js.string "round";
+    let ctx = dom_canvas##(getContext (Dom_html._2d_)) in
+    ctx##.lineCap := Js.string "round";
 
     let bus_draw (color, brush_size, (x1, y1), (x2, y2)) =
       Client_canvas.draw ctx !base_size !float_size
@@ -87,4 +87,4 @@
 
     end
 
-}}
+]
