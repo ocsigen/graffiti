@@ -8,7 +8,8 @@ remove: [
   [ "ocamlfind" "remove" "graffiti" ]
 ]
 depends: [
-  "eliom"
+  "eliom" {>= "dev"}
   "cairo2"
   "ocsigen-widgets"
 ]
+available: [ ocaml-version >= "4.02" ]

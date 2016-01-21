@@ -1,5 +1,4 @@
-
-Graffiti is a tiny collaborative drawing application.
+Graffiti is a collaborative drawing application.
 
 For more information, see:
 
@@ -8,12 +7,12 @@ For more information, see:
 Requirements
 ------------
 
-- eliom 2.0-rc1
-- oclosure (development version)
-- cairo-ocaml
+- Eliom >= 5.0
+- ocsigen-widgets >= dev
+- cairo2
 
 Usage
 -----
 
-Run "make" to compile, then run "make run.local" or "make
-run.opt.local" to launch the ocsigenserver on port 8080.
+Run "make test.opt" or "make test.byte" inside any of the three
+directories (simple, extended, web_app).
