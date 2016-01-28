@@ -8,7 +8,7 @@ remove: [
   [ "ocamlfind" "remove" "graffiti" ]
 ]
 depends: [
-  "eliom" {>= "dev"}
+  "eliom" {>= "5.0"}
   "cairo2"
   "ocsigen-widgets"
 ]
