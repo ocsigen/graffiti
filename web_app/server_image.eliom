@@ -300,21 +300,21 @@ let cmp_small w = w <= small_width
 let cmp_medium w = w <= medium_width
 
 let download_imageservice =
-  Eliom_registration.String.register_service
-    ~path:["image"; "graffiti.png"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_registration.String.create
+    ~id:(Eliom_service.Path ["image"; "graffiti.png"])
+    ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (medium_image_string (), "image/png"))
 
 let large_download_imageservice =
-  Eliom_registration.String.register_service
-    ~path:["image"; "large_graffiti.png"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_registration.String.create
+    ~id:(Eliom_service.Path ["image"; "large_graffiti.png"])
+    ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (large_image_string (), "image/png"))
 
 let imageservice =
-  Eliom_registration.String.register_service
-    ~path:["image"; "adaptation.png"]
-    ~get_params:Eliom_parameter.(int "width")
+  Eliom_registration.String.create
+    ~id:(Eliom_service.Path ["image"; "adaptation.png"])
+    ~meth:(Eliom_service.Get Eliom_parameter.(int "width"))
     (fun (width) () -> Lwt.return
       ((match width with
         | w when (cmp_small w)  -> small_image_string ()

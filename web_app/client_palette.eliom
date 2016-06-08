@@ -28,11 +28,11 @@
 
     (*** Elements ***)
 
-    let dom_palette = Eliom_content.Html5.To_dom.of_div palette_div in
-    let dom_button_palette = Eliom_content.Html5.To_dom.of_table palette_button
+    let dom_palette = Eliom_content.Html.To_dom.of_div palette_div in
+    let dom_button_palette = Eliom_content.Html.To_dom.of_table palette_button
     in
-    let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
-    let dom_color = Eliom_content.Html5.To_dom.of_div color_div in
+    let dom_canvas = Eliom_content.Html.To_dom.of_canvas canvas_elt in
+    let dom_color = Eliom_content.Html.To_dom.of_div color_div in
     let base_size = ref (float_of_int dom_canvas##.clientHeight) in
 
     (* Elarge color picker on computer *)
@@ -46,7 +46,7 @@
       Ow_table_color_picker.get_square_color_div_list color_picker'
     in
     let dom_color_list = List.map
-      (fun elt -> Eliom_content.Html5.To_dom.of_div elt) color_square_list
+      (fun elt -> Eliom_content.Html.To_dom.of_div elt) color_square_list
     in
     let nb_square_row = (List.length color_square_list) / 2 in
 

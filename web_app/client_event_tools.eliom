@@ -89,7 +89,7 @@ open Lwt
 
     Lwt_js_events.clicks Dom_html.document (fun ev _ ->
 
-      let width, height = Ow_size.get_document_size () in
+      let width, height = Ot_size.get_document_size () in
       let current_x, current_y = Ow_event_tools.get_mouse_ev_coord ev in
       let start_x' = get_relative_position width start_x in
       let start_y' = get_relative_position height start_y in

@@ -21,7 +21,7 @@
 [%%client.start]
 
 open Lwt
-open Eliom_content.Html5.D
+open Eliom_content.Html.D
 open Server_html
 
 module IntOrdered =
@@ -48,8 +48,8 @@ let start body_elt header_elt canvas_elt canvas2_elt slider color_picker =
   Eliom_bus.set_queue_size ~%Server_image.bus 5;
   Eliom_bus.set_time_before_flush ~%Server_image.bus 0.01;
 
-  let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
-  let dom_canvas2 = Eliom_content.Html5.To_dom.of_canvas canvas2_elt in
+  let dom_canvas = Eliom_content.Html.To_dom.of_canvas canvas_elt in
+  let dom_canvas2 = Eliom_content.Html.To_dom.of_canvas canvas2_elt in
 
   let ctx = dom_canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";

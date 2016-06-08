@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-open Eliom_content.Html5.F
+open Eliom_content.Html.F
 open Server_html
 
 (* Wait end of initialization of server to return html page of app *)

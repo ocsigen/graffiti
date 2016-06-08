@@ -45,7 +45,7 @@
     let float_size = ref (!width, !height) in
     let base_size = ref !height in
 
-    let dom_canvas = Eliom_content.Html5.To_dom.of_canvas canvas_elt in
+    let dom_canvas = Eliom_content.Html.To_dom.of_canvas canvas_elt in
     let ctx = dom_canvas##(getContext (Dom_html._2d_)) in
     ctx##.lineCap := Js.string "round";
 

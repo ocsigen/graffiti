@@ -26,12 +26,12 @@
 
   (* Handheld screen *)
   let has_small_screen () =
-    let width, height = Ow_size.get_screen_size () in
+    let width, height = Ot_size.get_screen_size () in
     width <= 768
 
   (* Tablet screen *)
   let has_medium_screen_or_less () =
-    let width, height = Ow_size.get_screen_size () in
+    let width, height = Ot_size.get_screen_size () in
     width <= 980
 
   let launch_on_small func =
@@ -63,7 +63,7 @@
 
       (* Remove header *)
       let medium_screen () =
-        Eliom_content.Html5.Manip.removeChild
+        Eliom_content.Html.Manip.removeChild
           body_elt header_elt;
         already_removed := true;
         !already_removed
@@ -80,11 +80,11 @@
 
     (*** Tools  ***)
     let dom_statring_logo =
-      Eliom_content.Html5.To_dom.of_table starting_logo_elt
+      Eliom_content.Html.To_dom.of_table starting_logo_elt
     in
 
     let remove_touch_to_start_logo () =
-      Eliom_content.Html5.Manip.removeChild body_elt starting_logo_elt
+      Eliom_content.Html.Manip.removeChild body_elt starting_logo_elt
     in
 
     (* Set touch action *)
