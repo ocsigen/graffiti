@@ -32,6 +32,7 @@ let _ =
 module My_appl =
   Eliom_registration.App (struct
     let application_name = "graffiti"
+    let global_data_path = None
   end)
 
 let%client draw ?(alpha = 1.) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
@@ -54,7 +55,7 @@ let%client () =
     ((int * int *int) * int * (int * int) * (int * int))
     [@@deriving json]
   type canvas =
-    Html5_types.flow5 Html5_types.canvas Eliom_content.Html5.elt
+    Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
 ]
 
 let bus : (messages, messages) Eliom_bus.t = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
@@ -90,53 +91,53 @@ let draw_server, image_string =
 let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
 let imageservice =
-  Eliom_registration.String.register_service
-    ~path:["image"]
-    ~get_params:Eliom_parameter.unit
+  Eliom_registration.String.create
+    ~id:(Eliom_service.Path ["image"])
+    ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
 let image_elt =
-  Html5.D.img ~alt:"canvas"
-    ~src:(Html5.D.make_uri ~service:imageservice ())
+  Html.D.img ~alt:"canvas"
+    ~src:(Html.D.make_uri ~service:imageservice ())
     ()
 
 let canvas_elt : canvas =
-  Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ]
-           [Html5.D.pcdata "your browser doesn't support canvas";
-            Html5.D.br ();
+  Html.D.canvas ~a:[ Html.D.a_width width; Html.D.a_height height ]
+           [Html.D.pcdata "your browser doesn't support canvas";
+            Html.D.br ();
             image_elt]
 
 let canvas2_elt : canvas =
-  Html5.D.canvas ~a:[ Html5.D.a_width width; Html5.D.a_height height ] []
+  Html.D.canvas ~a:[ Html.D.a_width width; Html.D.a_height height ] []
 
 let slider =
-  Html5.D.Form.input
+  Html.D.Form.input
     ~a:[
-      Html5.D.a_id "slider";
-      Html5.D.a_input_min 1.;
-      Html5.D.a_input_max 80.
+      Html.D.a_id "slider";
+      Html.D.a_input_min (`Number 1);
+      Html.D.a_input_max (`Number 80)
     ]
     ~input_type:`Range
-    Html5.D.Form.int
+    Html.D.Form.int
 
 let page =
-  Html5.D.html
-    (Html5.D.head
-       (Html5.D.title (Html5.D.pcdata "Graffiti"))
-       [ Html5.D.css_link
-	   ~uri:(Html5.D.make_uri
+  Html.D.html
+    (Html.D.head
+       (Html.D.title (Html.D.pcdata "Graffiti"))
+       [ Html.D.css_link
+	   ~uri:(Html.D.make_uri
 		   (Eliom_service.static_dir ()) ["css";"graffiti.css"]) ();
 	])
-    (Html5.D.body [
-       Html5.D.div ~a:[] [canvas_elt; canvas2_elt];
-       Html5.D.div ~a:[] [slider]])
+    (Html.D.body [
+       Html.D.div ~a:[] [canvas_elt; canvas2_elt];
+       Html.D.div ~a:[] [slider]])
 
 let%client init_client () =
 
   let colorpicker = Ow_color_picker.create ~width:150 () in
   Ow_color_picker.append_at (Dom_html.document##.body) colorpicker;
   Ow_color_picker.init_handler colorpicker;
-  let canvas = Html5.To_dom.of_canvas ~%canvas_elt in
+  let canvas = Html.To_dom.of_canvas ~%canvas_elt in
   let st = canvas##.style in
   st##.position := Js.string "absolute";
   st##.zIndex := Js.string "-1";
@@ -144,13 +145,13 @@ let%client init_client () =
   ctx##.lineCap := Js.string "round";
 
   (* Another canvas, for second layer *)
-  let canvas2 = Html5.To_dom.of_canvas ~%canvas2_elt in
+  let canvas2 = Html.To_dom.of_canvas ~%canvas2_elt in
   canvas2##.width := width; canvas2##.height := height;
   let ctx2 = canvas2##(getContext (Dom_html._2d_)) in
   ctx2##.lineCap := Js.string "round";
 
   (* The initial image: *)
-  let img = Html5.To_dom.of_img ~%image_elt in
+  let img = Html.To_dom.of_img ~%image_elt in
   let copy_image () = ctx##(drawImage img (0.) (0.)) in
   if Js.to_bool (img##.complete)
   then copy_image ()
@@ -165,7 +166,7 @@ let%client init_client () =
     let oldx = !x and oldy = !y in
     set_coord ev;
     let rgb = Ow_color_picker.get_rgb colorpicker in
-    let size_slider = Html5.To_dom.of_input ~%slider in
+    let size_slider = Html.To_dom.of_input ~%slider in
     let size = int_of_string (Js.to_string size_slider##.value) in
     (rgb, size, (oldx, oldy), (!x, !y))
   in
@@ -183,7 +184,7 @@ let%client init_client () =
             (function e (* Eliom_comet.Channel_full *) ->
               Firebug.console##(log e);
               Eliom_client.exit_to
-                ~service:Eliom_service.void_coservice' () ();
+                ~service:Eliom_service.reload_action () ();
               Lwt.return ()));
   (*                       | e -> Lwt.fail e)); *)
   Lwt_js_events.(async (fun () ->
@@ -212,7 +213,9 @@ let%client init_client () =
   ignore Lwt_js_events.(async (fun () -> (mousemoves Dom_html.document brush)))
 
 let main_service =
-  My_appl.register_service ~path:[""] ~get_params:Eliom_parameter.unit
+  My_appl.create
+    ~id:(Eliom_service.Path [""])
+    ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
       ignore [%client (init_client () : unit) ];
       Lwt.return page)
