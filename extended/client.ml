@@ -45,11 +45,11 @@ let stop_drawing { message_thread; drawing_thread } =
   Lwt.cancel drawing_thread
 
 let launch_client_canvas bus image_elt canvas_elt slider =
-  let canvas = Html5.To_dom.of_canvas canvas_elt in
+  let canvas = Html.To_dom.of_canvas canvas_elt in
   let ctx = canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";
 
-  let img = Html5.To_dom.of_img image_elt in
+  let img = Html.To_dom.of_img image_elt in
   let copy_image () = ctx##(drawImage img (0.) (0.)) in
   if Js.to_bool (img##.complete)
   then copy_image ()
@@ -70,7 +70,7 @@ let launch_client_canvas bus image_elt canvas_elt slider =
     let oldx = !x and oldy = !y in
     set_coord ev;
     let rgb = Ow_color_picker.get_rgb colorpicker in
-    let size_slider = Html5.To_dom.of_input slider in
+    let size_slider = Html.To_dom.of_input slider in
     let size = int_of_string (Js.to_string size_slider##.value) in
     (rgb, size, (oldx, oldy), (!x, !y))
   in

@@ -25,6 +25,7 @@ open Lwt
 module My_app =
   Eliom_registration.App (struct
     let application_name = "graffiti"
+    let global_data_path = None
   end)
 
 let launch_server_canvas () =
@@ -64,10 +65,12 @@ let launch_server_canvas () =
 let graffiti_info = Hashtbl.create 0
 
 let imageservice =
-  Eliom_registration.String.register_service
-    ~path:["image"]
+  Eliom_registration.String.create
+    ~id:(Eliom_service.Path ["image"])
     ~headers:Http_headers.dyn_headers
-    ~get_params:(let open Eliom_parameter in string "name" ** int "q")
+    ~meth:
+      (Eliom_service.Get
+         (let open Eliom_parameter in string "name" ** int "q"))
     (* we add another parameter for the browser not to cache: at least
        for chrome, there is no way to force the browser to reload the
        image without leaving the application *)
@@ -88,35 +91,52 @@ let get_bus (name:string) =
       Hashtbl.add graffiti_info name (bus, image_string);
       bus
 
-let main_service = Eliom_service.App.service ~path:[""]
-  ~get_params:(Eliom_parameter.unit) ()
-let multigraffiti_service = Eliom_service.App.service ~path:[""]
-  ~get_params:(Eliom_parameter.suffix (Eliom_parameter.string "name")) ()
+let main_service =
+  Eliom_service.create
+    ~id:(Eliom_service.Path [""])
+    ~meth:(Eliom_service.Get (Eliom_parameter.unit))
+    ()
+let multigraffiti_service =
+  Eliom_service.create
+    ~id:(Eliom_service.Path [""])
+    ~meth:(Eliom_service.Get (Eliom_parameter.(suffix (string "name"))))
+    ()
 
 let choose_drawing_form () =
-  Html5.D.Form.get_form ~service:multigraffiti_service
+  Html.D.Form.get_form ~service:multigraffiti_service
     (fun (name) ->
-       [Html5.D.p [
-           Html5.D.pcdata "drawing name: ";
-           Html5.D.Form.input ~input_type:`Text ~name
-             Html5.D.Form.string;
-           Html5.D.br ();
-           Html5.D.Form.input ~input_type:`Submit ~value:"Go"
-             Html5.D.Form.string
+       [Html.D.p [
+           Html.D.pcdata "drawing name: ";
+           Html.D.Form.input ~input_type:`Text ~name
+             Html.D.Form.string;
+           Html.D.br ();
+           Html.D.Form.input ~input_type:`Submit ~value:"Go"
+             Html.D.Form.string
          ]])
 
 let connection_service =
-  Eliom_service.Http.post_coservice'
-    ~post_params:Eliom_parameter.(string "name" ** string "password")
+  Eliom_service.create
+    ~meth:(Eliom_service.Post (
+        Eliom_parameter.unit,
+        Eliom_parameter.(string "name" ** string "password")
+      ))
+    ~id:Eliom_service.Global
     ()
 
 let disconnection_service =
-  Eliom_service.Http.post_coservice' ~post_params:Eliom_parameter.unit ()
+  Eliom_service.create
+    ~meth:(Eliom_service.Post (Eliom_parameter.unit, Eliom_parameter.unit))
+    ~id:Eliom_service.Global
+    ()
 
 let create_account_service =
-  Eliom_service.Http.post_coservice
-    ~fallback:main_service
-    ~post_params:Eliom_parameter.(string "name" ** string "password")
+  Eliom_service.create
+    ~meth:
+      (Eliom_service.Post (
+          Eliom_parameter.unit,
+          Eliom_parameter.(string "name" ** string "password")
+        ))
+    ~id:(Eliom_service.Fallback main_service)
     ()
 
 let user_table = Ocsipersist.open_table "user_table"
@@ -146,61 +166,61 @@ let () =
       Eliom_state.discard ~scope:Eliom_common.default_session_scope ())
 
 let disconnect_box () =
-  Html5.D.Form.post_form disconnection_service
+  Html.D.Form.post_form disconnection_service
     (fun _ ->
-       [Html5.D.p [
-           Html5.D.Form.input
+       [Html.D.p [
+           Html.D.Form.input
              ~input_type:`Submit ~value:"Log out"
-             Html5.D.Form.string
+             Html.D.Form.string
          ]
        ]) ()
 
 let login_name_form service button_text =
-  Html5.D.Form.post_form ~service
+  Html.D.Form.post_form ~service
     (fun (name1, name2) ->
-       [Html5.D.p [
-           Html5.D.pcdata "login: ";
-           Html5.D.Form.input ~input_type:`Text ~name:name1
-             Html5.D.Form.string;
-           Html5.D.br ();
-           Html5.D.pcdata "password: ";
-           Html5.D.Form.input ~input_type:`Password ~name:name2
-             Html5.D.Form.string;
-           Html5.D.br ();
-           Html5.D.Form.input ~input_type:`Submit ~value:button_text
-             Html5.D.Form.string
+       [Html.D.p [
+           Html.D.pcdata "login: ";
+           Html.D.Form.input ~input_type:`Text ~name:name1
+             Html.D.Form.string;
+           Html.D.br ();
+           Html.D.pcdata "password: ";
+           Html.D.Form.input ~input_type:`Password ~name:name2
+             Html.D.Form.string;
+           Html.D.br ();
+           Html.D.Form.input ~input_type:`Submit ~value:button_text
+             Html.D.Form.string
          ]]) ()
 
 let oclosure_script =
-  Html5.Id.create_global_elt
-    (Html5.D.js_script
-       ~uri:(Html5.D.Raw.uri_of_string "./graffiti_oclosure.js") ())
+  Html.Id.create_global_elt
+    (Html.D.js_script
+       ~uri:(Html.D.Raw.uri_of_string "./graffiti_oclosure.js") ())
 
 let make_page body =
   Lwt.return
-    (Html5.D.html
-       (Html5.D.head
-	  (Html5.D.title (Html5.D.pcdata "Graffiti"))
+    (Html.D.html
+       (Html.D.head
+	  (Html.D.title (Html.D.pcdata "Graffiti"))
  	  [
-	    Html5.D.css_link
-	      ~uri:(Html5.D.Raw.uri_of_string"./css/closure/common.css") ();
-	    Html5.D.css_link
-	      ~uri:(Html5.D.Raw.uri_of_string"./css/closure/hsvpalette.css") ();
-	    Html5.D.css_link
-	      ~uri:(Html5.D.Raw.uri_of_string"./css/slider.css") ();
+	    Html.D.css_link
+	      ~uri:(Html.D.Raw.uri_of_string"./css/closure/common.css") ();
+	    Html.D.css_link
+	      ~uri:(Html.D.Raw.uri_of_string"./css/closure/hsvpalette.css") ();
+	    Html.D.css_link
+	      ~uri:(Html.D.Raw.uri_of_string"./css/slider.css") ();
             oclosure_script;
-	    Html5.D.css_link
-	      ~uri:(Html5.D.Raw.uri_of_string"./css/graffiti.css") ();
+	    Html.D.css_link
+	      ~uri:(Html.D.Raw.uri_of_string"./css/graffiti.css") ();
           ])
-       (Html5.D.body body))
+       (Html.D.body body))
 
 
 let default_content () =
   make_page
-    [Html5.D.h1 [Html5.D.pcdata "Welcome to Multigraffiti"];
-     Html5.D.h2 [Html5.D.pcdata "log in"];
+    [Html.D.h1 [Html.D.pcdata "Welcome to Multigraffiti"];
+     Html.D.h2 [Html.D.pcdata "log in"];
      login_name_form connection_service "Connect";
-     Html5.D.h2 [Html5.D.pcdata "create account"];
+     Html.D.h2 [Html.D.pcdata "create account"];
      login_name_form create_account_service "Create account";]
 
 module Connected_translate =
@@ -222,5 +242,5 @@ let () = Connected.register
   ~service:main_service
   !% (fun () () username ->
     make_page
-      [Html5.D.h1 [Html5.D.pcdata ("Welcome to Multigraffiti " ^ username)];
+      [Html.D.h1 [Html.D.pcdata ("Welcome to Multigraffiti " ^ username)];
        choose_drawing_form ()])
