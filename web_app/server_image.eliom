@@ -146,10 +146,14 @@ let create file_name (width, height) =
 
 let save_step = 1000
 let store = Ocsipersist.open_store "drawing"
-let nb_drawing () = Ocsipersist.make_persistent ~store
-  ~name:"nb_drawing" ~default:0
-let last_save () = Ocsipersist.make_persistent ~store
-  ~name:"last_save" ~default:Server_tools.null_date
+let nb_drawing () =
+  let%lwt store = store in
+  Ocsipersist.make_persistent ~store
+    ~name:"nb_drawing" ~default:0
+let last_save () =
+  let%lwt store = store in
+  Ocsipersist.make_persistent ~store
+    ~name:"last_save" ~default:Server_tools.null_date
 
 let small_name = Server_tools.datadir ^ "small_image.png"
 let medium_name = Server_tools.datadir ^ "medium_image.png"
@@ -301,19 +305,19 @@ let cmp_medium w = w <= medium_width
 
 let download_imageservice =
   Eliom_registration.String.create
-    ~id:(Eliom_service.Path ["image"; "graffiti.png"])
+    ~path:(Eliom_service.Path ["image"; "graffiti.png"])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (medium_image_string (), "image/png"))
 
 let large_download_imageservice =
   Eliom_registration.String.create
-    ~id:(Eliom_service.Path ["image"; "large_graffiti.png"])
+    ~path:(Eliom_service.Path ["image"; "large_graffiti.png"])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (large_image_string (), "image/png"))
 
 let imageservice =
   Eliom_registration.String.create
-    ~id:(Eliom_service.Path ["image"; "adaptation.png"])
+    ~path:(Eliom_service.Path ["image"; "adaptation.png"])
     ~meth:(Eliom_service.Get Eliom_parameter.(int "width"))
     (fun (width) () -> Lwt.return
       ((match width with

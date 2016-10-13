@@ -26,24 +26,22 @@ module My_app =
 
 let main_service =
   Eliom_service.create
-    ~id:(Eliom_service.Path [""])
+    ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     ()
 
 let setting_replay_service =
   Eliom_service.create
-    ~id:(Eliom_service.Path ["replay"])
+    ~path:(Eliom_service.Path ["replay"])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     ()
 
 let start_replay_service =
-  Eliom_service.create
+  Eliom_service.attach_post
     ~name:"start_replay"
-    ~id:(Eliom_service.Fallback setting_replay_service)
-    ~meth:(
-      Eliom_service.Post (
-        Eliom_parameter.unit,
-        Eliom_parameter.(string "start_d" ** string "start_t" **
-			 string "end_d" ** string "end_t" **
-			 int "coef_to_replay" ** opt (int "hts"))))
+    ~fallback:setting_replay_service
+    ~post_params:
+      Eliom_parameter.(string "start_d" ** string "start_t" **
+		       string "end_d" ** string "end_t" **
+		       int "coef_to_replay" ** opt (int "hts"))
     ()

@@ -53,10 +53,10 @@ let launch_server_canvas () =
       Cairo.stroke ctx ;
      ),
      (fun () ->
-       let b = Buffer.create 10000 in
-       (* Output a PNG in a string *)
-       Cairo.PNG.write_to_stream surface (Buffer.add_string b);
-       Buffer.contents b
+        let b = Buffer.create 10000 in
+        (* Output a PNG in a string *)
+        Cairo.PNG.write_to_stream surface (Buffer.add_string b);
+        Buffer.contents b
      ))
   in
   let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus) in
@@ -66,7 +66,7 @@ let graffiti_info = Hashtbl.create 0
 
 let imageservice =
   Eliom_registration.String.create
-    ~id:(Eliom_service.Path ["image"])
+    ~path:(Eliom_service.Path ["image"])
     ~headers:Http_headers.dyn_headers
     ~meth:
       (Eliom_service.Get
@@ -93,12 +93,12 @@ let get_bus (name:string) =
 
 let main_service =
   Eliom_service.create
-    ~id:(Eliom_service.Path [""])
+    ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get (Eliom_parameter.unit))
     ()
 let multigraffiti_service =
   Eliom_service.create
-    ~id:(Eliom_service.Path [""])
+    ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get (Eliom_parameter.(suffix (string "name"))))
     ()
 
@@ -120,35 +120,35 @@ let connection_service =
         Eliom_parameter.unit,
         Eliom_parameter.(string "name" ** string "password")
       ))
-    ~id:Eliom_service.Global
+    ~path:Eliom_service.No_path
     ()
 
 let disconnection_service =
   Eliom_service.create
     ~meth:(Eliom_service.Post (Eliom_parameter.unit, Eliom_parameter.unit))
-    ~id:Eliom_service.Global
+    ~path:Eliom_service.No_path
     ()
 
 let create_account_service =
-  Eliom_service.create
-    ~meth:
-      (Eliom_service.Post (
-          Eliom_parameter.unit,
-          Eliom_parameter.(string "name" ** string "password")
-        ))
-    ~id:(Eliom_service.Fallback main_service)
+  Eliom_service.attach_post
+    ~fallback:main_service
+    ~post_params:
+      Eliom_parameter.(string "name" ** string "password")
     ()
 
 let user_table = Ocsipersist.open_table "user_table"
 let check_pwd name pwd =
   try%lwt
+    let%lwt user_table = user_table in
     let%lwt saved_password = Ocsipersist.find user_table name in
     Lwt.return (pwd = saved_password)
   with Not_found -> Lwt.return false
 
 let () = Eliom_registration.Action.register
   ~service:create_account_service
-  (fun () (name, pwd) -> Ocsipersist.add user_table name pwd)
+  (fun () (name, pwd) ->
+     let%lwt user_table = user_table in
+     Ocsipersist.add user_table name pwd)
 
 let () = Eliom_registration.Action.register
   ~service:connection_service

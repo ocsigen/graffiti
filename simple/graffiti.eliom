@@ -92,7 +92,7 @@ let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
 let imageservice =
   Eliom_registration.String.create
-    ~id:(Eliom_service.Path ["image"])
+    ~path:(Eliom_service.Path ["image"])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
@@ -214,7 +214,7 @@ let%client init_client () =
 
 let main_service =
   My_appl.create
-    ~id:(Eliom_service.Path [""])
+    ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
       ignore [%client (init_client () : unit) ];

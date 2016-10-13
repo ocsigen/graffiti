@@ -52,6 +52,7 @@ let image_info_table = Ocsipersist.open_table "image_info_table"
 
 let save_image username =
   let now = CalendarLib.Calendar.now () in
+  let%lwt image_info_table = image_info_table in
   let%lwt number,_,list =
     try%lwt Ocsipersist.find image_info_table username with
     | Not_found -> Lwt.return (0,now,[])
@@ -74,7 +75,7 @@ let save_image_box =
             ~meth:(Eliom_service.Post
                      (Eliom_parameter.unit,
                       Eliom_parameter.unit))
-            ~id:Eliom_service.Global
+            ~path:Eliom_service.No_path
             (fun () () -> save_image name) in
         let%lwt () = Eliom_reference.set save_service_reference (Some service) in
         Lwt.return service
@@ -89,7 +90,7 @@ let save_image_box =
 
 let feed_service =
   Eliom_service.create
-    ~id:(Eliom_service.Path ["feed"])
+    ~path:(Eliom_service.Path ["feed"])
     ~meth:(Eliom_service.Get (Eliom_parameter.string "name"))
     ()
 
@@ -119,6 +120,7 @@ let feed name () =
                                 ~service:feed_service name) in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   try%lwt
+    let%lwt image_info_table = image_info_table in
     Ocsipersist.find image_info_table name >|=
     (fun (number,updated,list) ->
        Atom_feed.feed ~id ~updated ~title (entries name list 10))
@@ -132,7 +134,9 @@ let feed name () =
   let id = Xml.string_of_uri (Html.D.make_uri ~absolute:true ~service:feed_service name) in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   Lwt.catch
-    (fun () -> Ocsipersist.find image_info_table name >|=
+    (fun () ->
+       let%lwt image_info_table = image_info_table in
+       Ocsipersist.find image_info_table name >|=
       (fun (number,updated,list) -> Atom_feed.feed ~id ~updated ~title (entries name list 10)))
     ( function Not_found ->
       let now = CalendarLib.Calendar.now () in

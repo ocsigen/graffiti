@@ -36,7 +36,7 @@ let start_drawing name image canvas slider =
     (let canceller =
        launch_client_canvas ~%bus ~%image ~%canvas ~%slider
      in
-     Eliom_client.onunload (fun () -> stop_drawing canceller; None)
+     Eliom_client.onunload (fun () -> stop_drawing canceller)
      : unit)
   ]
 
