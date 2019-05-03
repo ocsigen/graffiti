@@ -11,10 +11,10 @@ SERVER_FILES := $(wildcard *.eliomi *.eliom)
 CLIENT_FILES := $(wildcard *.eliomi *.eliom)
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := cairo2 unix js_of_ocaml.deriving.ppx
+SERVER_PACKAGES := ocsigen-toolkit.server cairo2 unix js_of_ocaml-ppx.deriving
 # OCamlfind packages for the client
-CLIENT_PACKAGES := ocsigen-widgets.client js_of_ocaml.ppx \
-                       js_of_ocaml.deriving.ppx lwt.ppx
+CLIENT_PACKAGES := ocsigen-toolkit.client react js_of_ocaml-ppx \
+                       js_of_ocaml-ppx.deriving lwt_ppx
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

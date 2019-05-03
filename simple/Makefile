@@ -12,9 +12,9 @@ include Makefile.options
 ##			      Internals
 
 ## Required binaries
-ELIOMC            := eliomc -ppx
-ELIOMOPT          := eliomopt -ppx
-JS_OF_ELIOM       := js_of_eliom -ppx
+ELIOMC            := eliomc -g -ppx
+ELIOMOPT          := eliomopt -g -ppx
+JS_OF_ELIOM       := js_of_eliom -g -jsopt --sourcemap -jsopt --debuginfo -jsopt --noinline -ppx
 ELIOMDEP          := eliomdep
 OCSIGENSERVER     := ocsigenserver
 OCSIGENSERVER.OPT := ocsigenserver.opt

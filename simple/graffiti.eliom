@@ -23,6 +23,10 @@
   open Eliom_content
   let width = 700
   let height = 300
+  module CSS = Js_of_ocaml.CSS
+  module Js = Js_of_ocaml.Js
+  module Dom = Js_of_ocaml.Dom
+  module Dom_html = Js_of_ocaml.Dom_html
 ]
 
 let _ =
@@ -63,16 +67,15 @@ let bus : (messages, messages) Eliom_bus.t = Eliom_bus.create ~scope:`Site ~name
 let draw_server, image_string =
   let rgb_ints_to_floats (r, g, b) =
     float r /. 255., float g /. 255., float b /. 255. in (* needed by cairo *)
-  let surface = Cairo.Image.create Cairo.Image.ARGB32 ~width ~height in
+  let surface = Cairo.Image.create Cairo.Image.ARGB32 ~w:width ~h:height in
   let ctx = Cairo.create surface in
   ((fun (rgb, size, (x1, y1), (x2, y2)) ->
-
     (* Set thickness of brush *)
     let r, g, b = rgb_ints_to_floats rgb in
     Cairo.set_line_width ctx (float size) ;
     Cairo.set_line_join ctx Cairo.JOIN_ROUND ;
     Cairo.set_line_cap ctx Cairo.ROUND ;
-    Cairo.set_source_rgb ctx ~r ~g ~b ;
+    Cairo.set_source_rgb ctx r g b ;
 
     Cairo.move_to ctx (float x1) (float y1) ;
     Cairo.line_to ctx (float x2) (float y2) ;
@@ -102,51 +105,50 @@ let image_elt =
     ()
 
 let canvas_elt : canvas =
-  Html.D.canvas ~a:[ Html.D.a_width width; Html.D.a_height height ]
-           [Html.D.pcdata "your browser doesn't support canvas";
-            Html.D.br ();
-            image_elt]
+  Html.D.(
+    canvas ~a:[ a_width width; a_height height; a_class ["undercanvas"] ]
+      [ Html.D.txt "your browser doesn't support canvas"
+      ; Html.D.br ()
+      ; image_elt
+      ]
+  )
 
 let canvas2_elt : canvas =
-  Html.D.canvas ~a:[ Html.D.a_width width; Html.D.a_height height ] []
+  Html.D.(
+    canvas ~a:[ a_width width; a_height height; a_class ["overcanvas"] ] []
+  )
 
-let slider =
-  Html.D.Form.input
-    ~a:[
-      Html.D.a_id "slider";
-      Html.D.a_input_min (`Number 1);
-      Html.D.a_input_max (`Number 80)
-    ]
-    ~input_type:`Range
-    Html.D.Form.int
-
-let page =
+let page () =
+  let colorpicker, cp_sig = Ot_color_picker.make () in
+  let slider, slider_sig = Ot_range.make ~lb:20 80 in
   Html.D.html
     (Html.D.head
-       (Html.D.title (Html.D.pcdata "Graffiti"))
+       (Html.D.title (Html.D.txt "Graffiti"))
        [ Html.D.css_link
-	   ~uri:(Html.D.make_uri
-		   (Eliom_service.static_dir ()) ["css";"graffiti.css"]) ();
-	])
+	        ~uri:(Html.D.make_uri
+          (Eliom_service.static_dir ()) ["css";"graffiti.css"]) ();
+        Html.D.css_link
+          ~uri:(Html.D.make_uri
+            (Eliom_service.static_dir ()) ["css";"ot_color_picker.css"])
+          ()
+       ]
+    )
     (Html.D.body [
-       Html.D.div ~a:[] [canvas_elt; canvas2_elt];
-       Html.D.div ~a:[] [slider]])
+        Html.D.div ~a:[] [canvas_elt; canvas2_elt];
+        Html.D.div ~a:[] [slider];
+        Html.D.div ~a:[Html.D.a_style "height: 600px"] [colorpicker]
+      ]
+    )
+  , cp_sig
+  , slider_sig
 
-let%client init_client () =
-
-  let colorpicker = Ow_color_picker.create ~width:150 () in
-  Ow_color_picker.append_at (Dom_html.document##.body) colorpicker;
-  Ow_color_picker.init_handler colorpicker;
+let%client init_client ~cp_sig ~slider_sig =
   let canvas = Html.To_dom.of_canvas ~%canvas_elt in
-  let st = canvas##.style in
-  st##.position := Js.string "absolute";
-  st##.zIndex := Js.string "-1";
   let ctx = canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";
 
   (* Another canvas, for second layer *)
   let canvas2 = Html.To_dom.of_canvas ~%canvas2_elt in
-  canvas2##.width := width; canvas2##.height := height;
   let ctx2 = canvas2##(getContext (Dom_html._2d_)) in
   ctx2##.lineCap := Js.string "round";
 
@@ -165,9 +167,10 @@ let%client init_client () =
   let compute_line set_coord x y ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let rgb = Ow_color_picker.get_rgb colorpicker in
-    let size_slider = Html.To_dom.of_input ~%slider in
-    let size = int_of_string (Js.to_string size_slider##.value) in
+    let size = Eliom_shared.React.S.value slider_sig in
+    let (h, s, v) = Eliom_shared.React.S.value cp_sig in
+    let (r, g, b) = Ot_color_picker.hsv_to_rgb h s v in
+    let rgb = int_of_float r, int_of_float g, int_of_float b in
     (rgb, size, (oldx, oldy), (!x, !y))
   in
   let bus = ~%bus in
@@ -186,7 +189,6 @@ let%client init_client () =
               Eliom_client.exit_to
                 ~service:Eliom_service.reload_action () ();
               Lwt.return ()));
-  (*                       | e -> Lwt.fail e)); *)
   Lwt_js_events.(async (fun () ->
     mousedowns canvas2 (fun ev elt ->
       Dom.preventDefault ev;
@@ -194,8 +196,6 @@ let%client init_client () =
       let%lwt () = line ev in
       Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
 	        let%lwt ev = mouseup Dom_html.document in line ev])));
-
-
 
   (* The brush *)
   ctx2##.globalCompositeOperation := Js.string "copy";
@@ -217,5 +217,6 @@ let main_service =
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
-      ignore [%client (init_client () : unit) ];
+      let (page, cp_sig, slider_sig) = page () in
+      ignore [%client (init_client ~cp_sig:~%cp_sig ~slider_sig:~%slider_sig : unit) ];
       Lwt.return page)
