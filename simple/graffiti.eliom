@@ -185,7 +185,7 @@ let%client init_client ~cp_sig ~slider_sig =
             (fun () ->
               Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus))
             (function e (* Eliom_comet.Channel_full *) ->
-              Firebug.console##(log e);
+              Js_of_ocaml.Firebug.console##(log e);
               Eliom_client.exit_to
                 ~service:Eliom_service.reload_action () ();
               Lwt.return ()));
