@@ -34,7 +34,10 @@ div.ojw_colorpicker {
 }
 
 input {
-  position: absolute;
   width: 400px;
 }
 
+.undercanvas {
+  z-index: -1;
+  position: absolute;
+}
