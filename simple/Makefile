@@ -18,6 +18,7 @@ JS_OF_ELIOM       := js_of_eliom -g -jsopt --sourcemap -jsopt --debuginfo -jsopt
 ELIOMDEP          := eliomdep
 OCSIGENSERVER     := ocsigenserver
 OCSIGENSERVER.OPT := ocsigenserver.opt
+OPAM 	  			  	:= opam
 
 ## Where to put intermediate object files.
 ## - ELIOM_{SERVER,CLIENT}_DIR must be distinct
@@ -51,12 +52,24 @@ DIST_DIRS = $(ETCDIR) $(DATADIR) $(LIBDIR) $(LOGDIR) $(STATICDIR) $(ELIOMSTATICD
 ##----------------------------------------------------------------------
 ## Testing
 
+# Main CSS generated file.
+# The OPAM share directory.
+SHAREDIR              := $(shell $(OPAM) config var share)
+# The ocsigen-toolkit directory containing CSS files.
+SHAREDIR_OT_CSS       := $(SHAREDIR)/ocsigen-toolkit/css
+
+REQUIRED_CSS_NAME		  := ot_color_picker.css
+REQUIRED_CSS 					:= static/css/$(REQUIRED_CSS_NAME)
+
+css:
+	cp -f $(SHAREDIR_OT_CSS)/$(REQUIRED_CSS_NAME) $(REQUIRED_CSS)
+
 DIST_FILES = $(ELIOMSTATICDIR)/$(PROJECT_NAME).js $(LIBDIR)/$(PROJECT_NAME).cma
 
 .PHONY: test.byte test.opt
-test.byte: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(DIST_FILES))
+test.byte: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(DIST_FILES)) css
 	$(OCSIGENSERVER) $(RUN_DEBUG) -c $<
-test.opt: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(patsubst %.cma,%.cmxs, $(DIST_FILES)))
+test.opt: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(patsubst %.cma,%.cmxs, $(DIST_FILES))) css
 	$(OCSIGENSERVER.OPT) $(RUN_DEBUG) -c $<
 
 $(addprefix $(TEST_PREFIX), $(DIST_DIRS)):
