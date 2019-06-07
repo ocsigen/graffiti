@@ -29,6 +29,11 @@
   module Dom_html = Js_of_ocaml.Dom_html
 ]
 
+[%%client
+  module Lwt_js = Js_of_ocaml_lwt.Lwt_js
+  module Lwt_js_events = Js_of_ocaml_lwt.Lwt_js_events
+]
+
 let _ =
   Eliom_state.set_global_volatile_data_state_timeout
     ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
@@ -62,7 +67,8 @@ let%client () =
     Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
 ]
 
-let bus : (messages, messages) Eliom_bus.t = Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
+let bus : (messages, messages) Eliom_bus.t =
+  Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
 
 let draw_server, image_string =
   let rgb_ints_to_floats (r, g, b) =
@@ -118,9 +124,24 @@ let canvas2_elt : canvas =
     canvas ~a:[ a_width width; a_height height; a_class ["overcanvas"] ] []
   )
 
+let slider_create () =
+  let slider_sig,slider_f = Eliom_shared.React.S.create 0 in
+  let elt = Html.F.(
+              input ~a:[ a_input_type `Range;
+                         a_input_min (`Number 1);
+                         a_input_max (`Number 80);
+                         a_oninput [%client fun ev ->
+                           match Dom_html.opt_tagged ev##.currentTarget with
+                           | Some Dom_html.Input elem ->
+                               ~%slider_f (int_of_string (Js.to_string elem##.value))
+                           | _ -> ()]
+                         ] ()
+  ) in
+  (elt,slider_sig)
+
 let page () =
   let colorpicker, cp_sig = Ot_color_picker.make () in
-  let slider, slider_sig = Ot_range.make ~lb:20 80 in
+  let slider,slider_sig = slider_create () in
   Html.D.html
     (Html.D.head
        (Html.D.title (Html.D.txt "Graffiti"))
@@ -136,7 +157,7 @@ let page () =
     (Html.D.body [
         Html.D.div ~a:[] [canvas_elt; canvas2_elt];
         Html.D.div ~a:[] [slider];
-        Html.D.div ~a:[Html.D.a_style "height: 600px"] [colorpicker]
+        Html.D.div ~a:[Html.D.a_style "height: 500px"] [colorpicker]
       ]
     )
   , cp_sig
@@ -218,5 +239,5 @@ let main_service =
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
       let (page, cp_sig, slider_sig) = page () in
-      ignore [%client (init_client ~cp_sig:~%cp_sig ~slider_sig:~%slider_sig : unit) ];
+      ignore [%client (init_client ~cp_sig:~%cp_sig ~slider_sig:~%slider_sig:unit)];
       Lwt.return page)
