@@ -119,6 +119,7 @@ let%server slider_create () =
     input
       ~a:
         [ a_input_type `Range
+        ; a_class ["slider"]
         ; a_input_min (`Number 1)
         ; a_input_max (`Number 80)
         ; a_value "1"
