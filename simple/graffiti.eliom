@@ -155,7 +155,7 @@ let%server page () =
          [ Html.D.div ~a:[] [canvas_elt; canvas2_elt]
          ; Html.D.div ~a:[] [slider]
          ; Html.D.div
-             ~a:[Html.D.a_style "height: 300px; width: 400px"]
+             ~a:[Html.D.a_class ["colorpicker"]]
              [colorpicker] ])
   , cp_sig
   , slider_sig )

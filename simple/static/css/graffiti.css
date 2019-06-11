@@ -37,6 +37,11 @@ input {
   width: 400px;
 }
 
+.colorpicker {
+  height: 300px;
+  width: 400px;
+}
+
 .undercanvas {
   z-index: -1;
   position: absolute;
