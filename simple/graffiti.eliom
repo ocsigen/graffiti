@@ -127,10 +127,11 @@ let canvas2_elt : canvas =
 let slider_create () =
   let slider_sig,slider_f = Eliom_shared.React.S.create 0 in
   let elt = Html.F.(
-              input ~a:[ a_input_type `Range;
-                         a_input_min (`Number 1);
-                         a_input_max (`Number 80);
-                         a_oninput [%client fun ev ->
+              input ~a:[ a_input_type `Range
+                       ; a_input_min (`Number 1)
+                       ; a_input_max (`Number 80)
+                       ; a_value "1"
+                       ; a_oninput [%client fun ev ->
                            match Dom_html.opt_tagged ev##.currentTarget with
                            | Some Dom_html.Input elem ->
                                ~%slider_f (int_of_string (Js.to_string elem##.value))
@@ -157,7 +158,7 @@ let page () =
     (Html.D.body [
         Html.D.div ~a:[] [canvas_elt; canvas2_elt];
         Html.D.div ~a:[] [slider];
-        Html.D.div ~a:[Html.D.a_style "height: 500px"] [colorpicker]
+        Html.D.div ~a:[Html.D.a_style "height: 300px; width: 400px"] [colorpicker]
       ]
     )
   , cp_sig
