@@ -34,7 +34,7 @@
   module Lwt_js_events = Js_of_ocaml_lwt.Lwt_js_events
 ]
 
-let _ =
+let%server _ =
   Eliom_state.set_global_volatile_data_state_timeout
     ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
 
@@ -67,10 +67,10 @@ let%client () =
     Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
 ]
 
-let bus : (messages, messages) Eliom_bus.t =
+let%server bus : (messages, messages) Eliom_bus.t =
   Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
 
-let draw_server, image_string =
+let%server draw_server, image_string =
   let rgb_ints_to_floats (r, g, b) =
     float r /. 255., float g /. 255., float b /. 255. in (* needed by cairo *)
   let surface = Cairo.Image.create Cairo.Image.ARGB32 ~w:width ~h:height in
@@ -97,20 +97,20 @@ let draw_server, image_string =
      Buffer.contents b
    ))
 
-let _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
+let%server _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
-let imageservice =
+let%server imageservice =
   Eliom_registration.String.create
     ~path:(Eliom_service.Path ["image"])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
-let image_elt =
+let%server image_elt =
   Html.D.img ~alt:"canvas"
     ~src:(Html.D.make_uri ~service:imageservice ())
     ()
 
-let canvas_elt : canvas =
+let%server canvas_elt : canvas =
   Html.D.(
     canvas ~a:[ a_width width; a_height height; a_class ["undercanvas"] ]
       [ Html.D.txt "your browser doesn't support canvas"
@@ -119,12 +119,12 @@ let canvas_elt : canvas =
       ]
   )
 
-let canvas2_elt : canvas =
+let%server canvas2_elt : canvas =
   Html.D.(
     canvas ~a:[ a_width width; a_height height; a_class ["overcanvas"] ] []
   )
 
-let slider_create () =
+let%server slider_create () =
   let slider_sig,slider_f = Eliom_shared.React.S.create 0 in
   let elt = Html.F.(
               input ~a:[ a_input_type `Range
@@ -140,7 +140,7 @@ let slider_create () =
   ) in
   (elt,slider_sig)
 
-let page () =
+let%server page () =
   let colorpicker, cp_sig = Ot_color_picker.make () in
   let slider,slider_sig = slider_create () in
   Html.D.html
@@ -234,7 +234,7 @@ let%client init_client ~cp_sig ~slider_sig =
   in
   ignore Lwt_js_events.(async (fun () -> (mousemoves Dom_html.document brush)))
 
-let main_service =
+let%server main_service =
   My_appl.create
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
