@@ -61,15 +61,15 @@ SHAREDIR_OT_CSS       := $(SHAREDIR)/ocsigen-toolkit/css
 REQUIRED_CSS_NAME		  := ot_color_picker.css
 REQUIRED_CSS 					:= static/css/$(REQUIRED_CSS_NAME)
 
-css:
-	cp -f $(SHAREDIR_OT_CSS)/$(REQUIRED_CSS_NAME) $(REQUIRED_CSS)
+$(REQUIRED_CSS): $(SHAREDIR_OT_CSS)/$(REQUIRED_CSS_NAME)
+	cp -f $^ $@
 
 DIST_FILES = $(ELIOMSTATICDIR)/$(PROJECT_NAME).js $(LIBDIR)/$(PROJECT_NAME).cma
 
 .PHONY: test.byte test.opt
-test.byte: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(DIST_FILES)) css
+test.byte: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(DIST_FILES)) $(REQUIRED_CSS)
 	$(OCSIGENSERVER) $(RUN_DEBUG) -c $<
-test.opt: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(patsubst %.cma,%.cmxs, $(DIST_FILES))) css
+test.opt: $(addprefix $(TEST_PREFIX),$(ETCDIR)/$(PROJECT_NAME)-test.conf $(DIST_DIRS) $(patsubst %.cma,%.cmxs, $(DIST_FILES))) $(REQUIRED_CSS)
 	$(OCSIGENSERVER.OPT) $(RUN_DEBUG) -c $<
 
 $(addprefix $(TEST_PREFIX), $(DIST_DIRS)):
@@ -80,8 +80,9 @@ $(addprefix $(TEST_PREFIX), $(DIST_DIRS)):
 
 .PHONY: install install.byte install.byte install.opt install.static install.etc install.lib install.lib.byte install.lib.opt run.byte run.opt
 install: install.byte install.opt
-install.byte: install.lib.byte install.etc install.static | $(addprefix $(PREFIX),$(DATADIR) $(LOGDIR) $(shell dirname $(CMDPIPE)))
-install.opt: install.lib.opt install.etc install.static | $(addprefix $(PREFIX),$(DATADIR) $(LOGDIR) $(shell dirname $(CMDPIPE)))
+install.byte: install.lib.byte install.etc install.static | $(addprefix $(PREFIX),$(DATADIR) $(LOGDIR) $(shell dirname $(CMDPIPE))) $(REQUIRED_CSS)
+install.opt: install.lib.opt install.etc install.static | $(addprefix $(PREFIX),$(DATADIR) $(LOGDIR) $(shell dirname $(CMDPIPE))) $(REQUIRED_CSS)
+
 install.lib: install.lib.byte install.lib.opt
 install.lib.byte: $(TEST_PREFIX)$(LIBDIR)/$(PROJECT_NAME).cma | $(PREFIX)$(LIBDIR)
 	install $< $(PREFIX)$(LIBDIR)
