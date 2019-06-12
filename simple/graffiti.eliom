@@ -136,7 +136,8 @@ let%server slider_create () =
 
 let%server page () =
   let colorpicker, cp_sig =
-    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]] in
+    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]]
+  in
   let slider, slider_sig = slider_create () in
   ( Html.D.html
       (Html.D.head
@@ -153,12 +154,7 @@ let%server page () =
                   (Eliom_service.static_dir ())
                   ["css"; "ot_color_picker.css"])
              () ])
-      (Html.D.body
-         [ Html.D.div [canvas_elt; canvas2_elt]
-         ; slider
-         ; Html.D.div
-             ~a:[Html.D.a_class ["colorpicker"]]
-             [colorpicker] ])
+      (Html.D.body [Html.D.div [canvas_elt; canvas2_elt]; slider; colorpicker])
   , cp_sig
   , slider_sig )
 

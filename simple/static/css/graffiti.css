@@ -37,7 +37,7 @@ input {
   width: 400px;
 }
 
-.colorpicker {
+.ot-color-picker.colorpicker {
   height: 300px;
   width: 400px;
 }
