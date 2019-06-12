@@ -135,7 +135,8 @@ let%server slider_create () =
   elt, slider_sig
 
 let%server page () =
-  let colorpicker, cp_sig = Ot_color_picker.make () in
+  let colorpicker, cp_sig =
+    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]] in
   let slider, slider_sig = slider_create () in
   ( Html.D.html
       (Html.D.head
@@ -153,8 +154,8 @@ let%server page () =
                   ["css"; "ot_color_picker.css"])
              () ])
       (Html.D.body
-         [ Html.D.div ~a:[] [canvas_elt; canvas2_elt]
-         ; Html.D.div ~a:[] [slider]
+         [ Html.D.div [canvas_elt; canvas2_elt]
+         ; slider
          ; Html.D.div
              ~a:[Html.D.a_class ["colorpicker"]]
              [colorpicker] ])
