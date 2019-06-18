@@ -112,33 +112,20 @@ let%server canvas_elt : canvas =
 let%server canvas2_elt : canvas =
   Html.D.(canvas ~a:[a_width width; a_height height; a_class ["overcanvas"]] [])
 
-let%server slider_create () =
-  let slider_sig, slider_f = Eliom_shared.React.S.create 0 in
-  let elt =
-    let open Html.F in
-    input
-      ~a:
-        [ a_input_type `Range
-        ; a_class ["slider"]
-        ; a_input_min (`Number 1)
-        ; a_input_max (`Number 80)
-        ; a_value "1"
-        ; a_oninput
-            [%client
-              fun ev ->
-                match Dom_html.opt_tagged ev##.currentTarget with
-                | Some (Dom_html.Input elem) ->
-                    ~%slider_f (int_of_string (Js.to_string elem##.value))
-                | _ -> ()] ]
-      ()
-  in
-  elt, slider_sig
+let%server slider =
+  Eliom_content.Html.D.Form.input
+    ~a:
+      [ Html.D.a_id "slider"
+      ; Html.D.a_class ["slider"]
+      ; Html.D.a_input_min (`Number 1)
+      ; Html.D.a_input_max (`Number 80)
+      ; Html.D.a_value "1" ]
+    ~input_type:`Range Html.D.Form.int
 
 let%server page () =
   let colorpicker, cp_sig =
     Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]]
   in
-  let slider, slider_sig = slider_create () in
   ( Html.D.html
       (Html.D.head
          (Html.D.title (Html.D.txt "Graffiti"))
@@ -155,10 +142,9 @@ let%server page () =
                   ["css"; "ot_color_picker.css"])
              () ])
       (Html.D.body [Html.D.div [canvas_elt; canvas2_elt]; slider; colorpicker])
-  , cp_sig
-  , slider_sig )
+  , cp_sig )
 
-let%client init_client ~cp_sig ~slider_sig =
+let%client init_client ~cp_sig =
   let canvas = Html.To_dom.of_canvas ~%canvas_elt in
   let ctx = canvas ## (getContext Dom_html._2d_) in
   ctx##.lineCap := Js.string "round";
@@ -181,7 +167,8 @@ let%client init_client ~cp_sig ~slider_sig =
   let compute_line set_coord x y ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let size = Eliom_shared.React.S.value slider_sig in
+    let size_slider = Eliom_content.Html.To_dom.of_input ~%slider in
+    let size = int_of_string (Js.to_string size_slider##.value) in
     let h, s, v = Eliom_shared.React.S.value cp_sig in
     let r, g, b = Ot_color_picker.hsv_to_rgb h s v in
     let rgb = int_of_float r, int_of_float g, int_of_float b in
@@ -235,8 +222,6 @@ let%server main_service =
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
-      let page, cp_sig, slider_sig = page () in
-      ignore
-        [%client
-          (init_client ~cp_sig:~%cp_sig ~slider_sig:~%slider_sig : unit)];
+      let page, cp_sig = page () in
+      ignore [%client (init_client ~cp_sig:~%cp_sig : unit)];
       Lwt.return page)
