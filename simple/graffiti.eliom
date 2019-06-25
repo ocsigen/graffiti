@@ -18,27 +18,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *)
 
-[%%shared
-open Eliom_lib.Lwt_ops
-open Eliom_content
+open%shared Eliom_content
+open%shared Js_of_ocaml
+open%client Js_of_ocaml_lwt
 
 let width = 700
 let height = 300
-
-module CSS = Js_of_ocaml.CSS
-module Js = Js_of_ocaml.Js
-module Dom = Js_of_ocaml.Dom
-module Dom_html = Js_of_ocaml.Dom_html]
-
-[%%client
-module Lwt_js = Js_of_ocaml_lwt.Lwt_js
-module Lwt_js_events = Js_of_ocaml_lwt.Lwt_js_events]
 
 let%server _ =
   Eliom_state.set_global_volatile_data_state_timeout
     ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
 
-module My_appl = Eliom_registration.App (struct
+module Graffiti_appl = Eliom_registration.App (struct
   let application_name = "graffiti"
   let global_data_path = None
 end)
@@ -50,19 +41,18 @@ let%client draw ?(alpha = 1.) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
   ctx##beginPath;
   ctx ## (moveTo (float x1) (float y1));
   ctx ## (lineTo (float x2) (float y2 +. 0.1));
-  (* The 0.1 is a fix for Chrome (does not draw lines if the first
-     and last points are equal) *)
+  (* The 0.1 is a fix for old versions of Chrome
+     (was not drawing lines if the first and last points were equal) *)
   ctx##stroke
 
 let%client () =
   let c = Eliom_comet.Configuration.new_configuration () in
   Eliom_comet.Configuration.set_active_until_timeout c true
 
-[%%shared
-type messages = (int * int * int) * int * (int * int) * (int * int)
+type%shared messages = (int * int * int) * int * (int * int) * (int * int)
 [@@deriving json]
 
-type canvas = Html_types.flow5 Html_types.canvas Eliom_content.Html.elt]
+type%shared canvas = Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
 
 let%server bus : (messages, messages) Eliom_bus.t =
   Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
@@ -119,7 +109,7 @@ let%server slider =
       ; Html.D.a_class ["slider"]
       ; Html.D.a_input_min (`Number 1)
       ; Html.D.a_input_max (`Number 80)
-      ; Html.D.a_value "1" ]
+      ; Html.D.a_value "22" ]
     ~input_type:`Range Html.D.Form.int
 
 let%server page () =
@@ -181,9 +171,7 @@ let%client init_client ~cp_sig =
     draw ctx v; Lwt.return ()
   in
   ignore
-    ( Lwt_js.sleep 0.1 >>= fun () ->
-      (* avoid chromium looping cursor *)
-      Lwt.catch
+    ( Lwt.catch
         (fun () -> Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus))
         (function
           | e (* Eliom_comet.Channel_full *) ->
@@ -218,7 +206,7 @@ let%client init_client ~cp_sig =
   ignore Lwt_js_events.(async (fun () -> mousemoves Dom_html.document brush))
 
 let%server main_service =
-  My_appl.create
+  Graffiti_appl.create
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
