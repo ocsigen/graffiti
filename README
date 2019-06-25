@@ -2,13 +2,13 @@ Graffiti is a collaborative drawing application.
 
 For more information, see:
 
-  http://ocsigen.org/tuto/manual/
+http://ocsigen.org/tuto/latest/manual/application
 
 Requirements
 ------------
 
-- Eliom >= 5.0
-- ocsigen-widgets >= dev
+- eliom
+- ocsigen-toolkit
 - cairo2
 
 Usage
