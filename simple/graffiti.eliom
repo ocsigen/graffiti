@@ -55,7 +55,7 @@ type%shared messages = (int * int * int) * int * (int * int) * (int * int)
 type%shared canvas = Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
 
 let%server bus : (messages, messages) Eliom_bus.t =
-  Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%derive.json: messages]
+  Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%json: messages]
 
 let%server draw_server, image_string =
   let rgb_ints_to_floats (r, g, b) =
