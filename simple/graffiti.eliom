@@ -114,7 +114,7 @@ let%server slider =
 
 let%server page () =
   let colorpicker, cp_sig =
-    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]]
+    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]] ()
   in
   ( Html.D.html
       (Html.D.head
@@ -122,13 +122,13 @@ let%server page () =
          [ Html.D.css_link
              ~uri:
                (Html.D.make_uri
-                  (Eliom_service.static_dir ())
+                  ~service:(Eliom_service.static_dir ())
                   ["css"; "graffiti.css"])
              ()
          ; Html.D.css_link
              ~uri:
                (Html.D.make_uri
-                  (Eliom_service.static_dir ())
+                  ~service:(Eliom_service.static_dir ())
                   ["css"; "ot_color_picker.css"])
              () ])
       (Html.D.body [Html.D.div [canvas_elt; canvas2_elt]; slider; colorpicker])
