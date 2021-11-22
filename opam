@@ -1,15 +1,21 @@
 opam-version: "1"
 maintainer: "gregoire.henry@ocamlpro.com"
+authors: [ "Ocsigen team" ]
+synopsis: "Client Server drawing app"
+bug-reports: "https://github.com/ocsigen/graffiti"
+homepage: "https://ocsigen.org/tuto/latest/manual/application"
 build: [
   [ make "PREFIX=%{prefix}%/" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" "-C" "simple" ]
+]
+install: [
   [ make "PREFIX=%{prefix}%/" "WWWUSER=%{user}%" "WWWGROUP=%{user}%" "-C" "simple" "install" ]
 ]
 remove: [
   [ "ocamlfind" "remove" "graffiti" ]
 ]
 depends: [
-  "eliom" {>= "dev"}
+  "eliom" {>= "8.0.0"}
   "cairo2"
-  "ocsigen-widgets"
+  "ocsigen-toolkit"
 ]
 available: [ ocaml-version >= "4.02" ]
