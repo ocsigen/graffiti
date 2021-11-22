@@ -16,46 +16,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *)
+*)
 
 open%shared Eliom_content
 open%shared Js_of_ocaml
 open%client Js_of_ocaml_lwt
 
-let width = 700
-let height = 300
+module%server Graffiti_app =
+  Eliom_registration.App (
+  struct
+    let application_name = "graffiti"
+    let global_data_path = None
+  end)
 
-let%server _ =
-  Eliom_state.set_global_volatile_data_state_timeout
-    ~cookie_scope:Eliom_common.comet_client_process_scope (Some 20.)
+let%shared width  = 700
+let%shared height = 400
 
-module Graffiti_appl = Eliom_registration.App (struct
-  let application_name = "graffiti"
-  let global_data_path = None
-end)
-
-let%client draw ?(alpha = 1.) ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
-  let color = CSS.Color.string_of_t (CSS.Color.rgb r g b ~a:alpha) in
-  ctx##.strokeStyle := Js.string color;
-  ctx##.lineWidth := float size;
-  ctx##beginPath;
-  ctx ## (moveTo (float x1) (float y1));
-  ctx ## (lineTo (float x2) (float y2 +. 0.1));
-  (* The 0.1 is a fix for old versions of Chrome
-     (was not drawing lines if the first and last points were equal) *)
-  ctx##stroke
-
-let%client () =
-  let c = Eliom_comet.Configuration.new_configuration () in
-  Eliom_comet.Configuration.set_active_until_timeout c true
-
-type%shared messages = (int * int * int) * int * (int * int) * (int * int)
+type%shared messages = ((int * int * int) * int * (int * int) * (int * int))
 [@@deriving json]
 
-type%shared canvas = Html_types.flow5 Html_types.canvas Eliom_content.Html.elt
-
-let%server bus : (messages, messages) Eliom_bus.t =
-  Eliom_bus.create ~scope:`Site ~name:"grib" ~size:500 [%json: messages]
+let%server bus = Eliom_bus.create [%json: messages]
 
 let%server draw_server, image_string =
   let rgb_ints_to_floats (r, g, b) =
@@ -65,22 +45,22 @@ let%server draw_server, image_string =
   let surface = Cairo.Image.create Cairo.Image.ARGB32 ~w:width ~h:height in
   let ctx = Cairo.create surface in
   ( (fun (rgb, size, (x1, y1), (x2, y2)) ->
-      (* Set thickness of brush *)
-      let r, g, b = rgb_ints_to_floats rgb in
-      Cairo.set_line_width ctx (float size);
-      Cairo.set_line_join ctx Cairo.JOIN_ROUND;
-      Cairo.set_line_cap ctx Cairo.ROUND;
-      Cairo.set_source_rgb ctx r g b;
-      Cairo.move_to ctx (float x1) (float y1);
-      Cairo.line_to ctx (float x2) (float y2);
-      Cairo.Path.close ctx;
-      (* Apply the ink *)
-      Cairo.stroke ctx)
+        (* Set thickness of brush *)
+        let r, g, b = rgb_ints_to_floats rgb in
+        Cairo.set_line_width ctx (float size);
+        Cairo.set_line_join ctx Cairo.JOIN_ROUND;
+        Cairo.set_line_cap ctx Cairo.ROUND;
+        Cairo.set_source_rgb ctx r g b;
+        Cairo.move_to ctx (float x1) (float y1);
+        Cairo.line_to ctx (float x2) (float y2);
+        Cairo.Path.close ctx;
+        (* Apply the ink *)
+        Cairo.stroke ctx)
   , fun () ->
-      let b = Buffer.create 10000 in
-      (* Output a PNG in a string *)
-      Cairo.PNG.write_to_stream surface (Buffer.add_string b);
-      Buffer.contents b )
+    let b = Buffer.create 10000 in
+    (* Output a PNG in a string *)
+    Cairo.PNG.write_to_stream surface (Buffer.add_string b);
+    Buffer.contents b )
 
 let%server _ = Lwt_stream.iter draw_server (Eliom_bus.stream bus)
 
@@ -90,17 +70,18 @@ let%server imageservice =
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () -> Lwt.return (image_string (), "image/png"))
 
-let%server image_elt =
-  Html.D.img ~alt:"canvas" ~src:(Html.D.make_uri ~service:imageservice ()) ()
+let%client draw ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
+  let color = CSS.Color.string_of_t (CSS.Color.rgb r g b) in
+  ctx##.strokeStyle := (Js.string color);
+  ctx##.lineWidth := float size;
+  ctx##beginPath;
+  ctx##(moveTo (float x1) (float y1));
+  ctx##(lineTo (float x2) (float y2));
+  ctx##stroke
 
-let%server canvas_elt : canvas =
-  let open Html.D in
-  canvas
-    ~a:[a_width width; a_height height; a_class ["undercanvas"]]
-    [Html.D.txt "your browser doesn't support canvas"; Html.D.br (); image_elt]
-
-let%server canvas2_elt : canvas =
-  Html.D.(canvas ~a:[a_width width; a_height height; a_class ["overcanvas"]] [])
+let%server canvas_elt =
+  Html.D.canvas ~a:[Html.D.a_width width; Html.D.a_height height]
+    [Html.D.txt "your browser doesn't support canvas"]
 
 let%server slider =
   Eliom_content.Html.D.Form.input
@@ -114,7 +95,7 @@ let%server slider =
 
 let%server page () =
   let colorpicker, cp_sig =
-    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]]
+    Ot_color_picker.make ~a:[Html.D.a_class ["colorpicker"]] ()
   in
   ( Html.D.html
       (Html.D.head
@@ -122,39 +103,41 @@ let%server page () =
          [ Html.D.css_link
              ~uri:
                (Html.D.make_uri
-                  (Eliom_service.static_dir ())
+                  ~service:(Eliom_service.static_dir ())
                   ["css"; "graffiti.css"])
              ()
          ; Html.D.css_link
              ~uri:
                (Html.D.make_uri
-                  (Eliom_service.static_dir ())
+                  ~service:(Eliom_service.static_dir ())
                   ["css"; "ot_color_picker.css"])
              () ])
-      (Html.D.body [Html.D.div [canvas_elt; canvas2_elt]; slider; colorpicker])
+      (Html.D.body [canvas_elt; slider; colorpicker])
   , cp_sig )
 
-let%client init_client ~cp_sig =
-  let canvas = Html.To_dom.of_canvas ~%canvas_elt in
-  let ctx = canvas ## (getContext Dom_html._2d_) in
+let%client init_client ~cp_sig () =
+
+  let canvas = Eliom_content.Html.To_dom.of_canvas ~%canvas_elt in
+  let ctx = canvas##(getContext (Dom_html._2d_)) in
   ctx##.lineCap := Js.string "round";
-  (* Another canvas, for second layer *)
-  let canvas2 = Html.To_dom.of_canvas ~%canvas2_elt in
-  let ctx2 = canvas2 ## (getContext Dom_html._2d_) in
-  ctx2##.lineCap := Js.string "round";
+
   (* The initial image: *)
-  let img = Html.To_dom.of_img ~%image_elt in
-  let copy_image () = ctx ## (drawImage img 0. 0.) in
-  if Js.to_bool img##.complete
-  then copy_image ()
-  else img##.onload := Dom_html.handler (fun ev -> copy_image (); Js._false);
+  let img = Eliom_content.Html.To_dom.of_img
+      (Html.D.img ~alt:"canvas"
+         ~src:(Html.D.make_uri ~service:~%imageservice ())
+         ())
+  in
+  img##.onload := Dom_html.handler (fun ev ->
+      ctx##drawImage img 0. 0.; Js._false);
+
   let x = ref 0 and y = ref 0 in
+
   let set_coord ev =
     let x0, y0 = Dom_html.elementClientPosition canvas in
-    x := ev##.clientX - x0;
-    y := ev##.clientY - y0
+    x := ev##.clientX - x0; y := ev##.clientY - y0
   in
-  let compute_line set_coord x y ev =
+
+  let compute_line ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
     let size_slider = Eliom_content.Html.To_dom.of_input ~%slider in
@@ -162,54 +145,34 @@ let%client init_client ~cp_sig =
     let h, s, v = Eliom_shared.React.S.value cp_sig in
     let r, g, b = Ot_color_picker.hsv_to_rgb h s v in
     let rgb = int_of_float r, int_of_float g, int_of_float b in
-    rgb, size, (oldx, oldy), (!x, !y)
+    (rgb, size, (oldx, oldy), (!x, !y))
   in
-  let bus = ~%bus in
+
   let line ev =
-    let v = compute_line set_coord x y ev in
-    let _ = Eliom_bus.write bus v in
-    draw ctx v; Lwt.return ()
-  in
-  ignore
-    ( Lwt.catch
-        (fun () -> Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus))
-        (function
-          | e (* Eliom_comet.Channel_full *) ->
-              Js_of_ocaml.Firebug.console ## (log e);
-              Eliom_client.exit_to ~service:Eliom_service.reload_action () ();
-              Lwt.return ()) );
-  (let open Lwt_js_events in
-  async (fun () ->
-      mousedowns canvas2 (fun ev elt ->
-          Dom.preventDefault ev;
-          set_coord ev;
-          let%lwt () = line ev in
-          Lwt.pick
-            [ mousemoves Dom_html.document (fun a _ -> line a)
-            ; (let%lwt ev = mouseup Dom_html.document in
-               line ev) ])));
-  (* The brush *)
-  ctx2##.globalCompositeOperation := Js.string "copy";
-  let x, y, size = ref 0, ref 0, ref 0 in
-  let set_coord ev =
-    let x0, y0 = Dom_html.elementClientPosition canvas2 in
-    x := ev##.clientX - x0;
-    y := ev##.clientY - y0
-  in
-  let brush ev _ =
-    let color, newsize, oldv, v = compute_line set_coord x y ev in
-    draw ~alpha:0. ctx2 ((0, 0, 0), !size + 3, oldv, oldv);
-    size := newsize;
-    draw ctx2 (color, newsize, v, v);
+    let v = compute_line ev in
+    let _ = Eliom_bus.write ~%bus v in
+    draw ctx v;
     Lwt.return ()
   in
-  ignore Lwt_js_events.(async (fun () -> mousemoves Dom_html.document brush))
+
+  Lwt.async (fun () ->
+      let open Lwt_js_events in
+      mousedowns canvas
+        (fun ev _ ->
+           set_coord ev;
+           let%lwt () = line ev in
+           Lwt.pick
+             [mousemoves Dom_html.document (fun x _ -> line x);
+              let%lwt ev = mouseup Dom_html.document in line ev]));
+
+  Lwt.async (fun () -> Lwt_stream.iter (draw ctx) (Eliom_bus.stream ~%bus))
 
 let%server main_service =
-  Graffiti_appl.create
+  Graffiti_app.create
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)
     (fun () () ->
-      let page, cp_sig = page () in
-      ignore [%client (init_client ~cp_sig:~%cp_sig : unit)];
-      Lwt.return page)
+       (* Cf. section "Client side side-effects on the server" *)
+       let page, cp_sig = page () in
+       let _ = [%client (init_client ~cp_sig:~%cp_sig () : unit) ] in
+       Lwt.return page)
