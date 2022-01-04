@@ -1,4 +1,3 @@
-
 #----------------------------------------------------------------------
 #           SETTINGS FOR THE ELIOM PROJECT graffiti
 #----------------------------------------------------------------------
@@ -6,9 +5,9 @@
 PROJECT_NAME := graffiti
 
 FILES :=     server_tools.eliom		\
-      	     server_service.eliom	\
+	     server_service.eliom	\
 	     shared_tools.eliom		\
-      	     server_image.eliom		\
+	     server_image.eliom		\
 	     client_js_tools.eliom	\
 	     client_js_tools.eliomi	\
 	     client_event_tools.eliom	\
@@ -18,7 +17,7 @@ FILES :=     server_tools.eliom		\
 	     grf_slider.eliom		\
 	     grf_slider.eliomi		\
 	     client_tools.eliom		\
-      	     server_html.eliom		\
+	     server_html.eliom		\
 	     client_mobile.eliom	\
 	     client_phonegap.eliom	\
 	     client_phonegap.eliomi	\
@@ -39,11 +38,11 @@ CLIENT_FILES := $(wildcard $(FILES)) \
 
 # OCamlfind packages for the server
 SERVER_PACKAGES := cairo2 ocsigen-toolkit.server \
-                       js_of_ocaml.deriving lwt_ppx
+		       js_of_ocaml.deriving lwt_ppx
 
 # OCamlfind packages for the client
 CLIENT_PACKAGES := ocsigen-toolkit.client \
-                       js_of_ocaml-ppx js_of_ocaml.deriving lwt_ppx
+		       js_of_ocaml-ppx js_of_ocaml.deriving lwt_ppx
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

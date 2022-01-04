@@ -88,7 +88,7 @@ let launch_client_canvas bus image_elt canvas_elt slider =
         set_coord ev;
         let%lwt () = line ev in
         Lwt.pick [mousemoves Dom_html.document (fun a _ -> line a);
-	          let%lwt ev = mouseup Dom_html.document in line ev]))
+                  let%lwt ev = mouseup Dom_html.document in line ev]))
   in
   { message_thread = t;
     drawing_thread = drawing_thread }

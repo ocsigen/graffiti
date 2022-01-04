@@ -1,4 +1,3 @@
-
 #----------------------------------------------------------------------
 #           SETTINGS FOR THE ELIOM PROJECT graffiti
 #----------------------------------------------------------------------
@@ -14,7 +13,7 @@ CLIENT_FILES := $(wildcard *.eliomi *.eliom)
 SERVER_PACKAGES := ocsigen-toolkit.server cairo2 unix js_of_ocaml-ppx_deriving_json
 # OCamlfind packages for the client
 CLIENT_PACKAGES := ocsigen-toolkit.client react js_of_ocaml-ppx \
-                   lwt_ppx js_of_ocaml-lwt js_of_ocaml-ppx_deriving_json
+		   lwt_ppx js_of_ocaml-lwt js_of_ocaml-ppx_deriving_json
 
 # Directory with files to be statically served
 LOCAL_STATIC = static

@@ -104,14 +104,14 @@ let rec entries name list = function
     | [] -> []
     | (n,saved)::q ->
       let title = Atom_feed.plain
-	  ("graffiti " ^ name ^ " " ^ (string_of_int n)) in
+          ("graffiti " ^ name ^ " " ^ (string_of_int n)) in
       let uri =
-	Html.D.make_uri ~absolute:true
-	  ~service:(Eliom_service.static_dir ())
-	  (local_filename name n)
+        Html.D.make_uri ~absolute:true
+          ~service:(Eliom_service.static_dir ())
+          (local_filename name n)
       in
       let entry =
-	Atom_feed.entry ~title ~id:(Xml.string_of_uri uri) ~updated:saved
+        Atom_feed.entry ~title ~id:(Xml.string_of_uri uri) ~updated:saved
           [Atom_feed.html5C [ Html.F.img ~src:uri ~alt:"image" ()]] in
       entry::(entries name q (len - 1))
 

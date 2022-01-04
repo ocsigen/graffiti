@@ -77,9 +77,9 @@ let imageservice =
     (fun (name,_) () ->
       try%lwt
         let _ ,image_string = Hashtbl.find graffiti_info name in
-	Lwt.return (image_string (), "image/png")
+        Lwt.return (image_string (), "image/png")
       with
-	| Not_found -> [%lwt raise Eliom_common.Eliom_404])
+        | Not_found -> [%lwt raise Eliom_common.Eliom_404])
 
 let get_bus (name:string) =
   (* create a new bus and image_string function only if it did not exists *)
@@ -155,8 +155,8 @@ let () = Eliom_registration.Action.register
   (fun () (name, password) ->
     match%lwt check_pwd name password with
       | true -> Eliom_state.set_volatile_data_session_group
-	~scope:Eliom_common.default_session_scope name;
-	Lwt.return ()
+        ~scope:Eliom_common.default_session_scope name;
+        Lwt.return ()
       | false -> Lwt.return ())
 
 let () =
@@ -200,17 +200,17 @@ let make_page body =
   Lwt.return
     (Html.D.html
        (Html.D.head
-	  (Html.D.title (Html.D.pcdata "Graffiti"))
- 	  [
-	    Html.D.css_link
-	      ~uri:(Html.D.Raw.uri_of_string"./css/closure/common.css") ();
-	    Html.D.css_link
-	      ~uri:(Html.D.Raw.uri_of_string"./css/closure/hsvpalette.css") ();
-	    Html.D.css_link
-	      ~uri:(Html.D.Raw.uri_of_string"./css/slider.css") ();
+          (Html.D.title (Html.D.pcdata "Graffiti"))
+          [
+            Html.D.css_link
+              ~uri:(Html.D.Raw.uri_of_string"./css/closure/common.css") ();
+            Html.D.css_link
+              ~uri:(Html.D.Raw.uri_of_string"./css/closure/hsvpalette.css") ();
+            Html.D.css_link
+              ~uri:(Html.D.Raw.uri_of_string"./css/slider.css") ();
             oclosure_script;
-	    Html.D.css_link
-	      ~uri:(Html.D.Raw.uri_of_string"./css/graffiti.css") ();
+            Html.D.css_link
+              ~uri:(Html.D.Raw.uri_of_string"./css/graffiti.css") ();
           ])
        (Html.D.body body))
 
@@ -229,8 +229,8 @@ struct
   let translate page =
     match Eliom_state.get_volatile_data_session_group
       ~scope:Eliom_common.default_session_scope () with
-	| None -> default_content ()
-	| Some username -> page username
+        | None -> default_content ()
+        | Some username -> page username
 end
 
 module Connected =
