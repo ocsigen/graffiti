@@ -1,0 +1,46 @@
+name: Main workflow
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 13 * * 1" # Every Monday at 1PM UTC
+    # https://jasonet.co/posts/scheduled-actions/
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ocaml-compiler:
+          - 4.13.x
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+
+      # ideally it should be done by `opam install . --deps-only` but right now
+      # we have opam 1.x in the repo, and I'm not very optimistic to even try it
+      - run: opam depext conf-dbm -y
+      - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm -y
+
+      - name: Compiling simple
+        run: opam exec -- make -C simple all
+
+      # first call of make fails, it should be fixed somehow
+      - name: Compiling extended
+        run: |
+          opam exec -- make -C extended all || echo "Attempt 1 fails somehow"
+          opam exec -- make -C extended all
+
+      - name: Compiling web_app
+        run: opam exec -- make -C webapp all
