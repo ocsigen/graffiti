@@ -19,6 +19,7 @@
  *)
 
 open Common
+open Js_of_ocaml
 open Eliom_content
 
 let draw ctx ((r, g, b), size, (x1, y1), (x2, y2)) =
@@ -58,9 +59,8 @@ let launch_client_canvas bus image_elt canvas_elt slider =
 
 
   (* The color palette: *)
-  let colorpicker = Ow_color_picker.create ~width:150 () in
-  Ow_color_picker.append_at (Dom_html.document##.body) colorpicker;
-  Ow_color_picker.init_handler colorpicker;
+  let colorpicker, cp_sig = Ot_color_picker.make () in
+  Html.(Manip.appendChild (Manip.Elt.body ()) colorpicker);
 
   let x = ref 0 and y = ref 0 in
   let set_coord ev =
@@ -69,7 +69,9 @@ let launch_client_canvas bus image_elt canvas_elt slider =
   let compute_line ev =
     let oldx = !x and oldy = !y in
     set_coord ev;
-    let rgb = Ow_color_picker.get_rgb colorpicker in
+    let h, s, v = Eliom_shared.React.S.value cp_sig in
+    let r, g, b = Ot_color_picker.hsv_to_rgb h s v in
+    let rgb = int_of_float r, int_of_float g, int_of_float b in
     let size_slider = Html.To_dom.of_input slider in
     let size = int_of_string (Js.to_string size_slider##.value) in
     (rgb, size, (oldx, oldy), (!x, !y))
@@ -82,7 +84,7 @@ let launch_client_canvas bus image_elt canvas_elt slider =
   in
   let t = Lwt_stream.iter (draw ctx) (Eliom_bus.stream bus) in
   let drawing_thread =
-    Lwt_js_events.(
+    Js_of_ocaml_lwt.Lwt_js_events.(
       mousedowns canvas (fun ev elt ->
         Dom.preventDefault ev;
         set_coord ev;

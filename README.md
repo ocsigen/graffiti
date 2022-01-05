@@ -14,7 +14,7 @@ http://ocsigen.org/tuto/latest/manual/application
 Requirements
 ------------
 
-    opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm
+    opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm syndic
 
 Usage
 -----
