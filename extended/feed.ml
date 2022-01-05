@@ -116,21 +116,6 @@ let rec entries name list = function
       entry::(entries name q (len - 1))
 
 let feed name () =
-  let id = Xml.string_of_uri (Html.D.make_uri ~absolute:true
-                                ~service:feed_service name) in
-  let title = Atom_feed.plain ("nice drawings of " ^ name) in
-  try%lwt
-    let%lwt image_info_table = image_info_table in
-    Ocsipersist.find image_info_table name >|=
-    (fun (number,updated,list) ->
-       Atom_feed.feed ~id ~updated ~title (entries name list 10))
-  with
-  | Not_found ->
-    let now = CalendarLib.Calendar.now () in
-    Lwt.return (Atom_feed.feed ~id ~updated:now ~title [])
-  | e -> Lwt.fail e
-
-let feed name () =
   let id = Xml.string_of_uri (Html.D.make_uri ~absolute:true ~service:feed_service name) in
   let title = Atom_feed.plain ("nice drawings of " ^ name) in
   Lwt.catch
