@@ -205,12 +205,7 @@ let make_page body =
     (Html.D.html
        (Html.D.head
           (Html.D.title (Html.D.txt "Graffiti"))
-          [
-            Html.D.css_link
-              ~uri:(Html.D.Raw.uri_of_string"./css/closure/common.css") ();
-            Html.D.css_link
-              ~uri:(Html.D.Raw.uri_of_string"./css/closure/hsvpalette.css") ();
-            Html.D.css_link
+          [ Html.D.css_link
               ~uri:(Html.D.Raw.uri_of_string"./css/slider.css") ();
             oclosure_script;
             Html.D.css_link
