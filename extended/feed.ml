@@ -117,10 +117,10 @@ let rec entries name list = function
         Syndic.Atom.entry ~content ~id:uri ~authors ~title ~updated:saved () in
       entry::(entries name q (len - 1))
 
-let feed_of_string_page xml =
-  xml
+let string_page_of_feed feed =
+  feed
   |> Syndic.Atom.to_xml
-  |> Syndic.XML.to_string
+  |> Syndic.XML.to_string ~ns_prefix:(fun x -> Some x)
   |> fun string -> string, ""
 
 let feed name () =
@@ -136,11 +136,11 @@ let feed name () =
        Ocsipersist.Polymorphic.find image_info_table name >|=
       (fun (number,updated,list) ->
          Syndic.Atom.feed ~id ~updated ~title (entries name list 10)
-       |> feed_of_string_page))
+       |> string_page_of_feed))
     ( function Not_found ->
       let now = Option.get (Ptime.of_float_s (Unix.gettimeofday ())) in
       Lwt.return (Syndic.Atom.feed ~id ~updated:now ~title []
-                  |> feed_of_string_page)
+                  |> string_page_of_feed)
              | e -> Lwt.fail e )
 
 let () = Eliom_registration.String.register ~service:feed_service feed
