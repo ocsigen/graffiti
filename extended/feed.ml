@@ -71,30 +71,24 @@ let save_image username =
   let (_,image_string) = Hashtbl.find graffiti_info username in
   save (image_string ()) username number
 
-let save_image_box =
-  let save_service_reference =
-    Eliom_reference.eref ~scope:Eliom_common.default_group_scope None in
-  fun name ->
-    let%lwt save_image_service =
-      match%lwt Eliom_reference.get save_service_reference with
-      | None ->
-        let service = Eliom_registration.Action.create
-            ~scope:Eliom_common.default_group_scope
-            ~meth:(Eliom_service.Post
-                     (Eliom_parameter.unit,
-                      Eliom_parameter.unit))
-            ~path:Eliom_service.No_path
-            (fun () () -> save_image name) in
-        let%lwt () = Eliom_reference.set save_service_reference (Some service) in
-        Lwt.return service
-      | Some service -> Lwt.return service
-    in
-    Lwt.return (
-      Html.D.Form.post_form ~service:save_image_service
-        (fun _ ->
-           [p [
-               Html.D.Form.input ~input_type:`Submit ~value:"save"
-                 Html.D.Form.string]]) ())
+let save_image_service =
+  Eliom_service.create
+    ~meth:(Eliom_service.Post
+             (Eliom_parameter.unit, Eliom_parameter.string "name"))
+    ~path:Eliom_service.No_path ()
+
+let () =
+  Eliom_registration.Action.register
+    ~service:save_image_service (fun () name -> save_image name)
+
+let save_image_box name =
+  Lwt.return
+    (Html.D.Form.post_form ~service:save_image_service
+       (fun param_name ->
+         [p [Html.D.Form.input ~input_type:`Hidden ~name:param_name
+              ~value:name Html.D.Form.string;
+             Html.D.Form.button_no_value ~button_type:`Submit [txt "save"]]])
+       ())
 
 let feed_service =
   Eliom_service.create
