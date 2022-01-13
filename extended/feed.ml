@@ -34,11 +34,19 @@ let static_dir =
     raise (Ocsigen_extensions.Error_in_config_file
              ("Unexpected content inside graffiti config"))
 
+let create_dir dir =
+  try%lwt Lwt_unix.mkdir dir 0o777 with
+  | Unix.Unix_error (Unix.EEXIST, "mkdir", _) -> Lwt.return_unit
+  | _ ->
+      Eliom_lib.debug "could not create the directory %s" dir;
+      Lwt.return_unit
+
 let image_dir name =
-  let dir = static_dir ^ "/graffiti_saved/" ^ (Eliom_lib.Url.encode name) in
-  (try%lwt Lwt_unix.mkdir dir 0o777 with
-   | _ -> Eliom_lib.debug "could not create the directory %s" dir; Lwt.return ())
-  >|= (fun () -> dir)
+  let dir = static_dir ^ "/graffiti_saved/" in
+  let%lwt () = create_dir dir in
+  let dir = dir ^ Eliom_lib.Url.encode name in
+  let%lwt () = create_dir dir in
+  Lwt.return dir
 
 let make_filename name number =
   image_dir name >|= ( fun dir -> (dir ^ "/" ^ (string_of_int number) ^ ".png") )
