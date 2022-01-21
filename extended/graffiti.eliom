@@ -62,19 +62,19 @@ let () =
         let canvas =
           Html.D.canvas
             ~a:[Html.D.a_width width; Html.D.a_height height ]
-            [ Html.D.pcdata "your browser doesn't support canvas";
+            [ Html.D.txt "your browser doesn't support canvas";
               Html.D.br (); image]
         in
         let%lwt save_box = if name = username
           then save_image_box name
-          else Lwt.return (Html.D.pcdata "no saving")
+          else Lwt.return (Html.D.txt "no saving")
         in
         start_drawing name image canvas slider;
         make_page
-          [ Html.D.h1 [ Html.D.pcdata name];
+          [ Html.D.h1 [ Html.D.txt name];
             disconnect_box ();
             choose_drawing_form ();
-            Html.D.a feed_service [Html.D.pcdata "atom feed"] name;
+            Html.D.a ~service:feed_service [Html.D.txt "atom feed"] name;
             Html.D.div [save_box];
             canvas;
             Html.D.div [slider]])

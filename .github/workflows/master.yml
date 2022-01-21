@@ -31,16 +31,10 @@ jobs:
       # ideally it should be done by `opam install . --deps-only` but right now
       # we have opam 1.x in the repo, and I'm not very optimistic to even try it
       - run: opam depext conf-dbm -y
-      - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm -y
+      - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm calendar syndic -y
 
       - name: Compiling simple
         run: opam exec -- make -C simple all
 
-      # first call of make fails, it should be fixed somehow
       - name: Compiling extended
-        run: |
-          opam exec -- make -C extended all || echo "Attempt 1 fails somehow"
-          opam exec -- make -C extended all
-
-      - name: Compiling web_app
-        run: opam exec -- make -C webapp all
+        run: opam exec -- make -C extended all
