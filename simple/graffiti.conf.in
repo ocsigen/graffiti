@@ -14,8 +14,10 @@
     %%DEBUGMODE%%
     <commandpipe>%%CMDPIPE%%</commandpipe>
     <extension findlib-package="ocsigenserver.ext.staticmod"/>
-    <extension findlib-package="ocsipersist.%%PERSISTENT_DATA_BACKEND%%"/>
+    <extension findlib-package="ocsipersist.dbm"/>
     <extension findlib-package="eliom.server"/>
+    <library findlib-package="cairo2"/>
+    <library findlib-package="ocsigen-toolkit.server"/>
     %%% This will include the packages defined as SERVER_PACKAGES in your Makefile:
     %%PACKAGES%%
     <host hostfilter="*">

@@ -19,7 +19,7 @@
 *)
 
 open%shared Eliom_content
-open%shared Js_of_ocaml
+open%client Js_of_ocaml
 open%client Js_of_ocaml_lwt
 
 module%server Graffiti_app =
@@ -29,8 +29,8 @@ module%server Graffiti_app =
     let global_data_path = None
   end)
 
-let%shared width  = 700
-let%shared height = 400
+let%server width  = 700
+let%server height = 400
 
 type%shared messages = ((int * int * int) * int * (int * int) * (int * int))
 [@@deriving json]
@@ -127,7 +127,7 @@ let%client init_client ~cp_sig () =
          ~src:(Html.D.make_uri ~service:~%imageservice ())
          ())
   in
-  img##.onload := Dom_html.handler (fun ev ->
+  img##.onload := Dom_html.handler (fun _ev ->
       ctx##drawImage img 0. 0.; Js._false);
 
   let x = ref 0 and y = ref 0 in
@@ -165,9 +165,9 @@ let%client init_client ~cp_sig () =
              [mousemoves Dom_html.document (fun x _ -> line x);
               let%lwt ev = mouseup Dom_html.document in line ev]));
 
-  Lwt.async (fun () -> Lwt_stream.iter (draw ctx) (Eliom_bus.stream ~%bus))
+  Lwt.async (fun () -> Lwt_stream.iter (draw ctx) (Eliom_bus.stream ~%(bus : (messages, messages) Eliom_bus.t)))
 
-let%server main_service =
+let%server _main_service =
   Graffiti_app.create
     ~path:(Eliom_service.Path [""])
     ~meth:(Eliom_service.Get Eliom_parameter.unit)

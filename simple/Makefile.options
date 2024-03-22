@@ -1,59 +1,79 @@
 #----------------------------------------------------------------------
 #           SETTINGS FOR THE ELIOM PROJECT graffiti
 #----------------------------------------------------------------------
+# Required binaries
+OPAM                  := opam
 
-PROJECT_NAME := graffiti
+PROJECT_NAME          := graffiti
 
-# Source files for the server
-SERVER_FILES := $(wildcard *.eliomi *.eliom)
-# Source files for the client
-CLIENT_FILES := $(wildcard *.eliomi *.eliom)
+##----------------------------------------------------------------------
+
+##----------------------------------------------------------------------
+## The following part contains the settings for the compilation process like the
+## server/client OPAM packages and the server/client files.
+
+# OCamlfind packages for the server (for modules which defines services)
+SERVER_ELIOM_PACKAGES :=
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := ocsigen-toolkit.server cairo2 unix js_of_ocaml-ppx_deriving_json
-# OCamlfind packages for the client
-CLIENT_PACKAGES := ocsigen-toolkit.client react js_of_ocaml-ppx \
-		   lwt_ppx js_of_ocaml-lwt js_of_ocaml-ppx_deriving_json
+SERVER_PACKAGES       := 
 
-# Directory with files to be statically served
-LOCAL_STATIC = static
+##----------------------------------------------------------------------
 
-# The backend for persistent data. Can be dbm or sqlite.
-PERSISTENT_DATA_BACKEND = dbm
+##----------------------------------------------------------------------
+## The following part contains the configuration for the ocsigenserver.
+
+# User to run server with (make run.*)
+WWWUSER               := www-data
+WWWGROUP              := www-data
+
+# Port for running the server (make run.*)
+PORT                  := 80
+
+# Port for testing (make test.*)
+TEST_PORT             := 8080
+
+# Root of installation (must end with /)
+PREFIX                := /usr/local/
+
+# Local folder for make test.* (must end with /)
+TEST_PREFIX           := local/
+
+## The installation tree (relative to $(PREFIX) when installing/running or
+## $(TEST_PREFIX) when testing).
+
+# Configuration file $(PROJECT_NAME).conf
+ETCDIR                := etc/${PROJECT_NAME}
+
+# Project's library $(PROJECT_NAME).cma (cmxs)
+LIBDIR                := lib/${PROJECT_NAME}
+
+# Command pipe, eg. $ echo restart > $(INSTALL_PREFIX)$(CMDPIPE)
+CMDPIPE               := var/run/${PROJECT_NAME}-cmd
+
+# Ocsigenserver's logging files
+LOGDIR                := var/log/${PROJECT_NAME}
+
+# Ocsigenserver's persistent data files
+DATADIR               := var/data/${PROJECT_NAME}
+
+# Project's static files
+FILESDIR              := var/www/${PROJECT_NAME}
+
+# Project's JavaScript file directory
+ELIOMSTATICDIR        := var/www/${PROJECT_NAME}
+
+LOCAL_STATIC          := static
+LOCAL_STATIC_CSS      := $(LOCAL_STATIC)/css
+CSS_PREFIX            := $(LOCAL_STATIC_CSS)/${PROJECT_NAME}
+##----------------------------------------------------------------------
+
+
+##----------------------------------------------------------------------
+## The following part contains the settings for debugging
 
 # Debug application (yes/no): Debugging info in compilation,
 # JavaScript, ocsigenserver
-DEBUG := no
+DEBUG                 := yes
 
-# User to run server with (make run.*)
-WWWUSER ?= www-data
-WWWGROUP ?= www-data
-
-# Port for running the server (make run.*)
-PORT := 80
-
-# Port for testing (make test.*)
-TEST_PORT := 8080
-
-# Root of installation (must end with /)
-PREFIX ?= /usr/local/
-
-# Local folder for make test.* (must end with /)
-TEST_PREFIX := local/
-
-# The installation tree (relative to $(PREFIX) when
-# installing/running or $(TEST_PREFIX) when testing).
-# Configuration file $(PROJECT_NAME).conf
-ETCDIR := etc/${PROJECT_NAME}
-# Project's library $(PROJECT_NAME).cma (cmxs)
-LIBDIR := lib/${PROJECT_NAME}
-# Command pipe, eg. $ echo restart > $(INSTALL_PREFIX)$(CMDPIPE)
-CMDPIPE := var/run/${PROJECT_NAME}-cmd
-# Ocsigenserver's logging files
-LOGDIR := var/log/${PROJECT_NAME}
-# Ocsigenserver's persistent data files
-DATADIR := var/data/${PROJECT_NAME}
-# Copy of $(LOCAL_STATIC)
-STATICDIR := var/www/${PROJECT_NAME}/static
-# Project's JavaScript file
-ELIOMSTATICDIR := var/www/${PROJECT_NAME}/eliom
+##----------------------------------------------------------------------
