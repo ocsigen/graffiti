@@ -19,6 +19,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: "4.14"
+          dune-cache: true
           allow-prerelease-opam: true
 
       # ideally it should be done by `opam install . --deps-only` but right now
@@ -26,7 +27,7 @@ jobs:
       - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm calendar syndic conf-dbm
 
       - name: Compiling simple
-        run: opam exec -- make all
+        run: opam exec -- dune build @all
         working-directory: simple
 
       - name: Compiling extended
