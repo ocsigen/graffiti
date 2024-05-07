@@ -24,7 +24,7 @@ jobs:
 
       # ideally it should be done by `opam install . --deps-only` but right now
       # we have opam 1.x in the repo, and I'm not very optimistic to even try it
-      - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm calendar syndic conf-dbm
+      - run: opam install cairo2 calendar conf-dbm eliom ocsigen-ppx-rpc ocsigen-toolkit ocsipersist-dbm pgocaml_ppx syndic
 
       - name: Compiling simple
         run: opam exec -- dune build @all
