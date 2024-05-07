@@ -26,7 +26,9 @@ jobs:
       - run: opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm calendar syndic conf-dbm
 
       - name: Compiling simple
-        run: opam exec -- make -C simple all
+        run: opam exec -- make all
+        working-directory: simple
 
       - name: Compiling extended
-        run: opam exec -- make -C extended all
+        run: opam exec -- make all
+        working-directory: extended
