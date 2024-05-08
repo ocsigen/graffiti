@@ -27,7 +27,7 @@ jobs:
       - run: opam install cairo2 calendar conf-dbm eliom ocsigen-i18n ocsigen-ppx-rpc ocsigen-toolkit ocsipersist-dbm pgocaml_ppx syndic
 
       - name: Compiling simple
-        run: opam exec -- dune build @all
+        run: opam exec -- make all
         working-directory: simple
 
       - name: Compiling extended
