@@ -27,9 +27,7 @@ jobs:
       - run: opam install cairo2 calendar conf-dbm eliom ocsigen-i18n ocsigen-ppx-rpc ocsigen-toolkit ocsipersist-dbm pgocaml_ppx syndic
 
       - name: Compiling simple
-        run: opam exec -- make all
-        working-directory: simple
+        run: opam exec -- make -C simple all
 
       - name: Compiling extended
-        run: opam exec -- make all
-        working-directory: extended
+        run: opam exec -- make -C extended all
