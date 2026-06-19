@@ -3,6 +3,8 @@ name: Main workflow
 on:
   pull_request:
   push:
+    branches:
+      - master
   schedule:
     - cron: "0 13 * * 1" # Every Monday at 1PM UTC
     # https://jasonet.co/posts/scheduled-actions/
