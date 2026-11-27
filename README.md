@@ -7,17 +7,30 @@
 
 ## Graffiti is a collaborative drawing application.
 
-For more information, see:
+It is the example application of the Ocsigen tutorial, for Eliom 13:
 
-http://ocsigen.org/tuto/latest/manual/application
+- `simple/`: the application of the tutorial
+  [Writing a client/server Eliom application](https://ocsigen.org/tuto/latest/application.html),
+- `extended/`: the multi-user version of the tutorial
+  [Traditional web interaction in a client-server app](https://ocsigen.org/tuto/latest/misc.html).
+
+Both were created with `eliom-distillery -template app`.
 
 Requirements
 ------------
 
-    opam install eliom ocsigen-toolkit cairo2 ocsipersist-dbm syndic
+Binaryen 120 or later (to compile the client to WebAssembly), then, from
+the directory of the application:
+
+    opam install --deps-only .
 
 Usage
 -----
 
-Run "make test.opt" or "make test.byte" inside any of the three
-directories (simple, extended, web_app).
+From the directory of the application:
+
+    dune build
+    dune exec graffiti
+
+and go to http://localhost:8080/. See the `README.md` file of each
+application for the other ways to run it.

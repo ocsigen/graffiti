@@ -1,0 +1,11 @@
+(executable
+ (public_name graffiti)
+ (name main)
+ (package graffiti)
+ (modes byte native)
+ (libraries
+  eliom.server
+  ocsigenserver
+  ocsipersist-sqlite
+  ocsigenserver.ext.staticmod
+  graffiti))
