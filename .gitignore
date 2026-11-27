@@ -1,0 +1,6 @@
+_build/
+*.install
+*/local/var/www/
+*/local/var/log/*/*.log
+*/local/var/data/*/ocsidb*
+*/local/var/run/*-cmd
