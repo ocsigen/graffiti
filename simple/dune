@@ -1,32 +1,69 @@
-(dirs tools client assets)
+; To run the application locally, in your own executable:
+;  dune build
+;  dune exec graffiti
+; or with the ocsigenserver command:
+;  dune build
+;  dune exec -- ocsigenserver -c graffiti.conf
+;
+; The initial 'dune build' is needed to update the generated files in local/
+; and, for the ocsigenserver command, the libraries that it loads.
 
-(executables
-    (names graffiti)
-    (modes (byte plugin) (native plugin))
-    (libraries eliom.server ocsipersist.dbm cairo2 ocsigen-toolkit.server)
-    (preprocess
-       (pps
-           lwt_ppx
-           pgocaml_ppx
-           js_of_ocaml-ppx_deriving_json
-           ocsigen-i18n
-           ocsigen-ppx-rpc --rpc-raw
-           eliom.ppx.server
-           -- --prefix Graffiti_ --suffix _i18n --default-module Graffiti_i18n
-       )
-    )
-  )
-
-(rule (target graffiti_i18n.eliom) (deps assets/graffiti_i18n.tsv)
+(subdir
+ local/var/www/graffiti
+ (rule
+  (mode promote)
   (action
-    (with-stdout-to %{target}
-      (with-stdin-from %{deps}
-        (pipe-stdout
-          (run ocsigen-i18n-generator --languages en,fr --default-language fr %{deps})
-          (run sed "1 s/]/[@@deriving json]]\\n[%%shared [@@@ocaml.warning\"-27\"]]/"))))))
+   (copy %{workspace_root}/app/client/graffiti.bc.js graffiti.js)))
+ (rule
+  (mode promote)
+  ; Depend on assets dir as it's not build by default
+  (deps graffiti.bc.wasm.assets)
+  (action
+   (copy
+    %{workspace_root}/app/client/graffiti.bc.wasm.js
+    graffiti.wasm.js)))
+ (rule
+  (mode promote)
+  ; Name is hardcoded into compiled wasm files
+  (targets
+   (dir graffiti.bc.wasm.assets))
+  (deps %{workspace_root}/app/client/graffiti.bc.wasm.assets)
+  (action
+   (run cp -r %{deps} .)))
+ (subdir
+  css
+  (rule
+   (mode promote)
+   (action
+    (copy %{workspace_root}/static/css/graffiti.css graffiti.css)))
+  (rule
+   (mode promote)
+   (action
+    (copy
+     %{workspace_root}/static/css/ot_color_picker.css
+     ot_color_picker.css)))))
 
-(rule (alias graffiti)
-   (deps graffiti.cma client/graffiti.bc client/graffiti.bc.js tools/check_modules.ml)
-   (action (run ocaml tools/check_modules.ml graffiti)))
+; Install the www directory
 
-(env (_ (flags (:standard -w -9-37-39))))
+(install
+ (section share)
+ (package graffiti)
+ (files
+  (app/client/graffiti.bc.js as www/graffiti.js)
+  (app/client/graffiti.bc.wasm.js as www/graffiti.wasm.js)
+  ; It seems that we can't change the wasm assets directory name
+  (glob_files_rec
+   (app/client/graffiti.bc.wasm.assets/**
+    with_prefix
+    www/graffiti.bc.wasm.assets))
+  (glob_files_rec
+   (static/** with_prefix www))))
+
+; js_of_ocaml-ppx_deriving_json 6.5 binds the functions it generates with
+; let rec, which triggers warning 39 (unused rec flag) for non-recursive
+; types. Remove this when js_of_ocaml-ppx_deriving_json silences it.
+
+(env
+ (dev
+  (flags
+   (:standard -w -39))))
